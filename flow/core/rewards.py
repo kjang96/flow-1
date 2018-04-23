@@ -90,7 +90,7 @@ def min_delay(env):
     destinations.
     """
 
-    vel = np.array(env.vehicles.get_speed())
+    vel = np.array(env.vehicles.get_speed(None))
 
     vel = vel[vel >= -1e-6]
     v_top = env.max_speed

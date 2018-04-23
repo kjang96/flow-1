@@ -92,7 +92,7 @@ class GreenWaveEnv(Env):
         edge_num = Box(low=0., high=1, shape=(self.vehicles.num_vehicles,),
                        dtype=np.float32)
         traffic_lights = Box(low=0., high=np.inf,
-                             shape=(3 * self.rows * self.cols),
+                             shape=(3 * self.rows * self.cols,),
                              dtype=np.float32)
         return Tuple((speed, dist_to_intersec, edge_num, traffic_lights))
 

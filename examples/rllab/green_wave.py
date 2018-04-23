@@ -1,6 +1,3 @@
-"""
-IN PROGRESS
-"""
 from rllab.envs.normalized_env import normalize
 from rllab.misc.instrument import run_experiment_lite
 from rllab.algos.trpo import TRPO
@@ -87,7 +84,7 @@ def run_task(*_):
     vehicles = Vehicles()
     vehicles.add(veh_id="idm",
                  acceleration_controller=(SumoCarFollowingController, {}),
-                 sumo_car_following_params=SumoCarFollowingParams(minGap=2.5),
+                 sumo_car_following_params=SumoCarFollowingParams(minGap=2.5, tau=1.1),
                  routing_controller=(GridRouter, {}),
                  num_vehicles=tot_cars,
                  speed_mode="all_checks")
@@ -116,8 +113,6 @@ def run_task(*_):
     env = GymEnv(env_name, record_video=False, register_params=pass_params)
     horizon = env.horizon
     env = normalize(env)
-
-    logging.info("Experiment Set Up complete")
 
     policy = GaussianMLPPolicy(
         env_spec=env.spec,
