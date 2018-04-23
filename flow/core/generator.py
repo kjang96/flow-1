@@ -104,7 +104,6 @@ class Generator(Serializable):
         cfgfn = "%s.netccfg" % self.name
         netfn = "%s.net.xml" % self.name
         confn = "%s.con.xml" % self.name
-
         # specify the attributes of the nodes
         nodes = self.specify_nodes(net_params)
 
@@ -234,6 +233,40 @@ class Generator(Serializable):
         for (edge, route) in self.rts.items():
             add.append(E("route", id="route%s" % edge, edges=" ".join(route)))
 
+        if "tl_logic" in net_params.additional_params and \
+            net_params.additional_params["tl_logic"].baseline:
+
+            tl_logic = net_params.additional_params["tl_logic"].actuated_default()
+
+            tl_type = str(tl_logic["tl_type"])
+            program_id = str(tl_logic["program_id"])
+            phases = tl_logic["phases"]
+            max_gap = str(tl_logic["max_gap"])
+            detector_gap = str(tl_logic["detector_gap"])
+            show_detectors = tl_logic["show_detectors"]
+
+            detectors = {"key": "detector-gap", "value": detector_gap}
+            gap = {"key": "max-gap", "value": max_gap}
+
+            if show_detectors:
+                show_detectors = {"key": "show-detectors", "value": "true"}
+            else:
+                show_detectors = {"key": "show-detectors", "value": "false"}
+
+            nodes = self.specify_tll(net_params)
+            tll = []
+            for node in nodes: 
+                tll.append({"id" :node['id'], "type": tl_type, "programID": program_id})
+                
+            for elem in tll:
+                e = E("tlLogic", **elem)
+                e.append(E("param", **show_detectors))
+                e.append(E("param", **gap))
+                e.append(E("param", **detectors))
+                for phase in phases:
+                    e.append(E("phase", **phase))
+                add.append(e)
+                    
         printxml(add, self.cfg_path + addfn)
 
         gui = E("viewsettings")

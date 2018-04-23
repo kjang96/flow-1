@@ -6,6 +6,7 @@ from rllab.policies.gaussian_mlp_policy import GaussianMLPPolicy
 from rllab.envs.gym_env import GymEnv
 
 from flow.core.vehicles import Vehicles
+from flow.core.traffic_lights import TrafficLights
 from flow.core.params import SumoParams, EnvParams, InitialConfig, NetParams, \
     InFlows
 from flow.core.params import SumoCarFollowingParams
@@ -88,6 +89,8 @@ def run_task(*_):
                  routing_controller=(GridRouter, {}),
                  num_vehicles=tot_cars,
                  speed_mode="all_checks")
+    
+    tl_logic = TrafficLights(baseline=True)
 
     additional_env_params = {"target_velocity": 50, "num_steps": 500,
                              "control-length": 150, "switch_time": 3.0}
@@ -96,7 +99,7 @@ def run_task(*_):
 
     additional_net_params = {"speed_limit": 35, "grid_array": grid_array,
                              "horizontal_lanes": 1, "vertical_lanes": 1,
-                             "traffic_lights": True}
+                             "traffic_lights": True, "tl_logic": tl_logic}
 
     initial_config, net_params = get_non_flow_params(10, additional_net_params)
 

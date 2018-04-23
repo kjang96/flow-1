@@ -3,7 +3,7 @@ import traci.constants as tc
 
 class TrafficLights:
 
-    def __init__(self):
+    def __init__(self, baseline=False):
         """
         Base traffic light class used to place traffic lights in the network
         and describe the state of these traffic lights. In addition, this class
@@ -13,6 +13,9 @@ class TrafficLights:
         self.__ids = list()  # names of nodes with traffic lights
         self.__tls_properties = dict()  # traffic light xml properties
         self.num_traffic_lights = 0  # number of traffic light nodes
+        self.baseline = baseline
+            
+
 
     def add(self,
             node_id,
@@ -128,3 +131,29 @@ class TrafficLights:
             Element = state of the traffic light at that node/lane
         """
         return self.__tls[node_id][tc.TL_RED_YELLOW_GREEN_STATE]
+
+    def actuated_default(self):
+        """
+        Returns the default values to be used for the generator
+        for a system where all junctions are actuated traffic lights.
+        
+        Returns 
+        _______
+        tl_logic: dict
+        """
+        tl_type = "actuated"
+        program_id = 1
+        max_gap = 3.0
+        detector_gap = 0.8
+        show_detectors = True
+        phases = [{"duration": "31", "minDur": "8", "maxDur": "45", "state": "GGGrrrGGGrrr"},
+                {"duration": "6", "minDur": "3", "maxDur": "6", "state": "yyyrrryyyrrr"},
+                {"duration": "31", "minDur": "8", "maxDur": "45", "state": "rrrGGGrrrGGG"},
+                {"duration": "6", "minDur": "3", "maxDur": "6", "state": "rrryyyrrryyy"}]
+
+        return {"tl_type": str(tl_type),
+                "program_id": str(program_id),
+                "max_gap": str(max_gap),
+                "detector_gap": str(detector_gap),
+                "show_detectors": show_detectors,
+                "phases": phases}
