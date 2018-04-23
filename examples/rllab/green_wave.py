@@ -80,7 +80,7 @@ def run_task(*_):
                   "cars_top": num_cars_top, "cars_bot": num_cars_bot}
 
     sumo_params = SumoParams(sim_step=1,
-                             sumo_binary="sumo-gui")
+                             sumo_binary="sumo")
 
     vehicles = Vehicles()
     vehicles.add(veh_id="idm",
@@ -90,7 +90,7 @@ def run_task(*_):
                  num_vehicles=tot_cars,
                  speed_mode="all_checks")
     
-    tl_logic = TrafficLights(baseline=True)
+    tl_logic = TrafficLights(baseline=False)
 
     additional_env_params = {"target_velocity": 50, "num_steps": 500,
                              "control-length": 150, "switch_time": 3.0}
@@ -109,7 +109,8 @@ def run_task(*_):
                                   net_params=net_params,
                                   initial_config=initial_config)
 
-    env_name = "GreenWaveEnv"
+    env_name = "PO_TrafficLightGridEnv"
+    # env_name = "TrafficLightGridEnv"
     pass_params = (env_name, sumo_params, vehicles, env_params, net_params,
                    initial_config, scenario)
 

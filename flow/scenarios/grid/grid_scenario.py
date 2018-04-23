@@ -125,10 +125,10 @@ class SimpleGridScenario(Scenario):
     def gen_even_start_pos(self, initial_config, num_vehicles, **kwargs):
         row_num = self.grid_array["row_num"]
         col_num = self.grid_array["col_num"]
-        num_cars = self.vehicles.num_vehicles
-        per_edge = int(num_cars/(2 * (row_num+col_num)))
+        per_edge = int(num_vehicles/(2 * (row_num+col_num)))
         start_positions = []
         d_inc = 10
+        # import ipdb; ipdb.set_trace()
         for i in range(self.col_num):
             x = 6
             for k in range(per_edge):
@@ -153,5 +153,6 @@ class SimpleGridScenario(Scenario):
 
     def get_node_mapping(self):
         """Return a list of a dictionary of nodes mapped to a list of edges
-        that head toward the node."""
+        that head toward the node. Nodes are listed in alphabetical order
+        and within that, edges are listed in order: [bot, right, top, left]"""
         return sorted(self.generator.node_mapping.items(), key=lambda k: k[1])
