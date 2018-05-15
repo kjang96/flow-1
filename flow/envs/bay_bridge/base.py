@@ -198,7 +198,7 @@ class BayBridgeEnv(Env):
 
         if new_tls_state != self.tl_state:
             self.tl_state = new_tls_state
-            self.traci_connection.trafficlights.setRedYellowGreenState(
+            self.traci_connection.trafficlight.setRedYellowGreenState(
                 tlsID=TB_TL_ID, state=new_tls_state)
 
     # TODO: decide on a good reward function
