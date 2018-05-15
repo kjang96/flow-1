@@ -7,8 +7,8 @@ from flow.core.params import SumoParams, EnvParams, NetParams, InitialConfig, \
 from flow.core.vehicles import Vehicles
 from flow.core.traffic_lights import TrafficLights
 
-from flow.scenarios.bridge_toll.gen import BBTollGenerator
-from flow.scenarios.bridge_toll.scenario import BBTollScenario
+from flow.scenarios.bottleneck.gen import BBTollGenerator
+from flow.scenarios.bottleneck.scenario import BBTollScenario
 from flow.controllers import RLController, SumoLaneChangeController, \
     ContinuousRouter
 from flow.core.params import SumoLaneChangeParams

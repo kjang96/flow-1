@@ -6,9 +6,9 @@ from flow.core.params import SumoParams, EnvParams, NetParams, InitialConfig, \
 from flow.core.vehicles import Vehicles
 
 from flow.core.experiment import SumoExperiment
-from flow.envs.bay_bridge import BridgeBaseEnv
-from flow.scenarios.bottleneck.gen import BottleneckGenerator
-from flow.scenarios.bottleneck.scenario import BottleneckScenario
+from flow.envs.bay_bridge import BayBridgeEnv
+from flow.scenarios.bay_bridge_toll.gen import BottleneckGenerator
+from flow.scenarios.bay_bridge_toll.scenario import BottleneckScenario
 from flow.controllers import SumoCarFollowingController, BayBridgeRouter
 
 NETFILE = "bottleneck.net.xml"
@@ -51,7 +51,7 @@ def bay_bridge_bottleneck_example(sumo_binary=None,
                  sumo_lc_params=sumo_lc_params,
                  num_vehicles=300)
 
-    additional_env_params = {"target_velocity": 8}
+    additional_env_params = {}
     env_params = EnvParams(additional_params=additional_env_params)
 
     inflow = InFlows()
@@ -83,33 +83,33 @@ def bay_bridge_bottleneck_example(sumo_binary=None,
                departLane="6", departSpeed=20)
 
     net_params = NetParams(in_flows=inflow,
-                           no_internal_links=False)
-    net_params.netfile = NETFILE
+                           no_internal_links=False,
+                           netfile="/home/aboudy/Downloads/bay_bridge_toll.net.xml")
 
-    # download the netfile from AWS
-    if use_traffic_lights:
-        my_url = "https://s3-us-west-1.amazonaws.com/flow.netfiles/" \
-                 "bay_bridge_TL_all_green.net.xml"
-    else:
-        my_url = "https://s3-us-west-1.amazonaws.com/flow.netfiles/" \
-                 "bay_bridge_junction_fix.net.xml"
-    my_file = urllib.request.urlopen(my_url)
-    data_to_write = my_file.read()
-
-    with open(os.path.join(net_params.cfg_path, NETFILE), "wb+") as f:
-        f.write(data_to_write)
+    # # download the netfile from AWS
+    # if use_traffic_lights:
+    #     my_url = "https://s3-us-west-1.amazonaws.com/flow.netfiles/" \
+    #              "bay_bridge_TL_all_green.net.xml"
+    # else:
+    #     my_url = "https://s3-us-west-1.amazonaws.com/flow.netfiles/" \
+    #              "bay_bridge_junction_fix.net.xml"
+    # my_file = urllib.request.urlopen(my_url)
+    # data_to_write = my_file.read()
+    #
+    # with open(os.path.join(net_params.cfg_path, NETFILE), "wb+") as f:
+    #     f.write(data_to_write)
 
     initial_config = InitialConfig(spacing="uniform",  # "random",
                                    lanes_distribution=float("inf"),
                                    min_gap=15)
 
-    scenario = BottleneckScenario(name="bottleneck",
+    scenario = BottleneckScenario(name="bay_bridge_toll",
                                   generator_class=BottleneckGenerator,
                                   vehicles=vehicles,
                                   net_params=net_params,
                                   initial_config=initial_config)
 
-    env = BridgeBaseEnv(env_params, sumo_params, scenario)
+    env = BayBridgeEnv(env_params, sumo_params, scenario)
 
     return SumoExperiment(env, scenario)
 
@@ -117,7 +117,7 @@ def bay_bridge_bottleneck_example(sumo_binary=None,
 if __name__ == "__main__":
     # import the experiment variable
     exp = bay_bridge_bottleneck_example(sumo_binary="sumo-gui",
-                                        use_traffic_lights=True)
+                                        use_traffic_lights=False)
 
     # run for a set number of rollouts / time steps
     exp.run(1, 1500)

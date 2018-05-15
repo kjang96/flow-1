@@ -11,8 +11,8 @@ from flow.core.traffic_lights import TrafficLights
 from flow.core.vehicles import Vehicles
 from flow.envs.green_wave_env import GreenWaveTestEnv
 from flow.envs.loop.loop_accel import AccelEnv
-from flow.scenarios.bridge_toll.gen import BBTollGenerator
-from flow.scenarios.bridge_toll.scenario import BBTollScenario
+from flow.scenarios.bottleneck.gen import BBTollGenerator
+from flow.scenarios.bottleneck.scenario import BBTollScenario
 from flow.scenarios.figure8.figure8_scenario import Figure8Scenario
 from flow.scenarios.figure8.gen import Figure8Generator
 from flow.scenarios.grid.gen import SimpleGridGenerator
