@@ -8,7 +8,7 @@ ADDITIONAL_NET_PARAMS = {
 }
 
 
-class BBTollScenario(Scenario):
+class BottleneckScenario(Scenario):
 
     def __init__(self, name, generator_class, vehicles, net_params,
                  initial_config=InitialConfig(),

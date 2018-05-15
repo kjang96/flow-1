@@ -1,7 +1,7 @@
 from flow.scenarios.netfile.scenario import NetFileScenario
 
 
-class BottleneckScenario(NetFileScenario):
+class BayBridgeTollScenario(NetFileScenario):
     """
     A scenario used to simulate the Bay Bridge.
     """

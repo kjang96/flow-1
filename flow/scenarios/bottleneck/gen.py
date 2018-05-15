@@ -2,7 +2,7 @@ from flow.core.generator import Generator
 import numpy as np
 
 
-class BBTollGenerator(Generator):
+class BottleneckGenerator(Generator):
     """
     Generator class for simulating the Bay Bridge toll. No parameters needed
     from net_params (the network is not parametrized)

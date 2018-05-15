@@ -1,7 +1,7 @@
 from flow.scenarios.netfile.gen import NetFileGenerator
 
 
-class BottleneckGenerator(NetFileGenerator):
+class BayBridgeTollGenerator(NetFileGenerator):
     """
     Bay Bridge bottleneck generator.
     """

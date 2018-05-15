@@ -7,8 +7,8 @@ from flow.core.vehicles import Vehicles
 
 from flow.core.experiment import SumoExperiment
 from flow.envs.bay_bridge import BayBridgeEnv
-from flow.scenarios.bay_bridge_toll.gen import BottleneckGenerator
-from flow.scenarios.bay_bridge_toll.scenario import BottleneckScenario
+from flow.scenarios.bay_bridge_toll.gen import BayBridgeTollGenerator
+from flow.scenarios.bay_bridge_toll.scenario import BayBridgeTollScenario
 from flow.controllers import SumoCarFollowingController, BayBridgeRouter
 
 NETFILE = "bottleneck.net.xml"
@@ -57,30 +57,13 @@ def bay_bridge_bottleneck_example(sumo_binary=None,
     inflow = InFlows()
 
     inflow.add(veh_type="human", edge="393649534", probability=0.2,
-               departLane="0", departSpeed=20)
-
+               departLane="random", departSpeed=20)
     inflow.add(veh_type="human", edge="4757680", probability=0.2,
-               departLane="0", departSpeed=20)
-
+               departLane="random", departSpeed=20)
     inflow.add(veh_type="human", edge="32661316", probability=0.2,
-               departLane="0", departSpeed=20)
-    inflow.add(veh_type="human", edge="32661316", probability=0.2,
-               departLane="1", departSpeed=20)
-
-    inflow.add(veh_type="human", edge="90077193#0", probability=0.2,
-               departLane="0", departSpeed=20)
-    inflow.add(veh_type="human", edge="90077193#0", probability=0.2,
-               departLane="1", departSpeed=20)
-    inflow.add(veh_type="human", edge="90077193#0", probability=0.2,
-               departLane="2", departSpeed=20)
-    inflow.add(veh_type="human", edge="90077193#0", probability=0.2,
-               departLane="3", departSpeed=20)
-    inflow.add(veh_type="human", edge="90077193#0", probability=0.2,
-               departLane="4", departSpeed=20)
-    inflow.add(veh_type="human", edge="90077193#0", probability=0.2,
-               departLane="5", departSpeed=20)
-    inflow.add(veh_type="human", edge="90077193#0", probability=0.2,
-               departLane="6", departSpeed=20)
+               departLane="random", departSpeed=20)
+    inflow.add(veh_type="human", edge="90077193#0", vehs_per_hour=2000,
+               departLane="random", departSpeed=20)
 
     net_params = NetParams(in_flows=inflow,
                            no_internal_links=False,
@@ -103,11 +86,11 @@ def bay_bridge_bottleneck_example(sumo_binary=None,
                                    lanes_distribution=float("inf"),
                                    min_gap=15)
 
-    scenario = BottleneckScenario(name="bay_bridge_toll",
-                                  generator_class=BottleneckGenerator,
-                                  vehicles=vehicles,
-                                  net_params=net_params,
-                                  initial_config=initial_config)
+    scenario = BayBridgeTollScenario(name="bay_bridge_toll",
+                                     generator_class=BayBridgeTollGenerator,
+                                     vehicles=vehicles,
+                                     net_params=net_params,
+                                     initial_config=initial_config)
 
     env = BayBridgeEnv(env_params, sumo_params, scenario)
 

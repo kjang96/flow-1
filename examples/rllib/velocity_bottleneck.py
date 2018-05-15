@@ -93,10 +93,10 @@ flow_params = dict(
     env_name="DesiredVelocityEnv",
 
     # name of the scenario class the experiment is running on
-    scenario="BBTollScenario",
+    scenario="BottleneckScenario",
 
     # name of the generator used to create/modify network configuration files
-    generator="BBTollGenerator",
+    generator="BottleneckGenerator",
 
     # sumo-related parameters (see flow.core.params.SumoParams)
     sumo=SumoParams(
