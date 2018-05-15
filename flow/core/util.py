@@ -133,9 +133,9 @@ def eval_net_params(flow_params):
                     temp['veh_type'] = obj[key]
                 elif key == 'begin':
                     temp['edge'] = str(obj[key])
-                elif key =='depart_speed':
+                elif key == 'depart_speed':
                     temp['departSpeed'] = obj[key]
-                elif key == 'probability' or key =='departSpeed' or \
+                elif key == 'probability' or key == 'departSpeed' or \
                     key == 'departLane' or key == 'vehsPerHour':
                     temp[key] = obj[key]
             new_inflow_list.append(temp)

@@ -8,11 +8,8 @@ import math
 import ray
 import ray.rllib.ppo as ppo
 from ray.tune import run_experiments
-from ray.tune.logger import UnifiedLogger
-from ray.tune.registry import get_registry, register_env
-from ray.tune.result import DEFAULT_RESULTS_DIR as RESULTS_DIR
+from ray.tune.registry import register_env
 
-from flow.core.util import rllib_logger_creator
 from flow.utils.rllib import make_create_env, FlowParamsEncoder
 from flow.core.params import SumoParams, EnvParams, InitialConfig, NetParams, \
     InFlows
