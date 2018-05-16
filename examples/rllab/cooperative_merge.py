@@ -4,8 +4,6 @@ vehicles in an inner ring, and 10 vehicles in an outer ring attempting to
 merge into the inner ring. rllab version.
 """
 
-from flow.scenarios.two_loops_one_merging.scenario \
-    import TwoLoopsOneMergingScenario
 from rllab.algos.trpo import TRPO
 from rllab.baselines.linear_feature_baseline import LinearFeatureBaseline
 from rllab.envs.gym_env import GymEnv
@@ -13,20 +11,18 @@ from rllab.envs.normalized_env import normalize
 from rllab.misc.instrument import run_experiment_lite
 from rllab.policies.gaussian_mlp_policy import GaussianMLPPolicy
 
-from flow.controllers.car_following_models import *
-from flow.controllers.lane_change_controllers import *
-from flow.controllers.rlcontroller import RLController
-from flow.controllers.routing_controllers import ContinuousRouter
-from flow.core.params import *
+from flow.controllers import RLController, IDMController, \
+    SumoLaneChangeController, ContinuousRouter
+from flow.core.params import SumoParams, EnvParams, NetParams, InitialConfig, \
+    SumoCarFollowingParams, SumoLaneChangeParams
 from flow.core.vehicles import Vehicles
-from flow.scenarios.two_loops_one_merging.gen import TwoLoopOneMergingGenerator
+from flow.scenarios.loop_merge.gen import TwoLoopOneMergingGenerator
+from flow.scenarios.loop_merge.scenario import TwoLoopsOneMergingScenario
 
 HORIZON = 300
 
 
 def run_task(*_):
-    logging.basicConfig(level=logging.INFO)
-
     sumo_params = SumoParams(sim_step=0.2, sumo_binary="sumo")
 
     # note that the vehicles are added sequentially by the generator,
@@ -34,44 +30,45 @@ def run_task(*_):
     vehicles = Vehicles()
     # Inner ring vehicles
     vehicles.add(veh_id="human",
-                          acceleration_controller=(
-                                IDMController, {"noise": 0.2}),
-                          lane_change_controller=(
-                                SumoLaneChangeController, {}),
-                          routing_controller=(ContinuousRouter, {}),
-                          num_vehicles=6,
-                          sumo_car_following_params=SumoCarFollowingParams(
-                              minGap=0.0, tau=0.5),
-                          sumo_lc_params=SumoLaneChangeParams())
+                 acceleration_controller=(IDMController, {"noise": 0.2}),
+                 lane_change_controller=(SumoLaneChangeController, {}),
+                 routing_controller=(ContinuousRouter, {}),
+                 num_vehicles=6,
+                 sumo_car_following_params=SumoCarFollowingParams(
+                     minGap=0.0,
+                     tau=0.5
+                 ),
+                 sumo_lc_params=SumoLaneChangeParams())
 
     # A single learning agent in the inner ring
     vehicles.add(veh_id="rl",
-                          acceleration_controller=(
-                              RLController, {"fail_safe": "safe_velocity"}),
-                          lane_change_controller=(
-                              SumoLaneChangeController, {}),
-                          routing_controller=(ContinuousRouter, {}),
-                          speed_mode="no_collide",
-                          num_vehicles=1,
-                          sumo_car_following_params=SumoCarFollowingParams(
-                              minGap=0.01, tau=0.5),
-                          sumo_lc_params=SumoLaneChangeParams())
+                 acceleration_controller=(RLController, {}),
+                 lane_change_controller=(SumoLaneChangeController, {}),
+                 routing_controller=(ContinuousRouter, {}),
+                 speed_mode="no_collide",
+                 num_vehicles=1,
+                 sumo_car_following_params=SumoCarFollowingParams(
+                     minGap=0.01,
+                     tau=0.5
+                 ),
+                 sumo_lc_params=SumoLaneChangeParams())
 
     # Outer ring vehicles
     vehicles.add(veh_id="merge-human",
-                          acceleration_controller=(
-                              IDMController, {"noise": 0.2}),
-                          lane_change_controller=(
-                              SumoLaneChangeController, {}),
-                          routing_controller=(ContinuousRouter, {}),
-                          num_vehicles=10,
-                          sumo_car_following_params=SumoCarFollowingParams(
-                              minGap=0.0, tau=0.5),
-                          sumo_lc_params=SumoLaneChangeParams())
+                 acceleration_controller=(IDMController, {"noise": 0.2}),
+                 lane_change_controller=(SumoLaneChangeController, {}),
+                 routing_controller=(ContinuousRouter, {}),
+                 num_vehicles=10,
+                 sumo_car_following_params=SumoCarFollowingParams(
+                     minGap=0.0,
+                     tau=0.5
+                 ),
+                 sumo_lc_params=SumoLaneChangeParams())
 
     additional_env_params = {"target_velocity": 20, "max-deacc": -1.5,
                              "max-acc": 1}
-    env_params = EnvParams(horizon=HORIZON, additional_params=additional_env_params)
+    env_params = EnvParams(horizon=HORIZON,
+                           additional_params=additional_env_params)
 
     additional_net_params = {"ring_radius": 50, "lanes": 1,
                              "lane_length": 75, "speed_limit": 30,
@@ -96,17 +93,11 @@ def run_task(*_):
     )
 
     env_name = "TwoLoopsMergePOEnv"
-    pass_params = (env_name, sumo_params, vehicles, env_params, 
+    pass_params = (env_name, sumo_params, vehicles, env_params,
                    net_params, initial_config, scenario)
 
     env = GymEnv(env_name, record_video=False, register_params=pass_params)
     horizon = env.horizon
-    env = normalize(env)
-
-    logging.info("Experiment Set Up complete")
-
-    print("experiment initialized")
-
     env = normalize(env)
 
     policy = GaussianMLPPolicy(
@@ -120,7 +111,7 @@ def run_task(*_):
         env=env,
         policy=policy,
         baseline=baseline,
-        batch_size= 64 * 3 * horizon,
+        batch_size=64 * 3 * horizon,
         max_path_length=horizon,
         # whole_paths=True,
         n_itr=1000,
@@ -128,6 +119,7 @@ def run_task(*_):
         # step_size=0.01,
     )
     algo.train()
+
 
 exp_tag = "cooperative_merge_example"  # experiment prefix
 
@@ -143,6 +135,5 @@ for seed in [1, 5, 10, 56]:  # , 1, 5, 10, 73]:
         seed=seed,
         mode="ec2",
         exp_prefix=exp_tag,
-        # python_command="/home/aboudy/anaconda2/envs/rllab-multiagent/bin/python3.5"
         # plot=True,
     )

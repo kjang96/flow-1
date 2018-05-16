@@ -23,14 +23,16 @@ class TestCFMController(unittest.TestCase):
         # add a few vehicles to the network using the requested model
         # also make sure that the input params are what is expected
 
-        contr_params = {"time_delay": 0, "k_d": 1, "k_v": 1, "k_c": 1, "d_des": 1, "v_des": 8, "noise": 0}
+        contr_params = {"time_delay": 0, "k_d": 1, "k_v": 1, "k_c": 1,
+                        "d_des": 1, "v_des": 8, "noise": 0}
 
         vehicles = Vehicles()
         vehicles.add(
             veh_id="test_0",
             acceleration_controller=(CFMController, contr_params),
             routing_controller=(ContinuousRouter, {}),
-            sumo_car_following_params=SumoCarFollowingParams(accel=20, decel=5),
+            sumo_car_following_params=SumoCarFollowingParams(
+                accel=20, decel=5),
             num_vehicles=5
         )
 
@@ -55,7 +57,7 @@ class TestCFMController(unittest.TestCase):
         requested_accel = [self.env.vehicles.get_acc_controller(
             veh_id).get_action(self.env) for veh_id in ids]
 
-        expected_accel = [12., 17., 20., 20., 20.]
+        expected_accel = [12., 17., 22., 27., 32.]
 
         np.testing.assert_array_almost_equal(requested_accel, expected_accel)
 
@@ -68,14 +70,16 @@ class TestBCMController(unittest.TestCase):
         # add a few vehicles to the network using the requested model
         # also make sure that the input params are what is expected
         contr_params = \
-            {"time_delay": 0, "k_d": 1, "k_v": 1, "k_c": 1, "d_des": 1, "v_des": 8, "noise": 0}
+            {"time_delay": 0, "k_d": 1, "k_v": 1, "k_c": 1, "d_des": 1,
+             "v_des": 8, "noise": 0}
 
         vehicles = Vehicles()
         vehicles.add(
             veh_id="test",
             acceleration_controller=(BCMController, contr_params),
             routing_controller=(ContinuousRouter, {}),
-            sumo_car_following_params=SumoCarFollowingParams(accel=15, decel=5),
+            sumo_car_following_params=SumoCarFollowingParams(
+                accel=15, decel=5),
             num_vehicles=5
         )
 
@@ -100,7 +104,7 @@ class TestBCMController(unittest.TestCase):
         requested_accel = [self.env.vehicles.get_acc_controller(
             veh_id).get_action(self.env) for veh_id in ids]
 
-        expected_accel = [-5., 13., 13., 13., 13.]
+        expected_accel = [-12., 13., 13., 13., 13.]
 
         np.testing.assert_array_almost_equal(requested_accel, expected_accel)
 
@@ -112,16 +116,16 @@ class TestOVMController(unittest.TestCase):
     def setUp(self):
         # add a few vehicles to the network using the requested model
         # also make sure that the input params are what is expected
-        contr_params = \
-            {"time_delay": 0, "alpha": 1, "beta": 1, "h_st": 2, "h_go": 15, "v_max": 30,
-                "noise": 0}
+        contr_params = {"time_delay": 0, "alpha": 1, "beta": 1, "h_st": 2,
+                        "h_go": 15, "v_max": 30, "noise": 0}
 
         vehicles = Vehicles()
         vehicles.add(
             veh_id="test",
             acceleration_controller=(OVMController, contr_params),
             routing_controller=(ContinuousRouter, {}),
-            sumo_car_following_params=SumoCarFollowingParams(accel=15, decel=5),
+            sumo_car_following_params=SumoCarFollowingParams(
+                accel=15, decel=5),
             num_vehicles=5
         )
 
@@ -146,7 +150,7 @@ class TestOVMController(unittest.TestCase):
         requested_accel = [self.env.vehicles.get_acc_controller(
             veh_id).get_action(self.env) for veh_id in ids]
 
-        expected_accel = [0., 15., 3.772339, 3.772339, 3.772339]
+        expected_accel = [0., 20.319073, 3.772339, 3.772339, 3.772339]
 
         np.testing.assert_array_almost_equal(requested_accel, expected_accel)
 
@@ -168,7 +172,8 @@ class TestLinearOVM(unittest.TestCase):
             veh_id="test",
             acceleration_controller=(LinearOVM, contr_params),
             routing_controller=(ContinuousRouter, {}),
-            sumo_car_following_params=SumoCarFollowingParams(accel=15, decel=5),
+            sumo_car_following_params=SumoCarFollowingParams(
+                accel=15, decel=5),
             num_vehicles=5
         )
 
@@ -193,7 +198,7 @@ class TestLinearOVM(unittest.TestCase):
         requested_accel = [self.env.vehicles.get_acc_controller(
             veh_id).get_action(self.env) for veh_id in ids]
 
-        expected_accel = [0., 12.992308, 12.992308, 15., 0.]
+        expected_accel = [0., 12.992308, 12.992308, 25.984615, 0.]
 
         np.testing.assert_array_almost_equal(requested_accel, expected_accel)
 
@@ -214,7 +219,8 @@ class TestIDMController(unittest.TestCase):
             veh_id="test",
             acceleration_controller=(IDMController, contr_params),
             routing_controller=(ContinuousRouter, {}),
-            sumo_car_following_params=SumoCarFollowingParams(tau=1, accel=1, decel=5),
+            sumo_car_following_params=SumoCarFollowingParams(
+                tau=1, accel=1, decel=5),
             num_vehicles=5
         )
 
@@ -261,8 +267,8 @@ class TestInstantaneousFailsafe(unittest.TestCase):
     would. This is tested on two crash-prone controllers: OVM and LinearOVM
     """
     def setUp_failsafe(self, vehicles):
-        additional_env_params = {"target_velocity": 8, "max-deacc": 3,
-                                 "max-acc": 3}
+        additional_env_params = {"target_velocity": 8, "max_accel": 3,
+                                 "max_decel": 3}
         env_params = EnvParams(additional_params=additional_env_params)
 
         additional_net_params = {"length": 100, "lanes": 1, "speed_limit": 30,

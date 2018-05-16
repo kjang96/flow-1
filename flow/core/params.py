@@ -14,7 +14,9 @@ class SumoParams:
                  overtake_right=False,
                  ballistic=False,
                  seed=None,
-                 restart_instance=False):
+                 restart_instance=False,
+                 print_warnings=True,
+                 teleport_time=-100):
         """Sumo-specific parameters
 
         These parameters are used to customize a sumo simulation instance upon
@@ -56,6 +58,11 @@ class SumoParams:
             the instance helps avoid slowdowns cause by excessive inflows over
             large experiment runtimes, but also require the gui to be started
             after every reset if "sumo_binary" is set to True.
+        print_warnings: bool, optional
+            If set to false, this will silence sumo warnings on the stdout
+        teleport_time: int, optional
+            If negative, vehicles don't teleport in gridlock. If positive,
+            they teleport after teleport_time seconds
 
         """
         self.port = port
@@ -68,18 +75,16 @@ class SumoParams:
         self.ballistic = ballistic
         self.overtake_right = overtake_right
         self.restart_instance = restart_instance
+        self.print_warnings = print_warnings
+        self.teleport_time = teleport_time
 
 
 class EnvParams:
 
     def __init__(self,
-                 max_speed=55.0,  # TODO: delete me
-                 lane_change_duration=None,
                  vehicle_arrangement_shuffle=False,
                  starting_position_shuffle=False,
                  additional_params=None,
-                 max_decel=-6,
-                 max_accel=3,
                  horizon=500,
                  sort_vehicles=False,
                  warmup_steps=0,
@@ -92,10 +97,6 @@ class EnvParams:
 
         Attributes
         ----------
-        lane_change_duration: float, optional
-            lane changing duration is always present in the environment, but
-            only used by sub-classes that apply lane changing; defaults to
-            5 seconds
         vehicle_arrangement_shuffle: bool, optional
             determines if initial conditions of vehicles are shuffled at reset;
             False by default
@@ -105,10 +106,6 @@ class EnvParams:
         additional_params: dict, optional
             Specify additional environment params for a specific environment
             configuration
-        max_decel: float, optional
-            maximum deceleration of autonomous vehicles, defaults to -6 m/s2
-        max_accel: float, optional
-            maximum acceleration of autonomous vehicles, defaults to 3 m/s2
         horizon: int, optional
             number of steps per rollouts
         sort_vehicles: bool, optional
@@ -127,14 +124,10 @@ class EnvParams:
             simulation steps.
 
         """
-        self.max_speed = max_speed
-        self.lane_change_duration = lane_change_duration
         self.vehicle_arrangement_shuffle = vehicle_arrangement_shuffle
         self.starting_position_shuffle = starting_position_shuffle
         self.additional_params = \
             additional_params if additional_params is not None else {}
-        self.max_decel = max_decel
-        self.max_accel = max_accel
         self.horizon = horizon
         self.sort_vehicles = sort_vehicles
         self.warmup_steps = warmup_steps
@@ -142,24 +135,6 @@ class EnvParams:
 
     def get_additional_param(self, key):
         return self.additional_params[key]
-
-    def get_lane_change_duration(self, sim_step):
-        """Determines the lane change duration in units of steps
-
-        Parameters
-        ----------
-        sim_step: float
-            elapsed time per simulation step
-
-        Returns
-        -------
-        float
-            minimum number of steps in between lane changes
-        """
-        if not self.lane_change_duration:
-            return 5 / sim_step
-        else:
-            return self.lane_change_duration / sim_step
 
 
 class NetParams:
@@ -174,7 +149,14 @@ class NetParams:
                  additional_params=None):
         """Network configuration parameters
 
-        (blank)
+        Unlike most other parameters, NetParams may vary drastically dependent
+        on the specific network configuration. For example, for the ring road
+        the network parameters will include a characteristic length, number of
+        lanes, and speed limit.
+
+        In order to determine which additional_params variable may be needed
+        for a specific scenario, refer to the ADDITIONAL_NET_PARAMS variable
+        located in the scenario file.
 
         Parameters
         ----------
@@ -226,12 +208,11 @@ class InitialConfig:
                  positions=None,
                  lanes=None,
                  additional_params=None):
-        """(blank)
+        """Initial configuration parameters.
 
-        (blank)
-        Parameters that affect the positioning of vehicle in the network at
-        the start of a rollout. By default, vehicles are uniformly distributed
-        in the network.
+        These parameters that affect the positioning of vehicle in the
+        network at the start of a rollout. By default, vehicles are uniformly
+        distributed in the network.
 
         Attributes
         ----------
@@ -291,8 +272,8 @@ class SumoCarFollowingParams:
                  accel=1.0,
                  decel=1.5,
                  sigma=0.5,
-                 tau=0.6,  # past 1 at sim_step=0.1 you no longer see waves
-                 min_gap=1.5,
+                 tau=1.0,  # past 1 at sim_step=0.1 you no longer see waves
+                 min_gap=2.5,
                  max_speed=30,
                  speed_factor=1.0,
                  speed_dev=0.1,
@@ -300,8 +281,6 @@ class SumoCarFollowingParams:
                  car_follow_model="IDM",
                  **kwargs):
         """Parameters for sumo-controlled acceleration behavior
-
-        (specify how we specify it in Vehicles.add())  #### TODO ####
 
         Attributes
         ----------
@@ -393,8 +372,6 @@ class SumoLaneChangeParams:
                  lc_accel_lat=1.0,
                  **kwargs):
         """Parameters for sumo-controlled lane change behavior
-
-        (specify how we specify it in Vehicles.add())  #### TODO ####
 
         Attributes
         ----------
@@ -565,7 +542,7 @@ class InFlows:
             in the Vehicles class.
         edge: str
             starting edge for vehicles in this inflow.
-        start: float, optional
+        begin: float, optional
             see Note
         end: float, optional
             see Note

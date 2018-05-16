@@ -2,15 +2,14 @@ import os
 import urllib.request
 
 from flow.core.params import SumoParams, EnvParams, NetParams, InitialConfig, \
-    SumoCarFollowingParams, SumoLaneChangeParams, InFlows
-from flow.controllers.routing_controllers import *
+    SumoLaneChangeParams, SumoCarFollowingParams, InFlows
 from flow.core.vehicles import Vehicles
 
 from flow.core.experiment import SumoExperiment
 from flow.envs.bay_bridge import BridgeBaseEnv
 from flow.scenarios.bottleneck.gen import BottleneckGenerator
 from flow.scenarios.bottleneck.scenario import BottleneckScenario
-from flow.controllers.car_following_models import *
+from flow.controllers import SumoCarFollowingController, BayBridgeRouter
 
 NETFILE = "bottleneck.net.xml"
 
@@ -31,7 +30,7 @@ def bay_bridge_bottleneck_example(sumo_binary=None,
     ----
     Unlike the bay_bridge_example, inflows are always activated here.
     """
-    sumo_params = SumoParams(sim_step=0.6,
+    sumo_params = SumoParams(sim_step=0.1,
                              overtake_right=True)
 
     if sumo_binary is not None:

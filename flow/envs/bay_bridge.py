@@ -1,7 +1,7 @@
 import numpy as np
 from collections import defaultdict
 
-from flow.envs.loop_accel import AccelEnv
+from flow.envs.loop.loop_accel import AccelEnv
 
 EDGE_LIST = ['11198593', '236348360#1', '157598960', '11415208', '236348361',
              '11198599', '35536683', '11198595.0', '11198595.656.0', "gneE5",
@@ -176,5 +176,5 @@ class BridgeBaseEnv(AccelEnv):
 
         if new_tls_state != self.tl_state:
             self.tl_state = new_tls_state
-            self.traci_connection.trafficlights.setRedYellowGreenState(
+            self.traci_connection.trafficlight.setRedYellowGreenState(
                 tlsID=TB_TL_ID, state=new_tls_state)
