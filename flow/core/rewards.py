@@ -240,7 +240,6 @@ def punish_queues_in_lane(env, edge, lane, penalty_gain=1, penalty_exponent=1):
         total reward (in this case a negative cost) corresponding
         to the queues in the lane in question
     """
-
     # IDs of all vehicles in passed-in lane
     lane_ids = [veh_id for veh_id in env.vehicles.get_ids_by_edge(edge)
                 if env.vehicles.get_lane(veh_id) == lane]

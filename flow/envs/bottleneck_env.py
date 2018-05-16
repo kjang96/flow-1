@@ -225,7 +225,6 @@ class BottleneckEnv(Env):
             self.feedback_timer = 0
             # now implement the integral controller update
             # find all the vehicles in an edge
-            veh_ids = self.vehicles.get_ids_by_edge('4')
             q_update = self.feedback_coeff * (self.n_crit -
                                               np.average(self.smoothed_num))
             self.q = np.clip(self.q + q_update,
