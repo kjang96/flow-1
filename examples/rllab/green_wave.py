@@ -84,7 +84,7 @@ def run_task(*_):
     vehicles.add(veh_id="idm",
                  acceleration_controller=(SumoCarFollowingController, {}),
                  sumo_car_following_params=SumoCarFollowingParams(
-                   minGap=2.5, 
+                   min_gap=2.5, 
                    tau=1.1,
                    max_speed=v_enter),
                  routing_controller=(GridRouter, {}),
@@ -151,8 +151,8 @@ for seed in [6]:  # , 7, 8]:
         # random seed will be used
         seed=seed,
         # mode="local",
-        # mode=,
-        mode="local",  # "local_docker", "ec2"
+        mode="local_docker",
+        # mode="local",  # "local_docker", "ec2"
         exp_prefix="green-wave",
         # plot=True,
     )

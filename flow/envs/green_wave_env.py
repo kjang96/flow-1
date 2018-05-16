@@ -72,7 +72,7 @@ class TrafficLightGridEnv(Env):
 
         if self.tl_type != "actuated":
             for i in range(self.rows * self.cols):
-                self.traci_connection.trafficlights.setRedYellowGreenState(
+                self.traci_connection.trafficlight.setRedYellowGreenState(
                     'center' + str(i), "GGGrrrGGGrrr")
                 self.last_change[i, 2] = 1
 
@@ -400,13 +400,15 @@ class PO_TrafficLightGridEnv(TrafficLightGridEnv):
         speeds = []
         dist_to_intersec = []
         edge_number = []
+        max_speed = max(self.scenario.speed_limit(edge)
+                    for edge in self.scenario.get_edge_list())
         max_dist = np.max([self.scenario.short_length, self.scenario.long_length, self.scenario.inner_length])
         for node, edges in self.scenario.get_node_mapping():
             
             observed_ids = self.k_closest_to_intersection(edges, self.num_observed)
             # check which edges we have so we can always pad in the right positions
             edges = self.vehicles.get_edge(observed_ids)
-            speeds += [self.vehicles.get_speed(veh_id) / self.max_speed for veh_id in observed_ids]
+            speeds += [self.vehicles.get_speed(veh_id) / max_speed for veh_id in observed_ids]
             dist_to_intersec += [(self.scenario.edge_length(self.vehicles.get_edge(veh_id)) -
                                   self.vehicles.get_position(veh_id)) / max_dist for veh_id in observed_ids]
             edge_number += [self._convert_edge(self.vehicles.get_edge(veh_id)) / (self.scenario.num_edges - 1)
@@ -428,7 +430,7 @@ class PO_TrafficLightGridEnv(TrafficLightGridEnv):
             ids = self.vehicles.get_ids_by_edge(edge)
             if len(ids) > 0:
                 density += [5 * len(ids) / self.scenario.edge_length(edge)]
-                velocity_avg += [np.mean([self.vehicles.get_speed(veh_id) for veh_id in ids]) / self.max_speed]
+                velocity_avg += [np.mean([self.vehicles.get_speed(veh_id) for veh_id in ids]) / max_speed]
             else:
                 density += [0]
                 velocity_avg += [0]

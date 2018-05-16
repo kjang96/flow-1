@@ -318,11 +318,12 @@ def grid_mxn_exp_setup(row_num=1,
         vehicles = Vehicles()
         vehicles.add(veh_id="idm",
                      acceleration_controller=(IDMController, {}),
-                     sumo_car_following_params=SumoCarFollowingParams(min_gap=2.5, tau=1.1),
-                     routing_controller=(GridRouter, {}),
                      sumo_car_following_params=SumoCarFollowingParams(
-                         max_speed=30,
-                     ),
+                        min_gap=2.5, 
+                        tau=1.1,
+                        max_speed=30
+                        ),
+                     routing_controller=(GridRouter, {}),
                      num_vehicles=total_vehicles)
 
     if env_params is None:

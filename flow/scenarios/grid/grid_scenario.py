@@ -33,6 +33,8 @@ ADDITIONAL_NET_PARAMS = {
     # speed limit for all edges, may be represented as a float value, or a
     # dictionary with separate values for vertical and horizontal lanes
     "speed_limit": {"vertical": 35, "horizontal": 35},
+    # specifies traffic light states, durations, baselins vs. actuated, etc
+    "tl_logic": TrafficLights(baseline=False)
 }
 
 
