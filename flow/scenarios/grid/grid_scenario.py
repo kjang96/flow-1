@@ -73,8 +73,9 @@ class SimpleGridScenario(Scenario):
 
         See Scenario.py for description of params.
         """
+        optional = ["tl_logic"]
         for p in ADDITIONAL_NET_PARAMS.keys():
-            if p not in net_params.additional_params:
+            if p not in net_params.additional_params and p not in optional:
                 raise KeyError('Network parameter "{}" not supplied'.format(p))
 
         for p in ADDITIONAL_NET_PARAMS["grid_array"].keys():
