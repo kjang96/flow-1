@@ -67,20 +67,20 @@ def bay_bridge_bottleneck_example(sumo_binary=None,
 
     net_params = NetParams(in_flows=inflow,
                            no_internal_links=False,
-                           netfile="/home/aboudy/Downloads/bay_bridge_toll.net.xml")
+                           netfile=NETFILE)
 
-    # # download the netfile from AWS
-    # if use_traffic_lights:
-    #     my_url = "https://s3-us-west-1.amazonaws.com/flow.netfiles/" \
-    #              "bay_bridge_TL_all_green.net.xml"
-    # else:
-    #     my_url = "https://s3-us-west-1.amazonaws.com/flow.netfiles/" \
-    #              "bay_bridge_junction_fix.net.xml"
-    # my_file = urllib.request.urlopen(my_url)
-    # data_to_write = my_file.read()
-    #
-    # with open(os.path.join(net_params.cfg_path, NETFILE), "wb+") as f:
-    #     f.write(data_to_write)
+    # download the netfile from AWS
+    if use_traffic_lights:
+        my_url = "https://s3-us-west-1.amazonaws.com/flow.netfiles/" \
+                 "bay_bridge_TL_all_green.net.xml"
+    else:
+        my_url = "https://s3-us-west-1.amazonaws.com/flow.netfiles/" \
+                 "bay_bridge_junction_fix.net.xml"
+    my_file = urllib.request.urlopen(my_url)
+    data_to_write = my_file.read()
+
+    with open(os.path.join(net_params.cfg_path, NETFILE), "wb+") as f:
+        f.write(data_to_write)
 
     initial_config = InitialConfig(spacing="uniform",  # "random",
                                    lanes_distribution=float("inf"),
