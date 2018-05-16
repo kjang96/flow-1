@@ -10,6 +10,7 @@ from flow.core.experiment import SumoExperiment
 from flow.controllers.routing_controllers import GridRouter
 from flow.controllers.car_following_models import IDMController
 
+
 os.environ["TEST_FLAG"] = "True"
 
 class TestUpdateGetState(unittest.TestCase):
@@ -141,11 +142,6 @@ class TestPOEnv(unittest.TestCase):
         self.env, scenario = grid_mxn_exp_setup(row_num=1,
                                                 col_num=3,
                                                 vehicles=vehicles)
-                                                # sumo_params=None,
-                                                # vehicles=None,
-                                                # env_params=None,
-                                                # net_params=None,
-                                                # initial_config=None)
 
     def tearDown(self):
         # terminate the traci instance
@@ -207,15 +203,10 @@ class TestItRuns(unittest.TestCase):
                      routing_controller=(GridRouter, {}),
                      sumo_car_following_params=SumoCarFollowingParams(min_gap=2.5, tau=1.1),
                      num_vehicles=16)
-    
+        
         self.env, self.scenario = grid_mxn_exp_setup(row_num=1,
                                                 col_num=3,
                                                 vehicles=vehicles)
-                                                # sumo_params=None,
-                                                # vehicles=None,
-                                                # env_params=None,
-                                                # net_params=None,
-                                                # initial_config=None)
 
     def tearDown(self):
         # terminate the traci instance
@@ -226,12 +217,9 @@ class TestItRuns(unittest.TestCase):
         self.scenario = None
 
     def test_it_runs(self):
-        # def test_it_runs(self):
-        # self.env, self.scenario = setup_bottlenecks()
         self.exp = SumoExperiment(self.env, self.scenario)
         self.exp.run(5, 50)
-    
-    
+
 
 
 if __name__ == '__main__':

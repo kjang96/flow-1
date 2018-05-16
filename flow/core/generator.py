@@ -234,6 +234,7 @@ class Generator(Serializable):
             add.append(E("route", id="route%s" % edge, edges=" ".join(route)))
 
         if "tl_logic" in net_params.additional_params and \
+            net_params.additional_params.get("tl_logic") and \
             net_params.additional_params["tl_logic"].baseline:
 
             tl_logic = net_params.additional_params["tl_logic"].actuated_default()

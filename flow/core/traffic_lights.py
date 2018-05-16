@@ -13,7 +13,7 @@ class TrafficLights:
         self.__ids = list()  # names of nodes with traffic lights
         self.__tls_properties = dict()  # traffic light xml properties
         self.num_traffic_lights = 0  # number of traffic light nodes
-        self.baseline = baseline
+        self.baseline = baseline # all traffic light parameters are set to default baseline values
             
 
 
