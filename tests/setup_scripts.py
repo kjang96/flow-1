@@ -11,8 +11,8 @@ from flow.core.traffic_lights import TrafficLights
 from flow.core.vehicles import Vehicles
 from flow.envs.green_wave_env import GreenWaveTestEnv
 from flow.envs.loop.loop_accel import AccelEnv
-from flow.scenarios.bridge_toll.gen import BBTollGenerator
-from flow.scenarios.bridge_toll.scenario import BBTollScenario
+from flow.scenarios.bottleneck.gen import BottleneckGenerator
+from flow.scenarios.bottleneck.scenario import BottleneckScenario
 from flow.scenarios.figure8.figure8_scenario import Figure8Scenario
 from flow.scenarios.figure8.gen import Figure8Generator
 from flow.scenarios.grid.gen import SimpleGridGenerator
@@ -508,12 +508,12 @@ def setup_bottlenecks(sumo_params=None,
                                        lanes_distribution=float("inf"),
                                        edges_distribution=["2", "3", "4", "5"])
 
-    scenario = BBTollScenario(name="bay_bridge_toll",
-                              generator_class=BBTollGenerator,
-                              vehicles=vehicles,
-                              net_params=net_params,
-                              initial_config=initial_config,
-                              traffic_lights=traffic_lights)
+    scenario = BottleneckScenario(name="bay_bridge_toll",
+                                  generator_class=BottleneckGenerator,
+                                  vehicles=vehicles,
+                                  net_params=net_params,
+                                  initial_config=initial_config,
+                                  traffic_lights=traffic_lights)
 
     # create the environment
     env = AccelEnv(env_params=env_params,

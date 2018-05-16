@@ -6,9 +6,9 @@ from flow.core.params import SumoParams, EnvParams, NetParams, InitialConfig, \
 from flow.core.vehicles import Vehicles
 
 from flow.core.experiment import SumoExperiment
-from flow.envs.bay_bridge import BridgeBaseEnv
-from flow.scenarios.bottleneck.gen import BottleneckGenerator
-from flow.scenarios.bottleneck.scenario import BottleneckScenario
+from flow.envs.bay_bridge import BayBridgeEnv
+from flow.scenarios.bay_bridge_toll.gen import BayBridgeTollGenerator
+from flow.scenarios.bay_bridge_toll.scenario import BayBridgeTollScenario
 from flow.controllers import SumoCarFollowingController, BayBridgeRouter
 
 NETFILE = "bottleneck.net.xml"
@@ -30,7 +30,7 @@ def bay_bridge_bottleneck_example(sumo_binary=None,
     ----
     Unlike the bay_bridge_example, inflows are always activated here.
     """
-    sumo_params = SumoParams(sim_step=0.1,
+    sumo_params = SumoParams(sim_step=0.4,
                              overtake_right=True)
 
     if sumo_binary is not None:
@@ -49,42 +49,25 @@ def bay_bridge_bottleneck_example(sumo_binary=None,
                  lane_change_mode="no_lat_collide",
                  sumo_car_following_params=sumo_car_following_params,
                  sumo_lc_params=sumo_lc_params,
-                 num_vehicles=300)
+                 num_vehicles=50)
 
-    additional_env_params = {"target_velocity": 8}
+    additional_env_params = {}
     env_params = EnvParams(additional_params=additional_env_params)
 
     inflow = InFlows()
 
     inflow.add(veh_type="human", edge="393649534", probability=0.2,
-               departLane="0", departSpeed=20)
-
+               departLane="random", departSpeed=10)
     inflow.add(veh_type="human", edge="4757680", probability=0.2,
-               departLane="0", departSpeed=20)
-
+               departLane="random", departSpeed=10)
     inflow.add(veh_type="human", edge="32661316", probability=0.2,
-               departLane="0", departSpeed=20)
-    inflow.add(veh_type="human", edge="32661316", probability=0.2,
-               departLane="1", departSpeed=20)
-
-    inflow.add(veh_type="human", edge="90077193#0", probability=0.2,
-               departLane="0", departSpeed=20)
-    inflow.add(veh_type="human", edge="90077193#0", probability=0.2,
-               departLane="1", departSpeed=20)
-    inflow.add(veh_type="human", edge="90077193#0", probability=0.2,
-               departLane="2", departSpeed=20)
-    inflow.add(veh_type="human", edge="90077193#0", probability=0.2,
-               departLane="3", departSpeed=20)
-    inflow.add(veh_type="human", edge="90077193#0", probability=0.2,
-               departLane="4", departSpeed=20)
-    inflow.add(veh_type="human", edge="90077193#0", probability=0.2,
-               departLane="5", departSpeed=20)
-    inflow.add(veh_type="human", edge="90077193#0", probability=0.2,
-               departLane="6", departSpeed=20)
+               departLane="random", departSpeed=10)
+    inflow.add(veh_type="human", edge="90077193#0", vehs_per_hour=2000,
+               departLane="random", departSpeed=10)
 
     net_params = NetParams(in_flows=inflow,
-                           no_internal_links=False)
-    net_params.netfile = NETFILE
+                           no_internal_links=False,
+                           netfile=NETFILE)
 
     # download the netfile from AWS
     if use_traffic_lights:
@@ -103,13 +86,13 @@ def bay_bridge_bottleneck_example(sumo_binary=None,
                                    lanes_distribution=float("inf"),
                                    min_gap=15)
 
-    scenario = BottleneckScenario(name="bottleneck",
-                                  generator_class=BottleneckGenerator,
-                                  vehicles=vehicles,
-                                  net_params=net_params,
-                                  initial_config=initial_config)
+    scenario = BayBridgeTollScenario(name="bay_bridge_toll",
+                                     generator_class=BayBridgeTollGenerator,
+                                     vehicles=vehicles,
+                                     net_params=net_params,
+                                     initial_config=initial_config)
 
-    env = BridgeBaseEnv(env_params, sumo_params, scenario)
+    env = BayBridgeEnv(env_params, sumo_params, scenario)
 
     return SumoExperiment(env, scenario)
 
@@ -117,7 +100,7 @@ def bay_bridge_bottleneck_example(sumo_binary=None,
 if __name__ == "__main__":
     # import the experiment variable
     exp = bay_bridge_bottleneck_example(sumo_binary="sumo-gui",
-                                        use_traffic_lights=True)
+                                        use_traffic_lights=False)
 
     # run for a set number of rollouts / time steps
     exp.run(1, 1500)
