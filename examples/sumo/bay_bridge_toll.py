@@ -30,7 +30,7 @@ def bay_bridge_bottleneck_example(sumo_binary=None,
     ----
     Unlike the bay_bridge_example, inflows are always activated here.
     """
-    sumo_params = SumoParams(sim_step=0.1,
+    sumo_params = SumoParams(sim_step=0.4,
                              overtake_right=True)
 
     if sumo_binary is not None:
@@ -49,7 +49,7 @@ def bay_bridge_bottleneck_example(sumo_binary=None,
                  lane_change_mode="no_lat_collide",
                  sumo_car_following_params=sumo_car_following_params,
                  sumo_lc_params=sumo_lc_params,
-                 num_vehicles=300)
+                 num_vehicles=50)
 
     additional_env_params = {}
     env_params = EnvParams(additional_params=additional_env_params)
@@ -57,13 +57,13 @@ def bay_bridge_bottleneck_example(sumo_binary=None,
     inflow = InFlows()
 
     inflow.add(veh_type="human", edge="393649534", probability=0.2,
-               departLane="random", departSpeed=20)
+               departLane="random", departSpeed=10)
     inflow.add(veh_type="human", edge="4757680", probability=0.2,
-               departLane="random", departSpeed=20)
+               departLane="random", departSpeed=10)
     inflow.add(veh_type="human", edge="32661316", probability=0.2,
-               departLane="random", departSpeed=20)
+               departLane="random", departSpeed=10)
     inflow.add(veh_type="human", edge="90077193#0", vehs_per_hour=2000,
-               departLane="random", departSpeed=20)
+               departLane="random", departSpeed=10)
 
     net_params = NetParams(in_flows=inflow,
                            no_internal_links=False,
