@@ -62,7 +62,7 @@ def bay_bridge_example(sumo_binary=None,
                  sumo_lc_params=sumo_lc_params,
                  num_vehicles=1400)
 
-    additional_env_params = {"target_velocity": 8}
+    additional_env_params = {}
     env_params = EnvParams(additional_params=additional_env_params)
 
     traffic_lights = TrafficLights()
@@ -142,7 +142,7 @@ if __name__ == "__main__":
     # import the experiment variable
     exp = bay_bridge_example(sumo_binary="sumo-gui",
                              use_inflows=False,
-                             use_traffic_lights=True)
+                             use_traffic_lights=False)
 
     # run for a set number of rollouts / time steps
     exp.run(1, 1500)
