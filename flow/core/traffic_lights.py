@@ -9,14 +9,18 @@ class TrafficLights:
         This class is used to place traffic lights in the network and describe
         the state of these traffic lights. In addition, this class supports
         modifying the states of certain lights via TraCI.
+
+        Parameters
+        ----------
+        baseline: bool
         """
         self.__tls = dict()  # contains current time step traffic light data
         self.__ids = list()  # names of nodes with traffic lights
         self.__tls_properties = dict()  # traffic light xml properties
         self.num_traffic_lights = 0  # number of traffic light nodes
-        self.baseline = baseline # all traffic light parameters are set to default baseline values
-            
 
+        # all traffic light parameters are set to default baseline values
+        self.baseline = baseline
 
     def add(self,
             node_id,

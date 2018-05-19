@@ -234,7 +234,8 @@ class Generator(Serializable):
             net_params.additional_params.get("tl_logic") and \
             net_params.additional_params["tl_logic"].baseline:
 
-            tl_logic = net_params.additional_params["tl_logic"].actuated_default()
+            tl_logic = \
+                net_params.additional_params["tl_logic"].actuated_default()
 
             tl_type = str(tl_logic["tl_type"])
             program_id = str(tl_logic["program_id"])
@@ -254,7 +255,8 @@ class Generator(Serializable):
             nodes = self.specify_tll(net_params)
             tll = []
             for node in nodes: 
-                tll.append({"id" :node['id'], "type": tl_type, "programID": program_id})
+                tll.append({"id": node['id'], "type": tl_type,
+                            "programID": program_id})
                 
             for elem in tll:
                 e = E("tlLogic", **elem)
