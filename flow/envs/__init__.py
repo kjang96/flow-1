@@ -1,6 +1,6 @@
 from flow.envs.base_env import Env
 from flow.envs.bottleneck_env import BottleNeckAccelEnv, BottleneckEnv
-from flow.envs.green_wave_env import GreenWaveEnv, GreenWaveTestEnv
+from flow.envs.green_wave_env import TrafficLightGridEnv, PO_TrafficLightGridEnv, GreenWaveTestEnv
 from flow.envs.loop.lane_changing import LaneChangeAccelEnv, \
     LaneChangeAccelPOEnv
 from flow.envs.loop.loop_accel import AccelEnv

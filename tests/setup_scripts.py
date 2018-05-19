@@ -318,10 +318,12 @@ def grid_mxn_exp_setup(row_num=1,
         vehicles = Vehicles()
         vehicles.add(veh_id="idm",
                      acceleration_controller=(IDMController, {}),
-                     routing_controller=(GridRouter, {}),
                      sumo_car_following_params=SumoCarFollowingParams(
-                         max_speed=30,
-                     ),
+                        min_gap=2.5, 
+                        tau=1.1,
+                        max_speed=30
+                        ),
+                     routing_controller=(GridRouter, {}),
                      num_vehicles=total_vehicles)
 
     if env_params is None:
@@ -346,7 +348,7 @@ def grid_mxn_exp_setup(row_num=1,
         additional_net_params = {"length": 200, "lanes": 2, "speed_limit": 35,
                                  "resolution": 40, "grid_array": grid_array,
                                  "horizontal_lanes": 1, "vertical_lanes": 1,
-                                 "traffic_lights": 1}
+                                 "traffic_lights": 1, "tl_logic": TrafficLights(baseline=False)}
 
         net_params = NetParams(no_internal_links=False,
                                additional_params=additional_net_params)

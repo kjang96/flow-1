@@ -115,7 +115,7 @@ def min_delay(env):
         state of the system.
     """
 
-    vel = np.array(env.vehicles.get_speed())
+    vel = np.array(env.vehicles.get_speed(env.vehicles.get_ids()))
 
     vel = vel[vel >= -1e-6]
     v_top = max(env.scenario.speed_limit(edge)
