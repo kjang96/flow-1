@@ -24,6 +24,9 @@ class SimpleGridGenerator(Generator):
         nodes += self._build_inner_nodes()
         nodes += self._build_outer_nodes()
         return nodes
+    
+    def specify_tll(self, net_params):
+        return self._build_inner_nodes()
 
     def specify_edges(self, net_params):
         edges = []

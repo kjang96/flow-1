@@ -9,9 +9,7 @@ from rllab.policies.gaussian_mlp_policy import GaussianMLPPolicy
 
 from flow.scenarios.figure8.gen import Figure8Generator
 from flow.scenarios.figure8.figure8_scenario import Figure8Scenario
-from flow.controllers.rlcontroller import RLController
-from flow.controllers.car_following_models import IDMController
-from flow.controllers.routing_controllers import ContinuousRouter
+from flow.controllers import RLController, IDMController, ContinuousRouter
 from flow.core.vehicles import Vehicles
 from flow.core.params import SumoParams, EnvParams, NetParams, InitialConfig
 from rllab.envs.gym_env import GymEnv
@@ -27,10 +25,12 @@ def run_task(*_):
     vehicles.add(veh_id="rl",
                  acceleration_controller=(RLController, {}),
                  routing_controller=(ContinuousRouter, {}),
+                 speed_mode="no_collide",
                  num_vehicles=1)
     vehicles.add(veh_id="idm",
                  acceleration_controller=(IDMController, {"noise": 0.2}),
                  routing_controller=(ContinuousRouter, {}),
+                 speed_mode="no_collide",
                  num_vehicles=13)
 
     additional_env_params = {"target_velocity": 20}

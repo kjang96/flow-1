@@ -1,6 +1,3 @@
-"""
-IN PROGRESS
-"""
 from rllab.envs.normalized_env import normalize
 from rllab.misc.instrument import run_experiment_lite
 from rllab.algos.trpo import TRPO
@@ -9,13 +6,12 @@ from rllab.policies.gaussian_mlp_policy import GaussianMLPPolicy
 from rllab.envs.gym_env import GymEnv
 
 from flow.core.vehicles import Vehicles
+from flow.core.traffic_lights import TrafficLights
 from flow.core.params import SumoParams, EnvParams, InitialConfig, NetParams, \
     InFlows
 from flow.core.params import SumoCarFollowingParams
 
-from flow.controllers.routing_controllers import GridRouter
-from flow.controllers.car_following_models \
-    import SumoCarFollowingController
+from flow.controllers import SumoCarFollowingController, GridRouter
 
 from flow.scenarios.grid.gen import SimpleGridGenerator
 from flow.scenarios.grid.grid_scenario import SimpleGridScenario
@@ -82,18 +78,20 @@ def run_task(*_):
                   "cars_top": num_cars_top, "cars_bot": num_cars_bot}
 
     sumo_params = SumoParams(sim_step=1,
-                             sumo_binary="sumo-gui")
+                             sumo_binary="sumo")
 
     vehicles = Vehicles()
     vehicles.add(veh_id="idm",
                  acceleration_controller=(SumoCarFollowingController, {}),
                  sumo_car_following_params=SumoCarFollowingParams(
-                     minGap=2.5,
-                     max_speed=v_enter,
-                 ),
+                   min_gap=2.5, 
+                   tau=1.1,
+                   max_speed=v_enter),
                  routing_controller=(GridRouter, {}),
                  num_vehicles=tot_cars,
                  speed_mode="all_checks")
+    
+    tl_logic = TrafficLights(baseline=False)
 
     additional_env_params = {"target_velocity": 50, "num_steps": 500,
                              "control-length": 150, "switch_time": 3.0}
@@ -101,7 +99,7 @@ def run_task(*_):
 
     additional_net_params = {"speed_limit": 35, "grid_array": grid_array,
                              "horizontal_lanes": 1, "vertical_lanes": 1,
-                             "traffic_lights": True}
+                             "traffic_lights": True, "tl_logic": tl_logic}
 
     initial_config, net_params = get_non_flow_params(10, additional_net_params)
 
@@ -111,7 +109,8 @@ def run_task(*_):
                                   net_params=net_params,
                                   initial_config=initial_config)
 
-    env_name = "GreenWaveEnv"
+    env_name = "PO_TrafficLightGridEnv"
+    # env_name = "TrafficLightGridEnv"
     pass_params = (env_name, sumo_params, vehicles, env_params, net_params,
                    initial_config, scenario)
 
@@ -152,8 +151,8 @@ for seed in [6]:  # , 7, 8]:
         # random seed will be used
         seed=seed,
         # mode="local",
-        # mode=,
-        mode="local",  # "local_docker", "ec2"
+        mode="local_docker",
+        # mode="local",  # "local_docker", "ec2"
         exp_prefix="green-wave",
         # plot=True,
     )

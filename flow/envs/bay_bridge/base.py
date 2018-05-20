@@ -1,7 +1,7 @@
 import numpy as np
 from collections import defaultdict
 
-from flow.envs.loop.loop_accel import AccelEnv
+from flow.envs import Env
 
 EDGE_LIST = ['11198593', '236348360#1', '157598960', '11415208', '236348361',
              '11198599', '35536683', '11198595.0', '11198595.656.0', "gneE5",
@@ -39,7 +39,29 @@ MEAN_SECONDS_WAIT_AT_TOLL = 15
 FAST_TRACK_ON = range(6, 11)
 
 
-class BridgeBaseEnv(AccelEnv):
+class BayBridgeEnv(Env):
+    """Base environment class for Bay Bridge scenarios.
+
+    This class is responsible for mimicking the effects of the
+
+    States
+    ------
+    No observations are issued by this class (i.e. empty list).
+
+    Actions
+    -------
+    No actions are issued by this class.
+
+    Rewards
+    -------
+    The reward is the average speed of vehicles in the network (temporarily).
+
+    Termination
+    -----------
+    A rollout is terminated if the time horizon is reached or if two vehicles
+    collide into one another.
+    """
+
     def __init__(self, env_params, sumo_params, scenario):
         self.num_rl = scenario.vehicles.num_rl_vehicles
         super().__init__(env_params, sumo_params, scenario)
@@ -79,7 +101,7 @@ class BridgeBaseEnv(AccelEnv):
             # right route
             self.edge_dict[edge][lane].append((veh_id, pos))
             if edge == "124952171" and lane == 1:
-                self.apply_lane_change([veh_id], target_lane=[2])
+                self.apply_lane_change([veh_id], direction=[1])
 
         if not self.disable_tb:
             self.apply_toll_bridge_control()
@@ -176,5 +198,17 @@ class BridgeBaseEnv(AccelEnv):
 
         if new_tls_state != self.tl_state:
             self.tl_state = new_tls_state
-            self.traci_connection.trafficlights.setRedYellowGreenState(
+            self.traci_connection.trafficlight.setRedYellowGreenState(
                 tlsID=TB_TL_ID, state=new_tls_state)
+
+    # TODO: decide on a good reward function
+    def compute_reward(self, state, rl_actions, **kwargs):
+        return np.mean(self.vehicles.get_speed(self.vehicles.get_ids()))
+
+    """ The below methods need to be updated by child classes. """
+
+    def _apply_rl_actions(self, rl_actions):
+        pass
+
+    def get_state(self):
+        return []

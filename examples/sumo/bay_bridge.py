@@ -3,7 +3,6 @@ import urllib.request
 
 from flow.core.params import SumoParams, EnvParams, NetParams, InitialConfig, \
     SumoCarFollowingParams, SumoLaneChangeParams, InFlows
-from flow.controllers.routing_controllers import BayBridgeRouter
 from flow.core.vehicles import Vehicles
 from flow.core.traffic_lights import TrafficLights
 
@@ -11,7 +10,7 @@ from flow.core.experiment import SumoExperiment
 from flow.envs.bay_bridge import BridgeBaseEnv
 from flow.scenarios.bay_bridge.gen import BayBridgeGenerator
 from flow.scenarios.bay_bridge.scenario import BayBridgeScenario
-from flow.controllers.car_following_models import SumoCarFollowingController
+from flow.controllers import SumoCarFollowingController, BayBridgeRouter
 
 NETFILE = "bay_bridge.net.xml"
 
@@ -63,7 +62,7 @@ def bay_bridge_example(sumo_binary=None,
                  sumo_lc_params=sumo_lc_params,
                  num_vehicles=1400)
 
-    additional_env_params = {"target_velocity": 8}
+    additional_env_params = {}
     env_params = EnvParams(additional_params=additional_env_params)
 
     traffic_lights = TrafficLights()
@@ -143,7 +142,7 @@ if __name__ == "__main__":
     # import the experiment variable
     exp = bay_bridge_example(sumo_binary="sumo-gui",
                              use_inflows=False,
-                             use_traffic_lights=True)
+                             use_traffic_lights=False)
 
     # run for a set number of rollouts / time steps
     exp.run(1, 1500)

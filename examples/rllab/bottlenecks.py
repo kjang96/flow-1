@@ -7,11 +7,10 @@ from flow.core.params import SumoParams, EnvParams, NetParams, InitialConfig, \
 from flow.core.vehicles import Vehicles
 from flow.core.traffic_lights import TrafficLights
 
-from flow.scenarios.bridge_toll.gen import BBTollGenerator
-from flow.scenarios.bridge_toll.scenario import BBTollScenario
-from flow.controllers.lane_change_controllers import SumoLaneChangeController
-from flow.controllers.rlcontroller import RLController
-from flow.controllers.routing_controllers import ContinuousRouter
+from flow.scenarios.bottleneck.gen import BottleneckGenerator
+from flow.scenarios.bottleneck.scenario import BottleneckScenario
+from flow.controllers import RLController, SumoLaneChangeController, \
+    ContinuousRouter
 from flow.core.params import SumoLaneChangeParams
 
 from rllab.envs.gym_env import GymEnv
@@ -83,16 +82,16 @@ initial_config = InitialConfig(spacing="uniform", min_gap=5,
                                lanes_distribution=float("inf"),
                                edges_distribution=["2", "3", "4", "5"])
 
-scenario = BBTollScenario(name="bay_bridge_toll",
-                          generator_class=BBTollGenerator,
-                          vehicles=vehicles,
-                          net_params=net_params,
-                          initial_config=initial_config,
-                          traffic_lights=traffic_lights)
+scenario = BottleneckScenario(name="bay_bridge_toll",
+                              generator_class=BottleneckGenerator,
+                              vehicles=vehicles,
+                              net_params=net_params,
+                              initial_config=initial_config,
+                              traffic_lights=traffic_lights)
 
 
 def run_task(*_):
-    env_name = "BottleNeckEnv"
+    env_name = "BottleneckEnv"
     pass_params = (env_name, sumo_params, vehicles, env_params,
                    net_params, initial_config, scenario)
 

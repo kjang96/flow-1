@@ -49,6 +49,8 @@ class BaseController:
         # max deaccel should always be a positive
         self.max_deaccel = abs(sumo_cf_params.controller_params['decel'])
 
+        self.sumo_cf_params = sumo_cf_params
+
     def uses_sumo(self):
         return self.sumo_controller
 
@@ -87,10 +89,6 @@ class BaseController:
         # add noise to the accelerations, if requested
         if self.accel_noise > 0:
             accel += np.random.normal(0, self.accel_noise)
-
-        # constrain the accel to be between the min and max set by
-        # SumoCarFollowingParams
-        accel = max(min(accel, self.max_accel), -1 * self.max_deaccel)
 
         # run the failsafes, if requested
         if self.fail_safe == 'instantaneous':
@@ -180,7 +178,10 @@ class BaseController:
             sim_step = env.sim_step
 
             if this_vel + action * sim_step > safe_velocity:
-                return (safe_velocity - this_vel)/sim_step
+                if safe_velocity > 0:
+                    return (safe_velocity - this_vel)/sim_step
+                else:
+                    return -this_vel/sim_step
             else:
                 return action
 

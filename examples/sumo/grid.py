@@ -5,6 +5,7 @@ from flow.controllers.routing_controllers import GridRouter
 from flow.core.experiment import SumoExperiment
 from flow.core.params import SumoParams, EnvParams, InitialConfig, NetParams
 from flow.core.vehicles import Vehicles
+from flow.core.traffic_lights import TrafficLights
 from flow.envs.loop.loop_accel import AccelEnv, ADDITIONAL_ENV_PARAMS
 from flow.scenarios.grid.gen import SimpleGridGenerator
 from flow.scenarios.grid.grid_scenario import SimpleGridScenario
@@ -43,7 +44,7 @@ def grid_example(sumo_binary=None):
 
     additional_net_params = {"grid_array": grid_array, "speed_limit": 35,
                              "horizontal_lanes": 1, "vertical_lanes": 1,
-                             "traffic_lights": True}
+                             "traffic_lights": True, "tl_logic": TrafficLights(baseline=False)}
     net_params = NetParams(no_internal_links=False,
                            additional_params=additional_net_params)
 

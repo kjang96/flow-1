@@ -6,31 +6,21 @@ Attributes
 E : etree.Element
     Description
 """
-# flake8: noqa
 import csv
 import errno
 import importlib
 import json
 import os
 import tempfile
-
 from lxml import etree
 from datetime import datetime
-
-import xml.etree.ElementTree as ET
+from xml.etree import ElementTree
 
 from gym.envs.registration import register
 
-from flow.core.params import SumoCarFollowingParams, SumoLaneChangeParams
-
-from flow.controllers.rlcontroller import RLController
-from flow.controllers.car_following_models import *
-from flow.core.params import InFlows
-from flow.controllers.velocity_controllers import *
-from flow.controllers.lane_change_controllers import *
-from flow.controllers.routing_controllers import ContinuousRouter
-from flow.scenarios.loop.loop_scenario import LoopScenario
-from flow.core.params import InFlows
+from flow.controllers import *
+from flow.core.params import SumoCarFollowingParams, SumoLaneChangeParams, \
+    InFlows
 
 E = etree.Element
 
@@ -149,7 +139,6 @@ def eval_net_params(flow_params):
                         key == 'departLane' or key == 'vehsPerHour':
                     temp[key] = obj[key]
             new_inflow_list.append(temp)
-        # add created inflows to inflow container
         [inflow.add(**inflow_i) for inflow_i in new_inflow_list]
         better_params['net']['in_flows'] = inflow
 
@@ -183,15 +172,15 @@ def eval_veh_params(orig_params):
 
     if 'acceleration_controller' in new_params:
         new_controller = (eval(orig_params['acceleration_controller'][0]),
-                               orig_params['acceleration_controller'][1])
+                          orig_params['acceleration_controller'][1])
         new_params['acceleration_controller'] = new_controller
     if 'lane_change_controller' in new_params:
         new_lc_controller = (eval(orig_params['lane_change_controller'][0]),
-                                  orig_params['lane_change_controller'][1])
+                             orig_params['lane_change_controller'][1])
         new_params['lane_change_controller'] = new_lc_controller
     if 'routing_controller' in new_params:
         new_route_controller = (eval(orig_params['routing_controller'][0]),
-                                     orig_params['routing_controller'][1])
+                                orig_params['routing_controller'][1])
         new_params['routing_controller'] = new_route_controller
     if 'sumo_car_following_params' in new_params:
         cf_params = SumoCarFollowingParams()
@@ -334,7 +323,7 @@ def emission_to_csv(emission_path, output_path=None):
     available from the emission file, but can be recreated.
     """
     parser = etree.XMLParser(recover=True)
-    tree = ET.parse(emission_path, parser=parser)
+    tree = ElementTree.parse(emission_path, parser=parser)
     root = tree.getroot()
 
     # parse the xml data into a dict
