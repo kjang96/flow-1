@@ -1,6 +1,7 @@
 import logging
 import random
 import numpy as np
+import time
 
 try:
     # Import serializable if rllab is installed
@@ -53,7 +54,7 @@ class Scenario(Serializable):
         if Serializable is not object:
             Serializable.quick_init(self, locals())
 
-        self.name = name
+        self.name = name + str(time.time())
         self.generator_class = generator_class
         self.vehicles = vehicles
         self.net_params = net_params
