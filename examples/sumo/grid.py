@@ -42,9 +42,20 @@ def grid_example(sumo_binary=None):
 
     env_params = EnvParams(additional_params=ADDITIONAL_ENV_PARAMS)
 
+
+    tl_logic = TrafficLights(baseline=False)
+    phases = [{"duration": "31", "minDur": "8", "maxDur": "45", "state": "GGGrrrGGGrrr"},
+                {"duration": "6", "minDur": "3", "maxDur": "6", "state": "yyyrrryyyrrr"},
+                {"duration": "31", "minDur": "8", "maxDur": "45", "state": "rrrGGGrrrGGG"},
+                {"duration": "6", "minDur": "3", "maxDur": "6", "state": "rrryyyrrryyy"}]
+    tl_logic.add("center0", phases=phases, programID=1)
+    tl_logic.add("center1", phases=phases, programID=1)
+    tl_logic.add("center2", tls_type="actuated", phases=phases, programID=1)
+
+
     additional_net_params = {"grid_array": grid_array, "speed_limit": 35,
                              "horizontal_lanes": 1, "vertical_lanes": 1,
-                             "traffic_lights": True, "tl_logic": TrafficLights(baseline=False)}
+                             "traffic_lights": True, "tl_logic": tl_logic}
     net_params = NetParams(no_internal_links=False,
                            additional_params=additional_net_params)
 
