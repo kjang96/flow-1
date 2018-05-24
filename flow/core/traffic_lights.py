@@ -1,5 +1,10 @@
 import traci.constants as tc
 
+# DEFAULTS
+PROGRAM_ID = 1
+MAX_GAP = 3.0
+DETECTOR_GAP = 0.8
+SHOW_DETECTORS = True
 
 class TrafficLights:
 
@@ -25,9 +30,15 @@ class TrafficLights:
     def add(self,
             node_id,
             tls_type="static",
-            programID=None,
+            programID=10,
             offset=None,
-            phases=None):
+            phases=None,
+            maxGap=None,
+            detectorGap=None,
+            showDetectors=None,
+            file=None,
+            freq=None
+            ):
         """Adds a traffic light component to the network.
 
         When generating networks using xml files, using this method to add a
@@ -54,26 +65,59 @@ class TrafficLights:
             must consist of a dict with two keys:
             - "duration": length of the current phase cycle (in sec)
             - "state": string consist the sequence of states in the phase
+            - "minDur": optional
+                The minimum duration of the phase when using type actuated
+            - "maxDur": optional
+                The maximum duration of the phase when using type actuated
+        maxGap : int, used for actuated traffic lights
+            describes the maximum time gap between successive vehicle that 
+            will cause the current phase to be prolonged
+        detectorGap : int, used for actuated traffic lights
+            determines the time distance between the (automatically generated) 
+            detector and the stop line in seconds (at each lanes maximum speed)
+        showDetectors : bool, used for actuated traffic lights
+            toggles whether or not detectors are shown in sumo-gui
+        file : str, optional
+            which file the detector shall write results into
+        freq : int, optional
+            the period over which collected values shall be aggregated 
 
         Note
         ----
         For information on defining traffic light properties, see:
         http://sumo.dlr.de/wiki/Simulation/Traffic_Lights#Defining_New_TLS-Programs
         """
+        # TODO add proper checks here: make sure programID exists 
+        # NOTE: the keys you add to the dictionary need to match the xml spec
         # add the node id to the list of controlled nodes
         self.__ids.append(node_id)
 
         # prepare the data needed to generate xml files
         self.__tls_properties[node_id] = {"id": node_id, "type": tls_type}
 
-        if programID is not None:
+        if programID:
             self.__tls_properties[node_id]["programID"] = programID
 
-        if offset is not None:
+        if offset:
             self.__tls_properties[node_id]["offset"] = offset
+    
+        if phases:
+            self.__tls_properties[node_id]["phases"] = phases
 
-        if phases is not None:
-            self.__tls_properties[node_id]["phase"] = phases
+        if tls_type == "actuated":
+            # Required parameters
+            self.__tls_properties[node_id]["max-gap"] = maxGap if maxGap else MAX_GAP
+
+            self.__tls_properties[node_id]["detector-gap"] = detectorGap if detectorGap else DETECTOR_GAP
+
+            self.__tls_properties[node_id]["show-detectors"] = showDetectors if showDetectors else SHOW_DETECTORS
+
+            # Optional parameters
+            if file:
+                self.__tls_properties[node_id]["file"] = file
+
+            if freq:
+                self.__tls_properties[node_id]["freq"] = freq
 
     def update(self, tls_subscriptions):
         """Updates the states and phases of the traffic lights to match current

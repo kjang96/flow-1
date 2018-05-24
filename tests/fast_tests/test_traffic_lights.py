@@ -220,7 +220,39 @@ class TestItRuns(unittest.TestCase):
         self.exp = SumoExperiment(self.env, self.scenario)
         self.exp.run(5, 50)
 
+class TestIndividualLights(unittest.TestCase):
+    """
+    Tests the functionality of the the TrafficLights class in allowing
+    for customization of specific nodes
+    """
+    def setUp(self):
+        
 
+        tl_logic = TrafficLights(baseline=False)
+        phases = [{"duration": "31", "minDur": "8", "maxDur": "45", "state": "GGGrrrGGGrrr"},
+                    {"duration": "6", "minDur": "3", "maxDur": "6", "state": "yyyrrryyyrrr"},
+                    {"duration": "31", "minDur": "8", "maxDur": "45", "state": "rrrGGGrrrGGG"},
+                    {"duration": "6", "minDur": "3", "maxDur": "6", "state": "rrryyyrrryyy"}]
+        tl_logic.add("center0", phases=phases, programID=1)
+        tl_logic.add("center1", phases=phases, programID=1, offset=1)
+        tl_logic.add("center2", tls_type="actuated", phases=phases, programID=1)
+        tl_logic.add("center3", tls_type="actuated", phases=phases, programID=1, maxGap=3.0,
+            detectorGap=0.8, showDetectors=True, file="testindividuallights.xml", freq=100)
+
+        self.env, self.scenario = grid_mxn_exp_setup(row_num=1,
+                                                     col_num=4,
+                                                     tl_logic=tl_logic)
+    def tearDown(self):
+        # terminate the traci instance
+        self.env.terminate()
+
+        # free data used by the class
+        self.env = None
+        self.scenario = None
+
+    def test_it_runs(self):
+        self.exp = SumoExperiment(self.env, self.scenario)
+        self.exp.run(5, 50)
 
 if __name__ == '__main__':
     unittest.main()

@@ -279,7 +279,8 @@ def grid_mxn_exp_setup(row_num=1,
                        vehicles=None,
                        env_params=None,
                        net_params=None,
-                       initial_config=None):
+                       initial_config=None,
+                       tl_logic=TrafficLights(baseline=False)):
     """
     Creates an environment and scenario pair for grid 1x1 test experiments.
     sumo-related configuration parameters, defaults to a time step of 1s
@@ -305,6 +306,8 @@ def grid_mxn_exp_setup(row_num=1,
     initial_config: InitialConfig type
         specifies starting positions of vehicles, defaults to evenly
         distributed vehicles across the length of the network
+    tl_logic TrafficLights type
+        specifies logic of any traffic lights added to the system
     """
     logging.basicConfig(level=logging.WARNING)
 
@@ -344,11 +347,12 @@ def grid_mxn_exp_setup(row_num=1,
                       "cars_right": int(total_vehicles / 4),
                       "cars_top": int(total_vehicles / 4),
                       "cars_bot": int(total_vehicles / 4)}
+        
 
         additional_net_params = {"length": 200, "lanes": 2, "speed_limit": 35,
                                  "resolution": 40, "grid_array": grid_array,
                                  "horizontal_lanes": 1, "vertical_lanes": 1,
-                                 "traffic_lights": 1, "tl_logic": TrafficLights(baseline=False)}
+                                 "traffic_lights": 1, "tl_logic": tl_logic}
 
         net_params = NetParams(no_internal_links=False,
                                additional_params=additional_net_params)
