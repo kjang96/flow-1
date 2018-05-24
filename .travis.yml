@@ -28,7 +28,7 @@ before_install:
   - pip install gym==0.10.5
 
   # Copy over local rllib changes (testing branch)
-  - pushd $HOME/build/cathywu
+  - pushd $HOME/build/berkeleyflow
   -     git clone https://github.com/cathywu/ray.git
   -     pushd ray
   -         git checkout testing
