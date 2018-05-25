@@ -44,8 +44,10 @@ class Generator(Serializable):
         if Serializable is not object:
             Serializable.quick_init(self, locals())
         self.net_params = net_params
-        self.net_path = net_params.net_path
-        self.cfg_path = net_params.cfg_path
+        self.net_path = os.path.dirname(os.path.abspath(__file__)) \
+            + "/debug/net/"
+        self.cfg_path = os.path.dirname(os.path.abspath(__file__)) \
+            + "/debug/cfg/"
         self.base = base
         self.netfn = ""
         self.vehicle_ids = []
@@ -536,7 +538,7 @@ class Generator(Serializable):
         """
         # import the .net.xml file containing all edge/type data
         parser = etree.XMLParser(recover=True)
-        tree = ET.parse(os.path.join(self.net_params.cfg_path, self.netfn),
+        tree = ET.parse(os.path.join(self.cfg_path, self.netfn),
                         parser=parser)
         root = tree.getroot()
 
