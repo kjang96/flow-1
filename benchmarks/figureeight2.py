@@ -13,14 +13,13 @@ Horizon: 1500 steps
 from flow.utils.rllib import make_create_env
 from flow.core.params import SumoParams, EnvParams, InitialConfig, NetParams
 from flow.core.vehicles import Vehicles
-from flow.controllers.routing_controllers import ContinuousRouter
-from flow.controllers.rlcontroller import RLController
+from flow.controllers import ContinuousRouter, RLController
 from flow.scenarios.figure8.figure8_scenario import ADDITIONAL_NET_PARAMS
 
 # time horizon of a single rollout
 HORIZON = 1500
 
-# We place 3 autonomous vehicle and 12 human-driven vehicles in the network
+# We place 16 autonomous vehicle and 0 human-driven vehicles in the network
 vehicles = Vehicles()
 vehicles.add(veh_id="rl",
              acceleration_controller=(RLController, {}),

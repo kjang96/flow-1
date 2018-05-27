@@ -15,8 +15,7 @@ from flow.core.params import SumoParams, EnvParams, InitialConfig, NetParams, \
     InFlows
 from flow.scenarios.merge.scenario import ADDITIONAL_NET_PARAMS
 from flow.core.vehicles import Vehicles
-from flow.controllers.car_following_models import IDMController
-from flow.controllers.rlcontroller import RLController
+from flow.controllers import IDMController, RLController
 
 # time horizon of a single rollout
 HORIZON = 600
