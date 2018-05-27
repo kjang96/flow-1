@@ -84,13 +84,13 @@ def run_task(*_):
     vehicles.add(veh_id="idm",
                  acceleration_controller=(SumoCarFollowingController, {}),
                  sumo_car_following_params=SumoCarFollowingParams(
-                   min_gap=2.5, 
+                   min_gap=2.5,
                    tau=1.1,
                    max_speed=v_enter),
                  routing_controller=(GridRouter, {}),
                  num_vehicles=tot_cars,
                  speed_mode="all_checks")
-    
+
     tl_logic = TrafficLights(baseline=False)
 
     additional_env_params = {"target_velocity": 50, "num_steps": 500,
@@ -98,8 +98,7 @@ def run_task(*_):
     env_params = EnvParams(additional_params=additional_env_params)
 
     additional_net_params = {"speed_limit": 35, "grid_array": grid_array,
-                             "horizontal_lanes": 1, "vertical_lanes": 1,
-                             "traffic_lights": True, "tl_logic": tl_logic}
+                             "horizontal_lanes": 1, "vertical_lanes": 1}
 
     initial_config, net_params = get_non_flow_params(10, additional_net_params)
 
@@ -107,7 +106,8 @@ def run_task(*_):
                                   generator_class=SimpleGridGenerator,
                                   vehicles=vehicles,
                                   net_params=net_params,
-                                  initial_config=initial_config)
+                                  initial_config=initial_config,
+                                  traffic_lights=tl_logic)
 
     env_name = "PO_TrafficLightGridEnv"
     # env_name = "TrafficLightGridEnv"

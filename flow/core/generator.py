@@ -7,7 +7,7 @@ import os
 import traceback
 import time
 from lxml import etree
-import xml.etree.ElementTree as ET
+import xml.etree.ElementTree as ElementTree
 
 try:
     # Import serializable if rllab is installed
@@ -109,8 +109,7 @@ class Generator(Serializable):
 
         # add traffic lights to the nodes
         for n_id in traffic_lights.get_ids():
-            indx = next(i for i, node in enumerate(nodes)
-                        if node["id"] == n_id)
+            indx = next(i for i, nd in enumerate(nodes) if nd["id"] == n_id)
             nodes[indx]["type"] = "traffic_light"
 
         # xml file for nodes; contains nodes for the boundary points with
@@ -201,18 +200,21 @@ class Generator(Serializable):
                 time.sleep(WAIT_ON_ERROR)
         raise error
 
-    def generate_cfg(self, net_params):
+    def generate_cfg(self, net_params, traffic_lights):
         """Generates .sumo.cfg files using net files and netconvert.
 
-        This includes files such as the routes vehicles can traverse and the
-        view settings of the gui (whether the gui is used or not). The
-        background of the gui is set here to be grey, with RGB values:
-        (100, 100, 100).
+        This includes files such as the routes vehicles can traverse,
+        properties of the traffic lights, and the view settings of the gui
+        (whether the gui is used or not). The background of the gui is set here
+        to be grey, with RGB values: (100, 100, 100).
 
         Parameters
         ----------
         net_params: NetParams type
             see flow/core/params.py
+        traffic_lights : flow.core.traffic_lights.TrafficLights type
+            traffic light information, used to determine which nodes are
+            treated as traffic lights
         """
         start_time = 0
         end_time = None
@@ -227,51 +229,56 @@ class Generator(Serializable):
 
         add = makexml("additional",
                       "http://sumo.dlr.de/xsd/additional_file.xsd")
+
+        # add the routes to the .add.xml file
         for (edge, route) in self.rts.items():
             add.append(E("route", id="route%s" % edge, edges=" ".join(route)))
 
-        tl_logic = net_params.additional_params.get("tl_logic")
-        if tl_logic:
-            if tl_logic.baseline:
-                tl_type = str(tl_logic["tl_type"])
-                program_id = str(tl_logic["program_id"])
-                phases = tl_logic["phases"]
-                max_gap = str(tl_logic["max_gap"])
-                detector_gap = str(tl_logic["detector_gap"])
-                show_detectors = tl_logic["show_detectors"]
+        # add (optionally) the traffic light properties to the .add.xml file
+        if traffic_lights.num_traffic_lights > 0:
+            if traffic_lights.baseline:
+                tl_type = str(traffic_lights["tl_type"])
+                program_id = str(traffic_lights["program_id"])
+                phases = traffic_lights["phases"]
+                max_gap = str(traffic_lights["max_gap"])
+                detector_gap = str(traffic_lights["detector_gap"])
+                show_detector = traffic_lights["show_detectors"]
 
                 detectors = {"key": "detector-gap", "value": detector_gap}
                 gap = {"key": "max-gap", "value": max_gap}
 
-                if show_detectors:
-                    show_detectors = {"key": "show-detectors", "value": "true"}
+                if show_detector:
+                    show_detector = {"key": "show-detectors", "value": "true"}
                 else:
-                    show_detectors = {"key": "show-detectors", "value": "false"}
+                    show_detector = {"key": "show-detectors", "value": "false"}
 
+                # FIXME(ak): add abstract method
                 nodes = self.specify_tll(net_params)
                 tll = []
-                for node in nodes: 
+                for node in nodes:
                     tll.append({"id": node['id'], "type": tl_type,
                                 "programID": program_id})
-                    
+
                 for elem in tll:
                     e = E("tlLogic", **elem)
-                    e.append(E("param", **show_detectors))
+                    e.append(E("param", **show_detector))
                     e.append(E("param", **gap))
                     e.append(E("param", **detectors))
                     for phase in phases:
                         e.append(E("phase", **phase))
                     add.append(e)
-        
+
             else:
-                tl_properties = tl_logic.get_properties()
+                tl_properties = traffic_lights.get_properties()
                 for node in tl_properties.values():
-                    # at this point, the generator assumes that traffic lights are properly formed
-                    # If there are no phases for a static traffic light, ignore and use default
-                    if node["type"] == "static" and not node.get("phases"): 
+                    # at this point, the generator assumes that traffic lights
+                    # are properly formed. If there are no phases for a static
+                    # traffic light, ignore and use default
+                    if node["type"] == "static" and not node.get("phases"):
                         continue
 
-                    elem = {"id": str(node["id"]), "type": str(node["type"]), "programID": str(node["programID"])}
+                    elem = {"id": str(node["id"]), "type": str(node["type"]),
+                            "programID": str(node["programID"])}
                     if node.get("offset"):
                         elem["offset"] = str(node.get("offset"))
 
@@ -281,10 +288,11 @@ class Generator(Serializable):
                             for phase in node.get("phases"):
                                 e.append(E("phase", **phase))
                         else:
-                            e.append(E("param", **{"key": key, "value": str(value)}))
-                            
+                            e.append(E("param",
+                                       **{"key": key, "value": str(value)}))
+
                     add.append(e)
-                    
+
         printxml(add, self.cfg_path + addfn)
 
         gui = E("viewsettings")
@@ -536,8 +544,8 @@ class Generator(Serializable):
         """
         # import the .net.xml file containing all edge/type data
         parser = etree.XMLParser(recover=True)
-        tree = ET.parse(os.path.join(self.net_params.cfg_path, self.netfn),
-                        parser=parser)
+        tree = ElementTree.parse(
+            os.path.join(self.net_params.cfg_path, self.netfn), parser=parser)
         root = tree.getroot()
 
         # Collect information on the available types (if any are available).
