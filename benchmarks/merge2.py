@@ -6,6 +6,8 @@ is 33.3%.
 Action Dimension: (17, )
 
 Observation Dimension: (85, )
+
+Horizon: 600 steps
 """
 
 from flow.utils.rllib import make_create_env
@@ -71,7 +73,7 @@ flow_params = dict(
     # sumo-related parameters (see flow.core.params.SumoParams)
     sumo=SumoParams(
         sim_step=0.2,
-        sumo_binary="sumo",
+        sumo_binary="sumo-gui",
     ),
 
     # environment related parameters (see flow.core.params.EnvParams)

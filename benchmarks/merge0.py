@@ -6,6 +6,8 @@ is 10%.
 Action Dimension: (5, )
 
 Observation Dimension: (25, )
+
+Horizon: 600 steps
 """
 
 from flow.utils.rllib import make_create_env

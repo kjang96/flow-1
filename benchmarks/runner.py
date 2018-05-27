@@ -15,12 +15,12 @@ from ray.tune.registry import register_env
 from flow.utils.rllib import FlowParamsEncoder
 
 # use this to specify the environment to run
-from .merge0 import flow_params, env_name, create_env
+from benchmarks.merge0 import flow_params, env_name, create_env
 
 # number of rollouts per training iteration
 N_ROLLOUTS = 20
 # number of parallel workers
-PARALLEL_ROLLOUTS = 10
+PARALLEL_ROLLOUTS = 20
 
 
 if __name__ == "__main__":
