@@ -255,7 +255,7 @@ def get_flow_params(config):
     flow_params = json.loads(config['env_config']['flow_params'])
     flow_params = unstring_flow_params(flow_params)
 
-    module_name = 'examples.rllib.' + flow_params['module']
+    module_name = 'tutorials.examples.rllib.' + flow_params['module']
 
     env_module = importlib.import_module(module_name)
     make_create_env = env_module.make_create_env

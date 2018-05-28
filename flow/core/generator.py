@@ -547,7 +547,8 @@ class Generator(Serializable):
         # import the .net.xml file containing all edge/type data
         parser = etree.XMLParser(recover=True)
         tree = ElementTree.parse(os.path.join(self.cfg_path, self.netfn),
-                        parser=parser)
+                                 parser=parser)
+        
         root = tree.getroot()
 
         # Collect information on the available types (if any are available).
