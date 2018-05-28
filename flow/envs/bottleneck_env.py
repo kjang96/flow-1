@@ -682,6 +682,20 @@ class DesiredVelocityEnv(BottleneckEnv):
                 self.action_index += [self.action_index[i] +
                                       segment * controlled * num_lanes]
 
+        self.action_index = {}
+        action_list = [0]
+        index = 0
+        for (edge, num_segments, controlled) in self.segments:
+            if controlled:
+                if self.symmetric:
+                    self.action_index[edge] = [action_list[index]]
+                    action_list += [action_list[index] + controlled]
+                else:
+                    num_lanes = self.scenario.num_lanes(edge)
+                    self.action_index[edge] = [action_list[index]]
+                    action_list += [action_list[index] + num_segments * controlled * num_lanes]
+                index += 1
+
     @property
     def observation_space(self):
         num_obs = 0
@@ -789,13 +803,12 @@ class DesiredVelocityEnv(BottleneckEnv):
                         # find what segment we fall into
                         bucket = np.searchsorted(self.slices[edge], pos) - 1
                         action = rl_actions[int(lane) + bucket * num_lanes
-                                            + self.action_index[int(edge) - 1]]
-
+                                            + self.action_index[edge]]
                     else:
                         # find what segment we fall into
                         bucket = np.searchsorted(self.slices[edge], pos) - 1
                         action = rl_actions[bucket +
-                                            self.action_index[int(edge) - 1]]
+                                            self.action_index[edge]]
 
                     traci_veh = self.traci_connection.vehicle
                     max_speed_curr = traci_veh.getMaxSpeed(rl_id)
