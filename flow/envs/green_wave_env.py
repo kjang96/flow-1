@@ -318,9 +318,9 @@ class TrafficLightGridEnv(Env):
 
     def k_closest_to_intersection(self, edges, k):
         """
-        Return the veh_id of the k closest vehicles to an intersection for each edge
-        Performs no check on whether or not edge is going toward an intersection or not
-        Does no padding
+        Return the veh_id of the k closest vehicles to an intersection for
+        each edge. Performs no check on whether or not edge is going toward an
+        intersection or not. Does no padding
         """
         if k < 0:
             raise IndexError("k must be greater than 0")
@@ -328,13 +328,18 @@ class TrafficLightGridEnv(Env):
         if isinstance(edges, list):
             for edge in edges:
                 vehicles = self.vehicles.get_ids_by_edge(edge)
-                dist = sorted(vehicles, key=lambda veh_id: self.get_distance_to_intersection(veh_id))
+                dist = sorted(vehicles,
+                              key=lambda veh_id:
+                              self.get_distance_to_intersection(veh_id))
                 dists += dist[:k]
         else:
             vehicles = self.vehicles.get_ids_by_edge(edges)
-            dist = sorted(vehicles, key=lambda veh_id: self.get_distance_to_intersection(veh_id))
+            dist = sorted(vehicles,
+                          key=lambda veh_id:
+                          self.get_distance_to_intersection(veh_id))
             dists += dist[:k]
         return dists
+
 
 class PO_TrafficLightGridEnv(TrafficLightGridEnv):
     """Environment used to train traffic lights to regulate traffic flow
@@ -356,7 +361,8 @@ class PO_TrafficLightGridEnv(TrafficLightGridEnv):
 
     Rewards
     -------
-    The reward is the delay of each vehicle minus a penalty for switching traffic lights
+    The reward is the delay of each vehicle minus a penalty for switching
+    traffic lights
 
     Termination
     -----------
@@ -373,18 +379,18 @@ class PO_TrafficLightGridEnv(TrafficLightGridEnv):
         super().__init__(env_params, sumo_params, scenario)
         self.num_observed = self.grid_array.get("num_observed", 3)
 
-
     @property
     def observation_space(self):
         """
-        Partial observed state space. Velocities, distance to intersections, edge number (for nearby vehicles)
-         traffic light state
-        :return:
+        Partial observed state space. Velocities, distance to intersections,
+        edge number (for nearby vehicles) traffic light state
         """
-        tl_box = Box(low=0., high=np.inf, shape=(3 * 4 * self.num_observed * self.num_traffic_lights +
-                                                 2 * len(self.scenario.get_edge_list())
-                                                 + 3 * self.num_traffic_lights,),
-                                          dtype=np.float32)
+        tl_box = Box(low=0.,
+                     high=np.inf,
+                     shape=(12 * self.num_observed * self.num_traffic_lights
+                            + 2 * len(self.scenario.get_edge_list())
+                            + 3 * self.num_traffic_lights,),
+                     dtype=np.float32)
         return tl_box
 
     def get_state(self):
@@ -392,31 +398,39 @@ class PO_TrafficLightGridEnv(TrafficLightGridEnv):
 
     def get_po_state(self):
         """
-        Returns self.num_observed number of vehicles closest to each traffic light and for each vehicle its
-        velocity, distance to intersection, edge_number traffic light state.
-        This is partially observed
-        :return:
+        Returns self.num_observed number of vehicles closest to each traffic
+        light and for each vehicle its velocity, distance to intersection,
+        edge_number traffic light state. This is partially observed
         """
         speeds = []
         dist_to_intersec = []
         edge_number = []
         max_speed = max(self.scenario.speed_limit(edge)
-                    for edge in self.scenario.get_edge_list())
-        max_dist = np.max([self.scenario.short_length, self.scenario.long_length, self.scenario.inner_length])
+                        for edge in self.scenario.get_edge_list())
+        max_dist = max(self.scenario.short_length, self.scenario.long_length,
+                       self.scenario.inner_length)
+
         for node, edges in self.scenario.get_node_mapping():
-            
-            observed_ids = self.k_closest_to_intersection(edges, self.num_observed)
-            # check which edges we have so we can always pad in the right positions
-            edges = self.vehicles.get_edge(observed_ids)
-            speeds += [self.vehicles.get_speed(veh_id) / max_speed for veh_id in observed_ids]
-            dist_to_intersec += [(self.scenario.edge_length(self.vehicles.get_edge(veh_id)) -
-                                  self.vehicles.get_position(veh_id)) / max_dist for veh_id in observed_ids]
-            edge_number += [self._convert_edge(self.vehicles.get_edge(veh_id)) / (self.scenario.num_edges - 1)
+            observed_ids = self.k_closest_to_intersection(edges,
+                                                          self.num_observed)
+
+            # check which edges we have so we can always pad in the right
+            # positions
+            speeds += [self.vehicles.get_speed(veh_id) / max_speed
+                       for veh_id in observed_ids]
+            dist_to_intersec += [
+                (self.scenario.edge_length(self.vehicles.get_edge(veh_id)) -
+                 self.vehicles.get_position(veh_id)) / max_dist
+                for veh_id in observed_ids]
+            edge_number += [self._convert_edge(self.vehicles.get_edge(veh_id))
+                            / (self.scenario.num_edges - 1)
                             for veh_id in observed_ids]
+
             # pad as needed
             # FIXME (ev) you should pad in the position of missing edges
-            # i.e. the edge order is [bot, right, top, left] so if right is missing, you should pad
-            # at right rather than at the end. This should make learning easier
+            # i.e. the edge order is [bot, right, top, left] so if right is
+            # missing, you should pad at right rather than at the end. This
+            # should make learning easier
             if len(observed_ids) < 4 * self.num_observed:
                 diff = 4 * self.num_observed - len(observed_ids)
                 speeds += [0] * diff
@@ -430,12 +444,14 @@ class PO_TrafficLightGridEnv(TrafficLightGridEnv):
             ids = self.vehicles.get_ids_by_edge(edge)
             if len(ids) > 0:
                 density += [5 * len(ids) / self.scenario.edge_length(edge)]
-                velocity_avg += [np.mean([self.vehicles.get_speed(veh_id) for veh_id in ids]) / max_speed]
+                velocity_avg += [np.mean([self.vehicles.get_speed(veh_id)
+                                          for veh_id in ids]) / max_speed]
             else:
                 density += [0]
                 velocity_avg += [0]
-        return np.array(np.concatenate([speeds, dist_to_intersec, edge_number, density,
-                                        velocity_avg, self.last_change.flatten().tolist()]))
+        return np.array(np.concatenate([speeds, dist_to_intersec, edge_number,
+                                        density, velocity_avg,
+                                        self.last_change.flatten().tolist()]))
 
 
 class GreenWaveTestEnv(TrafficLightGridEnv):

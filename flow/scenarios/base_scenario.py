@@ -116,7 +116,9 @@ class Scenario(Serializable):
                 self.generate_starting_positions()
 
         # create the sumo configuration files using the generator class
-        cfg_name = self.generator.generate_cfg(self.net_params)
+        cfg_name = self.generator.generate_cfg(self.net_params,
+                                               self.traffic_lights)
+
         self.generator.make_routes(self, self.initial_config)
 
         # specify the location of the sumo configuration file

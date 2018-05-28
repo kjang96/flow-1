@@ -89,8 +89,7 @@ additional_env_params = {"target_velocity": 50, "num_steps": HORIZON,
                          "control-length": 150, "switch_time": 3.0}
 
 additional_net_params = {"speed_limit": 35, "grid_array": grid_array,
-                         "horizontal_lanes": 1, "vertical_lanes": 1,
-                         "traffic_lights": True}
+                         "horizontal_lanes": 1, "vertical_lanes": 1}
 
 vehicles = Vehicles()
 vehicles.add(veh_id="idm",
