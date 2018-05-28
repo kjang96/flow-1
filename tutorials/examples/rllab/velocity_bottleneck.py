@@ -28,7 +28,7 @@ AV_FRAC = .1
 PARALLEL_ROLLOUTS = 32
 i = 0
 
-sumo_params = SumoParams(sim_step=0.5, sumo_binary="sumo-gui",
+sumo_params = SumoParams(sim_step=0.5, sumo_binary="sumo",
                          restart_instance=True)
 
 vehicles = Vehicles()
