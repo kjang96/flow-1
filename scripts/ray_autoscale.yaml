@@ -1,7 +1,7 @@
 # cluster.yaml ========================================= 
 
 # An unique identifier for the head node and workers of this cluster.
-cluster_name: bayexp4 #<YOUR NAME>
+cluster_name: your_name #<YOUR NAME>
 
 # The minimum number of workers nodes to launch in addition to the head
 # node. This number should be >= 0.
@@ -40,7 +40,7 @@ auth:
 # http://boto3.readthedocs.io/en/latest/reference/services/ec2.html#EC2.ServiceResource.create_instances
 head_node:
     InstanceType: m4.16xlarge
-    ImageId: ami-78948f18 # Flow AMI (Ubuntu)
+    ImageId: ami-a2948fc2 # Flow AMI (Ubuntu)
 
     # Additional options in the boto docs.
 
@@ -50,7 +50,7 @@ head_node:
 # http://boto3.readthedocs.io/en/latest/reference/services/ec2.html#EC2.ServiceResource.create_instances
 worker_nodes:
     InstanceType: m4.16xlarge
-    ImageId: ami-78948f18 # Flow AMI (Ubuntu)
+    ImageId: ami-a2948fc2 # Flow AMI (Ubuntu)
 
     # Run workers on spot by default. Comment this out to use on-demand.
     InstanceMarketOptions:
