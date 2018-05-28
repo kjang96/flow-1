@@ -27,12 +27,13 @@ AV_FRAC = 0.10
 
 vehicles = Vehicles()
 vehicles.add(veh_id="human",
-             speed_mode="all_checks",
+             speed_mode=9,
              routing_controller=(ContinuousRouter, {}),
              lane_change_mode=0,
              num_vehicles=1 * SCALING)
 vehicles.add(veh_id="rl",
-             acceleration_controller=(RLController, {}),
+             acceleration_controller=(RLController,
+                                      {"fail_safe": "safe_velocity"}),
              routing_controller=(ContinuousRouter, {}),
              speed_mode=9,
              lane_change_mode=0,
@@ -52,7 +53,8 @@ additional_env_params = {
     "reset_inflow": False,
     "lane_change_duration": 5,
     "max_accel": 3,
-    "max_decel": 3
+    "max_decel": 3,
+    "inflow_range": [1000,2000]
 }
 
 # flow rate

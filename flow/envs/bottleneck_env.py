@@ -66,7 +66,9 @@ ADDITIONAL_VSL_ENV_PARAMS = {
     # which edges are observed
     "observed_segments": [("1", 1), ("2", 1), ("3", 1), ("4", 1), ("5", 1)],
     # whether the inflow should be reset on each rollout
-    "reset_inflow": False
+    "reset_inflow": False,
+    # the range of inflows to reset on
+    "inflow_range": [1000, 2000]
 }
 
 ADDITIONAL_NET_PARAMS = {
@@ -395,7 +397,7 @@ class BottleNeckAccelEnv(BottleneckEnv):
         num_edges = len(self.scenario.get_edge_list())
         num_rl_veh = self.num_rl
         num_obs = 2 * num_edges + 4 * MAX_LANES * self.scaling \
-            * num_rl_veh + 4 * num_rl_veh
+                  * num_rl_veh + 4 * num_rl_veh
         print("--------------")
         print("--------------")
         print("--------------")
@@ -746,9 +748,9 @@ class DesiredVelocityEnv(BottleneckEnv):
             rl_speeds_list += rl_vehicle_speeds.flatten().tolist()
 
         unnorm_veh_list = np.asarray(num_vehicles_list) * \
-            NUM_VEHICLE_NORM
+                          NUM_VEHICLE_NORM
         unnorm_rl_list = np.asarray(num_rl_vehicles_list) * \
-            NUM_VEHICLE_NORM
+                         NUM_VEHICLE_NORM
         # compute the mean speed if the speed isn't zero
         num_rl = len(num_rl_vehicles_list)
         num_veh = len(num_vehicles_list)
@@ -807,20 +809,14 @@ class DesiredVelocityEnv(BottleneckEnv):
     def compute_reward(self, state, rl_actions, **kwargs):
 
         reward = self.vehicles.get_outflow_rate(10 * self.sim_step) / 200.0
-
-        # penalize high density in the bottleneck
-        # bottleneck_ids = self.vehicles.get_ids_by_edge('4')
-        # bottleneck_threshold = 35  # could be 10 also
-        # if len(bottleneck_ids) > bottleneck_threshold:
-        #     reward -= len(bottleneck_ids) - bottleneck_threshold
-        #
-        # print('outflow is', self.vehicles.get_outflow_rate(800))
-
         return reward
 
     def reset(self):
-        if self.env_params.additional_params.get("reset_inflow"):
-            flow_rate = np.random.uniform(1000, 2000) * self.scaling
+        add_params = self.env_params.additional_params
+        if add_params.get("reset_inflow"):
+            inflow_range = add_params.get("inflow_range")
+            flow_rate = np.random.uniform(min(inflow_range),
+                                          max(inflow_range)) * self.scaling
             for _ in range(100):
                 try:
                     inflow = InFlows()
@@ -862,10 +858,17 @@ class DesiredVelocityEnv(BottleneckEnv):
                         initial_config=self.scenario.initial_config,
                         traffic_lights=self.scenario.traffic_lights
                     )
+                    observation = super().reset()
+
+                    # reset the timer to zero
+                    self.time_counter = 0
+
+                    return observation
 
                 except Exception as e:
                     print('error on reset ', e)
                     # perform the generic reset function
+
         observation = super().reset()
 
         # reset the timer to zero
