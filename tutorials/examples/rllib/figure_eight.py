@@ -118,7 +118,7 @@ if __name__ == "__main__":
             "checkpoint_freq": 1,
             "max_failures": 999,
             "stop": {
-                "training_iteration": 1
+                "training_iteration": 200
             },
             "repeat": 3,
             "trial_resources": {
