@@ -6,6 +6,7 @@ MAX_GAP = 3.0
 DETECTOR_GAP = 0.8
 SHOW_DETECTORS = True
 
+
 class TrafficLights:
 
     def __init__(self, baseline=False):
@@ -37,8 +38,7 @@ class TrafficLights:
             detectorGap=None,
             showDetectors=None,
             file=None,
-            freq=None
-            ):
+            freq=None):
         """Adds a traffic light component to the network.
 
         When generating networks using xml files, using this method to add a
@@ -70,24 +70,27 @@ class TrafficLights:
             - "maxDur": optional
                 The maximum duration of the phase when using type actuated
         maxGap : int, used for actuated traffic lights
-            describes the maximum time gap between successive vehicle that 
+            describes the maximum time gap between successive vehicle that
             will cause the current phase to be prolonged
         detectorGap : int, used for actuated traffic lights
-            determines the time distance between the (automatically generated) 
+            determines the time distance between the (automatically generated)
             detector and the stop line in seconds (at each lanes maximum speed)
         showDetectors : bool, used for actuated traffic lights
             toggles whether or not detectors are shown in sumo-gui
         file : str, optional
             which file the detector shall write results into
         freq : int, optional
-            the period over which collected values shall be aggregated 
+            the period over which collected values shall be aggregated
 
         Note
         ----
         For information on defining traffic light properties, see:
         http://sumo.dlr.de/wiki/Simulation/Traffic_Lights#Defining_New_TLS-Programs
         """
-        # TODO add proper checks here: make sure programID exists 
+        # increment the number of traffic lights
+        self.num_traffic_lights += 1
+
+        # TODO add proper checks here: make sure programID exists
         # NOTE: the keys you add to the dictionary need to match the xml spec
         # add the node id to the list of controlled nodes
         self.__ids.append(node_id)
@@ -100,17 +103,18 @@ class TrafficLights:
 
         if offset:
             self.__tls_properties[node_id]["offset"] = offset
-    
+
         if phases:
             self.__tls_properties[node_id]["phases"] = phases
 
         if tls_type == "actuated":
             # Required parameters
-            self.__tls_properties[node_id]["max-gap"] = maxGap if maxGap else MAX_GAP
-
-            self.__tls_properties[node_id]["detector-gap"] = detectorGap if detectorGap else DETECTOR_GAP
-
-            self.__tls_properties[node_id]["show-detectors"] = showDetectors if showDetectors else SHOW_DETECTORS
+            self.__tls_properties[node_id]["max-gap"] = \
+                maxGap if maxGap else MAX_GAP
+            self.__tls_properties[node_id]["detector-gap"] = \
+                detectorGap if detectorGap else DETECTOR_GAP
+            self.__tls_properties[node_id]["show-detectors"] = \
+                showDetectors if showDetectors else SHOW_DETECTORS
 
             # Optional parameters
             if file:
@@ -183,8 +187,8 @@ class TrafficLights:
         """
         Returns the default values to be used for the generator
         for a system where all junctions are actuated traffic lights.
-        
-        Returns 
+
+        Returns
         _______
         tl_logic: dict
         """
@@ -193,10 +197,14 @@ class TrafficLights:
         max_gap = 3.0
         detector_gap = 0.8
         show_detectors = True
-        phases = [{"duration": "31", "minDur": "8", "maxDur": "45", "state": "GGGrrrGGGrrr"},
-                {"duration": "6", "minDur": "3", "maxDur": "6", "state": "yyyrrryyyrrr"},
-                {"duration": "31", "minDur": "8", "maxDur": "45", "state": "rrrGGGrrrGGG"},
-                {"duration": "6", "minDur": "3", "maxDur": "6", "state": "rrryyyrrryyy"}]
+        phases = [{"duration": "31", "minDur": "8", "maxDur": "45",
+                   "state": "GGGrrrGGGrrr"},
+                  {"duration": "6", "minDur": "3", "maxDur": "6",
+                   "state": "yyyrrryyyrrr"},
+                  {"duration": "31", "minDur": "8", "maxDur": "45",
+                   "state": "rrrGGGrrrGGG"},
+                  {"duration": "6", "minDur": "3", "maxDur": "6",
+                   "state": "rrryyyrrryyy"}]
 
         return {"tl_type": str(tl_type),
                 "program_id": str(program_id),

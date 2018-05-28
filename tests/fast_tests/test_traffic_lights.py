@@ -10,8 +10,8 @@ from flow.core.experiment import SumoExperiment
 from flow.controllers.routing_controllers import GridRouter
 from flow.controllers.car_following_models import IDMController
 
-
 os.environ["TEST_FLAG"] = "True"
+
 
 class TestUpdateGetState(unittest.TestCase):
     """
@@ -126,6 +126,7 @@ class TestSetState(unittest.TestCase):
 
         self.assertEqual(state[1], "R")
 
+
 class TestPOEnv(unittest.TestCase):
     """
     Tests the set_state function
@@ -136,11 +137,11 @@ class TestPOEnv(unittest.TestCase):
         vehicles.add(veh_id="idm",
                      acceleration_controller=(IDMController, {}),
                      routing_controller=(GridRouter, {}),
-                     sumo_car_following_params=SumoCarFollowingParams(min_gap=2.5, tau=1.1),
+                     sumo_car_following_params=SumoCarFollowingParams(
+                         min_gap=2.5, tau=1.1),
                      num_vehicles=16)
-    
-        self.env, scenario = grid_mxn_exp_setup(row_num=1,
-                                                col_num=3,
+
+        self.env, scenario = grid_mxn_exp_setup(row_num=1, col_num=3,
                                                 vehicles=vehicles)
 
     def tearDown(self):
@@ -155,11 +156,10 @@ class TestPOEnv(unittest.TestCase):
         # print(ordering)
         for x in ordering:
             # print(x)
-            if not(x[0].startswith("bot") and x[1].startswith("right") and \
-                x[2].startswith("top") and x[3].startswith("left")):
+            if not (x[0].startswith("bot") and x[1].startswith("right") and
+                    x[2].startswith("top") and x[3].startswith("left")):
                 return False
         return True
-                
 
     def test_node_mapping(self):
         # reset the environment
@@ -181,14 +181,17 @@ class TestPOEnv(unittest.TestCase):
         k_closest = self.env.k_closest_to_intersection(c0_edges, 3)
 
         # check bot, right, top, left in that order
-        self.assertEqual(self.env.k_closest_to_intersection(c0_edges[0], 3), k_closest[0:2])
-        self.assertEqual(self.env.k_closest_to_intersection(c0_edges[1], 3), k_closest[2:4])
-        self.assertEqual(len(self.env.k_closest_to_intersection(c0_edges[2], 3)), 0)
-        self.assertEqual(self.env.k_closest_to_intersection(c0_edges[3], 3), k_closest[4:6])
+        self.assertEqual(self.env.k_closest_to_intersection(c0_edges[0], 3),
+                         k_closest[0:2])
+        self.assertEqual(self.env.k_closest_to_intersection(c0_edges[1], 3),
+                         k_closest[2:4])
+        self.assertEqual(
+            len(self.env.k_closest_to_intersection(c0_edges[2], 3)), 0)
+        self.assertEqual(self.env.k_closest_to_intersection(c0_edges[3], 3),
+                         k_closest[4:6])
 
         for veh_id in k_closest:
             self.assertTrue(self.env.vehicles.get_edge(veh_id) in c0_edges)
-
 
 
 class TestItRuns(unittest.TestCase):
@@ -201,12 +204,12 @@ class TestItRuns(unittest.TestCase):
         vehicles.add(veh_id="idm",
                      acceleration_controller=(IDMController, {}),
                      routing_controller=(GridRouter, {}),
-                     sumo_car_following_params=SumoCarFollowingParams(min_gap=2.5, tau=1.1),
+                     sumo_car_following_params=SumoCarFollowingParams(
+                         min_gap=2.5, tau=1.1),
                      num_vehicles=16)
-        
-        self.env, self.scenario = grid_mxn_exp_setup(row_num=1,
-                                                col_num=3,
-                                                vehicles=vehicles)
+
+        self.env, self.scenario = grid_mxn_exp_setup(row_num=1, col_num=3,
+                                                     vehicles=vehicles)
 
     def tearDown(self):
         # terminate the traci instance
@@ -219,29 +222,36 @@ class TestItRuns(unittest.TestCase):
     def test_it_runs(self):
         self.exp = SumoExperiment(self.env, self.scenario)
         self.exp.run(5, 50)
+
 
 class TestIndividualLights(unittest.TestCase):
     """
     Tests the functionality of the the TrafficLights class in allowing
     for customization of specific nodes
     """
-    def setUp(self):
-        
 
+    def setUp(self):
         tl_logic = TrafficLights(baseline=False)
-        phases = [{"duration": "31", "minDur": "8", "maxDur": "45", "state": "GGGrrrGGGrrr"},
-                    {"duration": "6", "minDur": "3", "maxDur": "6", "state": "yyyrrryyyrrr"},
-                    {"duration": "31", "minDur": "8", "maxDur": "45", "state": "rrrGGGrrrGGG"},
-                    {"duration": "6", "minDur": "3", "maxDur": "6", "state": "rrryyyrrryyy"}]
+        phases = [{"duration": "31", "minDur": "8", "maxDur": "45",
+                   "state": "GGGrrrGGGrrr"},
+                  {"duration": "6", "minDur": "3", "maxDur": "6",
+                   "state": "yyyrrryyyrrr"},
+                  {"duration": "31", "minDur": "8", "maxDur": "45",
+                   "state": "rrrGGGrrrGGG"},
+                  {"duration": "6", "minDur": "3", "maxDur": "6",
+                   "state": "rrryyyrrryyy"}]
         tl_logic.add("center0", phases=phases, programID=1)
         tl_logic.add("center1", phases=phases, programID=1, offset=1)
-        tl_logic.add("center2", tls_type="actuated", phases=phases, programID=1)
-        tl_logic.add("center3", tls_type="actuated", phases=phases, programID=1, maxGap=3.0,
-            detectorGap=0.8, showDetectors=True, file="testindividuallights.xml", freq=100)
+        tl_logic.add("center2", tls_type="actuated", phases=phases,
+                     programID=1)
+        tl_logic.add("center3", tls_type="actuated", phases=phases,
+                     programID=1, maxGap=3.0, detectorGap=0.8,
+                     showDetectors=True,
+                     file="testindividuallights.xml", freq=100)
 
-        self.env, self.scenario = grid_mxn_exp_setup(row_num=1,
-                                                     col_num=4,
+        self.env, self.scenario = grid_mxn_exp_setup(row_num=1, col_num=4,
                                                      tl_logic=tl_logic)
+
     def tearDown(self):
         # terminate the traci instance
         self.env.terminate()
@@ -253,6 +263,7 @@ class TestIndividualLights(unittest.TestCase):
     def test_it_runs(self):
         self.exp = SumoExperiment(self.env, self.scenario)
         self.exp.run(5, 50)
+
 
 if __name__ == '__main__':
     unittest.main()

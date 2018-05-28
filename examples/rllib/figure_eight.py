@@ -17,6 +17,8 @@ from flow.controllers.routing_controllers import ContinuousRouter
 from flow.controllers.rlcontroller import RLController
 from flow.scenarios.figure8.figure8_scenario import ADDITIONAL_NET_PARAMS
 
+
+
 # time horizon of a single rollout
 HORIZON = 1500
 # number of rollouts per training iteration
