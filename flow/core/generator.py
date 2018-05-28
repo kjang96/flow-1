@@ -548,6 +548,7 @@ class Generator(Serializable):
         parser = etree.XMLParser(recover=True)
         tree = ElementTree.parse(os.path.join(self.cfg_path, self.netfn),
                                  parser=parser)
+        
         root = tree.getroot()
 
         # Collect information on the available types (if any are available).
