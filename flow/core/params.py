@@ -140,8 +140,6 @@ class EnvParams:
 class NetParams:
 
     def __init__(self,
-                 net_path="debug/net/",
-                 cfg_path="debug/cfg/",
                  no_internal_links=True,
                  in_flows=None,
                  osm_path=None,
@@ -160,10 +158,6 @@ class NetParams:
 
         Parameters
         ----------
-        net_path : str, optional
-            path to the network files created to create a network with sumo
-        cfg_path : str, optional
-            path to the config files created to create a network with sumo
         no_internal_links : bool, optional
             determines whether the space between edges is finite. Important
             when using networks with intersections; default is False
@@ -183,15 +177,11 @@ class NetParams:
             network specific parameters; see each subclass for a description of
             what is needed
         """
-        if additional_params is None:
-            additional_params = {}
-        self.net_path = net_path
-        self.cfg_path = cfg_path
         self.no_internal_links = no_internal_links
         self.in_flows = in_flows
         self.osm_path = osm_path
         self.netfile = netfile
-        self.additional_params = additional_params
+        self.additional_params = additional_params or {}
 
 
 class InitialConfig:

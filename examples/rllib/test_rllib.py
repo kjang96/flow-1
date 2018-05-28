@@ -1,5 +1,5 @@
 """
-(blank)
+File used for quick tests of whether the code is working on large machines
 """
 
 import json
@@ -24,7 +24,7 @@ HORIZON = 1500
 # number of rollouts per training iteration
 N_ROLLOUTS = 20
 # number of parallel workers
-PARALLEL_ROLLOUTS = 2
+PARALLEL_ROLLOUTS = 20
 
 # We place one autonomous vehicle and 13 human-driven vehicles in the network
 vehicles = Vehicles()
@@ -124,7 +124,7 @@ if __name__ == "__main__":
             "stop": {
                 "training_iteration": 1
             },
-            "repeat": 3,
+            "repeat": 1,
             "trial_resources": {
                 "cpu": 1,
                 "gpu": 0,
