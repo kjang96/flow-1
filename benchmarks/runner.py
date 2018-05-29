@@ -36,6 +36,8 @@ if __name__ == "__main__":
     config["kl_target"] = 0.02
     config["use_gae"] = True
     config["horizon"] = horizon
+    config["ADB"] = grid_search([True, False])
+    """
     config["gamma"] = grid_search([0.995, 0.999, 1.0])  # discount rate
     config["model"].update({"fcnet_hiddens": grid_search([[100, 50, 25], [256, 256], [32, 32]])})
     config["lambda"] = grid_search([0.9, 0.99])
@@ -44,10 +46,10 @@ if __name__ == "__main__":
     config["entropy_coeff"] = grid_search([0, -1e-4, 1e-4])
     config["kl_coeff"] = grid_search([0.0, 0.2])
     #config["clip_param"] = grid_search([0.2, 0.3])
-    #config["ADB"] = grid_search([True, False])
+    #
     config["clip_param"] = 0.2
     config["ADB"] = False
-
+    """
     # save the flow params for replay
     flow_json = json.dumps(flow_params, cls=FlowParamsEncoder, sort_keys=True,
                            indent=4)
