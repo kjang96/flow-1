@@ -26,7 +26,7 @@ PARALLEL_ROLLOUTS = 15
 
 if __name__ == "__main__":
     start = time.time()
-    print("START")
+    print("STARTTTTTTTTTT STARTTTTTTTTTT STARTTTTTTTTTT STARTTTTTTTTTT")
     ray.init(redis_address="localhost:6379")
     horizon = flow_params["env"].horizon
     config = ppo.DEFAULT_CONFIG.copy()
