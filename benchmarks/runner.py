@@ -26,8 +26,8 @@ PARALLEL_ROLLOUTS = 15
 
 if __name__ == "__main__":
     start = time.time()
-    print("STARTTTTTTTTTT STARTTTTTTTTTT STARTTTTTTTTTT STARTTTTTTTTTT")
-    ray.init(redis_address="localhost:6379")
+    print("STARTTTTTT")
+    ray.init(redis_address="localhost:6379", redirect_output=True)
     horizon = flow_params["env"].horizon
     config = ppo.DEFAULT_CONFIG.copy()
     config["num_workers"] = PARALLEL_ROLLOUTS
