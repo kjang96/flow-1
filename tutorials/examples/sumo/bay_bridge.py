@@ -7,7 +7,7 @@ from flow.core.vehicles import Vehicles
 from flow.core.traffic_lights import TrafficLights
 
 from flow.core.experiment import SumoExperiment
-from flow.envs.bay_bridge import BridgeBaseEnv
+from flow.envs.bay_bridge import BayBridgeEnv
 from flow.scenarios.bay_bridge.gen import BayBridgeGenerator
 from flow.scenarios.bay_bridge.scenario import BayBridgeScenario
 from flow.controllers import SumoCarFollowingController, BayBridgeRouter
@@ -135,7 +135,7 @@ def bay_bridge_example(sumo_binary=None,
                                  net_params=net_params,
                                  initial_config=initial_config)
 
-    env = BridgeBaseEnv(env_params, sumo_params, scenario)
+    env = BayBridgeEnv(env_params, sumo_params, scenario)
 
     return SumoExperiment(env, scenario)
 

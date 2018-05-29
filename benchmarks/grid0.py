@@ -1,15 +1,14 @@
 """
 Grid/green wave example
+
+Action Dimension: (?, )
+
+Observation Dimension: (?, )
+
+Horizon: 200 steps
 """
 
-import json
-
-import ray
-import ray.rllib.ppo as ppo
-from ray.tune import run_experiments
-from ray.tune.registry import register_env
-
-from flow.utils.rllib import make_create_env, FlowParamsEncoder
+from flow.utils.rllib import make_create_env
 from flow.core.params import SumoParams, EnvParams, InitialConfig, NetParams, \
     InFlows, SumoCarFollowingParams
 from flow.core.vehicles import Vehicles
@@ -17,10 +16,6 @@ from flow.controllers import SumoCarFollowingController, GridRouter
 
 # time horizon of a single rollout
 HORIZON = 200
-# number of rollouts per training iteration
-N_ROLLOUTS = 20
-# number of parallel workers
-PARALLEL_ROLLOUTS = 2
 
 
 def gen_edges(row_num, col_num):
@@ -122,7 +117,7 @@ flow_params = dict(
     # sumo-related parameters (see flow.core.params.SumoParams)
     sumo=SumoParams(
         sim_step=1,
-        sumo_binary="sumo-gui",
+        sumo_binary="sumo",
     ),
 
     # environment related parameters (see flow.core.params.EnvParams)
@@ -144,50 +139,5 @@ flow_params = dict(
     initial=initial_config,
 )
 
-
-if __name__ == "__main__":
-    ray.init(num_cpus=PARALLEL_ROLLOUTS, redirect_output=True)
-
-    config = ppo.DEFAULT_CONFIG.copy()
-    config["num_workers"] = PARALLEL_ROLLOUTS
-    config["timesteps_per_batch"] = HORIZON * N_ROLLOUTS
-    config["gamma"] = 0.999  # discount rate
-    config["model"].update({"fcnet_hiddens": [32, 32]})
-    config["sgd_batchsize"] = min(16 * 1024, config["timesteps_per_batch"])
-    config["kl_target"] = 0.02
-    config["num_sgd_iter"] = 30
-    config["sgd_stepsize"] = 5e-5
-    config["observation_filter"] = "NoFilter"
-    config["use_gae"] = True
-    config["clip_param"] = 0.2
-    config["horizon"] = HORIZON
-
-    # save the flow params for replay
-    flow_json = json.dumps(flow_params, cls=FlowParamsEncoder, sort_keys=True,
-                           indent=4)
-    config['env_config']['flow_params'] = flow_json
-
-    create_env, env_name = make_create_env(params=flow_params, version=0)
-
-    # Register as rllib env
-    register_env(env_name, create_env)
-
-    trials = run_experiments({
-        "green_wave": {
-            "run": "PPO",
-            "env": env_name,
-            "config": {
-                **config
-            },
-            "checkpoint_freq": 20,
-            "max_failures": 999,
-            "stop": {
-                "training_iteration": 200,
-            },
-            "trial_resources": {
-                "cpu": 1,
-                "gpu": 0,
-                "extra_cpu": PARALLEL_ROLLOUTS - 1,
-            },
-        }
-    })
+# get the env name and a creator for the environment (used by rllib)
+create_env, env_name = make_create_env(params=flow_params, version=0)
