@@ -6,38 +6,46 @@ this runner script is executed on. Furthermore, the rllib specific algorithm/
 parameters can be specified here once and used on multiple environments.
 """
 import json
-
+import time
 import ray
 import ray.rllib.ppo as ppo
 from ray.tune import run_experiments
+from ray.tune import grid_search
 from ray.tune.registry import register_env
 
 from flow.utils.rllib import FlowParamsEncoder
 
 # use this to specify the environment to run
-from benchmarks.merge0 import flow_params, env_name, create_env
+from benchmarks.figureeight2 import flow_params, env_name, create_env
 
 # number of rollouts per training iteration
-N_ROLLOUTS = 20
+N_ROLLOUTS = 15
 # number of parallel workers
-PARALLEL_ROLLOUTS = 20
+PARALLEL_ROLLOUTS = 15
 
 
 if __name__ == "__main__":
+    start = time.time()
+    print("START")
     ray.init(num_cpus=PARALLEL_ROLLOUTS, redirect_output=True)
     horizon = flow_params["env"].horizon
 
     config = ppo.DEFAULT_CONFIG.copy()
     config["num_workers"] = PARALLEL_ROLLOUTS
     config["timesteps_per_batch"] = horizon * N_ROLLOUTS
-    config["gamma"] = 0.999  # discount rate
-    config["model"].update({"fcnet_hiddens": [32, 32, 32]})
-    config["use_gae"] = True
-    config["lambda"] = 0.97
-    config["sgd_batchsize"] = min(16 * 1024, config["timesteps_per_batch"])
+    config["vf_loss_coeff"] = 1.0
     config["kl_target"] = 0.02
-    config["num_sgd_iter"] = 10
+    config["use_gae"] = True
     config["horizon"] = horizon
+    config["gamma"] = grid_search([0.995, 0.999, 1.0])  # discount rate
+    config["model"].update({"fcnet_hiddens": grid_search([[100, 50, 25], [256, 256], [32, 32]])})
+    config["lambda"] = grid_search([0.9, 0.99])
+    config["sgd_batchsize"] = grid_search([64, 1024, min(16 * 1024, config["timesteps_per_batch"])])
+    config["num_sgd_iter"] = grid_search([10, 30])
+    config["entropy_coeff"] = grid_search([0, -1e-4, 1e-4])
+    config["kl_coeff"] = grid_search([0.0, 0.2])
+    config["clip_param"] = grid_search([0.2, 0.3])
+    config["ADB"] = grid_search([True, False])
 
     # save the flow params for replay
     flow_json = json.dumps(flow_params, cls=FlowParamsEncoder, sort_keys=True,
@@ -57,7 +65,7 @@ if __name__ == "__main__":
             "checkpoint_freq": 5,
             "max_failures": 999,
             "stop": {
-                "training_iteration": 200,
+                "training_iteration": 1,
             },
             "repeat": 3,
             "trial_resources": {
@@ -67,3 +75,7 @@ if __name__ == "__main__":
             },
         },
     })
+
+    end = time.time()
+
+    print("IT TOOK " + str(end-start))
