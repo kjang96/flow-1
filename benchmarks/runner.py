@@ -43,8 +43,10 @@ if __name__ == "__main__":
     config["num_sgd_iter"] = grid_search([10, 30])
     config["entropy_coeff"] = grid_search([0, -1e-4, 1e-4])
     config["kl_coeff"] = grid_search([0.0, 0.2])
-    config["clip_param"] = grid_search([0.2, 0.3])
-    config["ADB"] = grid_search([True, False])
+    #config["clip_param"] = grid_search([0.2, 0.3])
+    #config["ADB"] = grid_search([True, False])
+    config["clip_param"] = 0.2
+    config["ADB"] = False
 
     # save the flow params for replay
     flow_json = json.dumps(flow_params, cls=FlowParamsEncoder, sort_keys=True,
