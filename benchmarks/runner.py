@@ -27,7 +27,7 @@ PARALLEL_ROLLOUTS = 15
 if __name__ == "__main__":
     start = time.time()
     print("START")
-    ray.init(num_cpus=PARALLEL_ROLLOUTS, redirect_output=True)
+    ray.init(redirect_output=True)
     horizon = flow_params["env"].horizon
 
     config = ppo.DEFAULT_CONFIG.copy()
