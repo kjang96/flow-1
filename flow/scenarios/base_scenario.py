@@ -1,6 +1,7 @@
 import logging
 import random
 import numpy as np
+import time
 
 try:
     # Import serializable if rllab is installed
@@ -53,7 +54,7 @@ class Scenario(Serializable):
         if Serializable is not object:
             Serializable.quick_init(self, locals())
 
-        self.name = name
+        self.name = name + str(time.time())
         self.generator_class = generator_class
         self.vehicles = vehicles
         self.net_params = net_params
@@ -115,7 +116,9 @@ class Scenario(Serializable):
                 self.generate_starting_positions()
 
         # create the sumo configuration files using the generator class
-        cfg_name = self.generator.generate_cfg(self.net_params)
+        cfg_name = self.generator.generate_cfg(self.net_params,
+                                               self.traffic_lights)
+
         self.generator.make_routes(self, self.initial_config)
 
         # specify the location of the sumo configuration file
@@ -559,7 +562,8 @@ class Scenario(Serializable):
                 available_edges, initial_config)
 
     def edge_length(self, edge_id):
-        """Returns the length of a given edge/junction. Returns -1001 if edge not found."""
+        """Returns the length of a given edge/junction. Returns -1001 if edge
+        not found."""
         try:
             return self._edges[edge_id]["length"]
         except KeyError:
@@ -567,7 +571,8 @@ class Scenario(Serializable):
             return -1001
 
     def speed_limit(self, edge_id):
-        """Returns the speed limit of a given edge/junction. Returns -1001 if edge not found."""
+        """Returns the speed limit of a given edge/junction. Returns -1001 if
+        edge not found."""
         try:
             return self._edges[edge_id]["speed"]
         except KeyError:
@@ -575,7 +580,8 @@ class Scenario(Serializable):
             return -1001
 
     def num_lanes(self, edge_id):
-        """Returns the number of lanes of a given edge/junction. Returns -1001 if edge not found."""
+        """Returns the number of lanes of a given edge/junction. Returns -1001
+        if edge not found."""
         try:
             return self._edges[edge_id]["lanes"]
         except KeyError:

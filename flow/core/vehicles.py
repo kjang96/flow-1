@@ -17,6 +17,7 @@ LC_MODES = {"aggressive": 0, "no_lat_collide": 512, "strategic": 853}
 
 
 class Vehicles:
+
     def __init__(self):
         """Base vehicle class.
 
@@ -63,6 +64,9 @@ class Vehicles:
         # simulation step size
         self.sim_step = 0
 
+        # initial state of the vehicles class, used for serialization purposes
+        self.initial = []
+
     def add(self,
             veh_id,
             acceleration_controller=(SumoCarFollowingController, {}),
@@ -70,7 +74,7 @@ class Vehicles:
             routing_controller=None,
             initial_speed=0,
             num_vehicles=1,
-            speed_mode='no_collide',
+            speed_mode='all_checks',
             lane_change_mode="no_lat_collide",
             sumo_car_following_params=None,
             sumo_lc_params=None):
@@ -174,6 +178,18 @@ class Vehicles:
              "sumo_car_following_params": sumo_car_following_params,
              "sumo_lc_params": sumo_lc_params}
 
+        self.initial.append({
+            "veh_id": veh_id,
+            "acceleration_controller": acceleration_controller,
+            "lane_change_controller": lane_change_controller,
+            "routing_controller": routing_controller,
+            "initial_speed": initial_speed,
+            "num_vehicles": num_vehicles,
+            "speed_mode": speed_mode,
+            "lane_change_mode": lane_change_mode,
+            "sumo_car_following_params": sumo_car_following_params,
+            "sumo_lc_params": sumo_lc_params})
+
         # this is used to return the actual headways from the vehicles class
         self.minGap[veh_id] = type_params["minGap"]
 
@@ -190,9 +206,10 @@ class Vehicles:
 
             # specify the acceleration controller class
             self.__vehicles[v_id]["acc_controller"] = \
-                acceleration_controller[0](v_id,
-                                           sumo_cf_params=sumo_car_following_params,
-                                           **acceleration_controller[1])
+                acceleration_controller[0](
+                    v_id,
+                    sumo_cf_params=sumo_car_following_params,
+                    **acceleration_controller[1])
 
             # specify the lane-changing controller class
             self.__vehicles[v_id]["lane_changer"] = \
@@ -256,6 +273,7 @@ class Vehicles:
         env: Environment type
             state of the environment at the current time step
         """
+
         # remove exiting vehicles from the vehicles class
         for veh_id in sim_obs[tc.VAR_ARRIVED_VEHICLES_IDS]:
             if veh_id not in sim_obs[tc.VAR_TELEPORT_STARTING_VEHICLES_IDS]:
@@ -545,6 +563,14 @@ class Vehicles:
             return 0
         num_outflow = self._num_arrived[-int(time_span / self.sim_step):]
         return 3600 * sum(num_outflow) / (len(num_outflow) * self.sim_step)
+
+    def get_num_arrived(self):
+        """Returns the number of vehicles that arrived in the last
+        time step"""
+        if len(self._num_arrived) > 0:
+            return self._num_arrived[-1]
+        else:
+            return 0
 
     def get_initial_speed(self, veh_id, error=-1001):
         """Returns the initial speed upon reset of the specified vehicle.
@@ -1089,14 +1115,14 @@ class Vehicles:
                     else:
                         leader[lane] = ids[index]
                         headway[lane] = positions[index] - this_pos \
-                                        - self.get_length(leader[lane])
+                            - self.get_length(leader[lane])
 
                 # you are in the back of the queue, the lane follower is in the
                 # edges behind you
                 if index > 0:
                     follower[lane] = ids[index - 1]
                     tailway[lane] = this_pos - positions[index - 1] \
-                                    - self.get_length(veh_id)
+                        - self.get_length(veh_id)
 
             # if lane leader not found, check next edges
             if leader[lane] == "":
@@ -1141,7 +1167,7 @@ class Vehicles:
                 if len(edge_dict[edge][lane]) > 0:
                     leader = edge_dict[edge][lane][0][0]
                     headway = edge_dict[edge][lane][0][1] - pos + add_length \
-                              - self.get_length(leader)
+                        - self.get_length(leader)
             except KeyError:
                 # current edge has no vehicles, so move on
                 continue

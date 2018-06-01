@@ -14,7 +14,9 @@ class SumoParams:
                  overtake_right=False,
                  ballistic=False,
                  seed=None,
-                 restart_instance=False):
+                 restart_instance=False,
+                 print_warnings=True,
+                 teleport_time=-100):
         """Sumo-specific parameters
 
         These parameters are used to customize a sumo simulation instance upon
@@ -56,6 +58,11 @@ class SumoParams:
             the instance helps avoid slowdowns cause by excessive inflows over
             large experiment runtimes, but also require the gui to be started
             after every reset if "sumo_binary" is set to True.
+        print_warnings: bool, optional
+            If set to false, this will silence sumo warnings on the stdout
+        teleport_time: int, optional
+            If negative, vehicles don't teleport in gridlock. If positive,
+            they teleport after teleport_time seconds
 
         """
         self.port = port
@@ -68,6 +75,8 @@ class SumoParams:
         self.ballistic = ballistic
         self.overtake_right = overtake_right
         self.restart_instance = restart_instance
+        self.print_warnings = print_warnings
+        self.teleport_time = teleport_time
 
 
 class EnvParams:
@@ -131,8 +140,6 @@ class EnvParams:
 class NetParams:
 
     def __init__(self,
-                 net_path="debug/net/",
-                 cfg_path="debug/cfg/",
                  no_internal_links=True,
                  in_flows=None,
                  osm_path=None,
@@ -151,10 +158,6 @@ class NetParams:
 
         Parameters
         ----------
-        net_path : str, optional
-            path to the network files created to create a network with sumo
-        cfg_path : str, optional
-            path to the config files created to create a network with sumo
         no_internal_links : bool, optional
             determines whether the space between edges is finite. Important
             when using networks with intersections; default is False
@@ -174,15 +177,11 @@ class NetParams:
             network specific parameters; see each subclass for a description of
             what is needed
         """
-        if additional_params is None:
-            additional_params = {}
-        self.net_path = net_path
-        self.cfg_path = cfg_path
         self.no_internal_links = no_internal_links
         self.in_flows = in_flows
         self.osm_path = osm_path
         self.netfile = netfile
-        self.additional_params = additional_params
+        self.additional_params = additional_params or {}
 
 
 class InitialConfig:
@@ -263,8 +262,8 @@ class SumoCarFollowingParams:
                  accel=1.0,
                  decel=1.5,
                  sigma=0.5,
-                 tau=0.6,  # past 1 at sim_step=0.1 you no longer see waves
-                 min_gap=1.5,
+                 tau=1.0,  # past 1 at sim_step=0.1 you no longer see waves
+                 min_gap=2.5,
                  max_speed=30,
                  speed_factor=1.0,
                  speed_dev=0.1,

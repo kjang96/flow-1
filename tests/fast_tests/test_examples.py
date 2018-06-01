@@ -1,13 +1,13 @@
 import unittest
 import os
-from examples.sumo.figure_eight import figure_eight_example
-from examples.sumo.highway import highway_example
-from examples.sumo.sugiyama import sugiyama_example
-from examples.sumo.two_loops_merge_straight import \
+from tutorials.examples.sumo.figure_eight import figure_eight_example
+from tutorials.examples.sumo.highway import highway_example
+from tutorials.examples.sumo.sugiyama import sugiyama_example
+from tutorials.examples.sumo.two_loops_merge_straight import \
     two_loops_merge_straight_example
-from examples.sumo.grid import grid_example
-from examples.sumo.bottleneck import bottleneck_example
-from examples.sumo.merge import merge_example
+from tutorials.examples.sumo.grid import grid_example
+from tutorials.examples.sumo.bottleneck import bottleneck_example
+from tutorials.examples.sumo.merge import merge_example
 
 os.environ["TEST_FLAG"] = "True"
 
@@ -25,7 +25,7 @@ class TestSumoExamples(unittest.TestCase):
         Verifies that examples/sumo/bottleneck.py is working
         """
         # import the experiment variable from the example
-        exp = bottleneck_example(sumo_binary="sumo")
+        exp = bottleneck_example(1000, 5, sumo_binary="sumo")
 
         # run the experiment for a few time steps to ensure it doesn't fail
         exp.run(1, 5)
@@ -89,6 +89,7 @@ class TestSumoExamples(unittest.TestCase):
 
         # run the experiment for a few time steps to ensure it doesn't fail
         exp.run(1, 5)
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -36,8 +36,7 @@ class TestCollisions(unittest.TestCase):
                       "cars_bot": int(total_vehicles / 4)}
 
         additional_net_params = {"speed_limit": 35, "grid_array": grid_array,
-                                 "horizontal_lanes": 1, "vertical_lanes": 1,
-                                 "traffic_lights": 1}
+                                 "horizontal_lanes": 1, "vertical_lanes": 1}
 
         net_params = NetParams(no_internal_links=False,
                                additional_params=additional_net_params)
@@ -49,7 +48,7 @@ class TestCollisions(unittest.TestCase):
 
         # go through the env and set all the lights to green
         for i in range(self.env.rows * self.env.cols):
-            self.env.traci_connection.trafficlights.setRedYellowGreenState(
+            self.env.traci_connection.trafficlight.setRedYellowGreenState(
                 'center' + str(i), "gggggggggggg")
 
         # instantiate an experiment class
@@ -79,12 +78,11 @@ class TestCollisions(unittest.TestCase):
                       "cars_bot": 3}
 
         additional_net_params = {"speed_limit": 35, "grid_array": grid_array,
-                                 "horizontal_lanes": 1, "vertical_lanes": 1,
-                                 "traffic_lights": 1}
+                                 "horizontal_lanes": 1, "vertical_lanes": 1}
 
         inflows = InFlows()
-        inflows.add(veh_type="idm", edge="bot0_0", vehsPerHour=1000)
-        inflows.add(veh_type="idm", edge="top0_1", vehsPerHour=1000)
+        inflows.add(veh_type="idm", edge="bot0_0", vehs_per_hour=1000)
+        inflows.add(veh_type="idm", edge="top0_1", vehs_per_hour=1000)
 
         net_params = NetParams(no_internal_links=False,
                                in_flows=inflows,
@@ -97,7 +95,7 @@ class TestCollisions(unittest.TestCase):
 
         # go through the env and set all the lights to green
         for i in range(self.env.rows * self.env.cols):
-            self.env.traci_connection.trafficlights.setRedYellowGreenState(
+            self.env.traci_connection.trafficlight.setRedYellowGreenState(
                 'center' + str(i), "gggggggggggg")
 
         # instantiate an experiment class
