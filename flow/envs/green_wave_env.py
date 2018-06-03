@@ -426,13 +426,8 @@ class PO_TrafficLightGridEnv(TrafficLightGridEnv):
                             / (self.scenario.num_edges - 1)
                             for veh_id in observed_ids]
 
-            # pad as needed
-            # FIXME (ev) you should pad in the position of missing edges
-            # i.e. the edge order is [bot, right, top, left] so if right is
-            # missing, you should pad at right rather than at the end. This
-            # should make learning easier
-            if len(observed_ids) < 4 * self.num_observed:
-                diff = 4 * self.num_observed - len(observed_ids)
+            if len(observed_ids) < self.num_observed:
+                diff = self.num_observed - len(observed_ids)
                 speeds += [0] * diff
                 dist_to_intersec += [0] * diff
                 edge_number += [0] * diff
