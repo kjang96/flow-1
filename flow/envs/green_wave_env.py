@@ -449,6 +449,8 @@ class PO_TrafficLightGridEnv(TrafficLightGridEnv):
                                         density, velocity_avg,
                                         self.last_change.flatten().tolist()]))
 
+    def compute_reward(self, state, rl_actions, **kwargs):
+        return rewards.min_delay(self)
 
 class GreenWaveTestEnv(TrafficLightGridEnv):
     """
