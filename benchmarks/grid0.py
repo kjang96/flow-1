@@ -1,11 +1,11 @@
 """
 Grid/green wave example
 
-Action Dimension: (?, )
+Action Dimension: (9, )
 
-Observation Dimension: (?, )
+Observation Dimension: (447, )
 
-Horizon: 200 steps
+Horizon: 400 steps
 """
 
 from flow.utils.rllib import make_create_env
@@ -15,7 +15,7 @@ from flow.core.vehicles import Vehicles
 from flow.controllers import SumoCarFollowingController, GridRouter
 
 # time horizon of a single rollout
-HORIZON = 200
+HORIZON = 400
 
 
 def gen_edges(row_num, col_num):
@@ -32,7 +32,7 @@ def gen_edges(row_num, col_num):
     return edges
 
 
-def get_flow_params(col_num, row_num, additional_net_params):
+def get_flow_params(v_enter, vehs_per_hour, col_num, row_num, additional_net_params):
     initial_config = InitialConfig(spacing="uniform",
                                    lanes_distribution=float("inf"),
                                    shuffle=True)
@@ -40,8 +40,8 @@ def get_flow_params(col_num, row_num, additional_net_params):
     inflow = InFlows()
     outer_edges = gen_edges(col_num, row_num)
     for i in range(len(outer_edges)):
-        inflow.add(veh_type="idm", edge=outer_edges[i], probability=0.25,
-                   departLane="free", departSpeed=20)
+        inflow.add(veh_type="idm", edge=outer_edges[i], vehs_per_hour=vehs_per_hour,
+                   departLane="free", departSpeed=v_enter)
 
     net_params = NetParams(in_flows=inflow,
                            no_internal_links=False,
@@ -61,15 +61,15 @@ def get_non_flow_params(enter_speed, additional_net_params):
 
 v_enter = 30
 
-inner_length = 800
+inner_length = 300
 long_length = 100
-short_length = 800
-n = 1
-m = 5
-num_cars_left = 3
-num_cars_right = 3
-num_cars_top = 15
-num_cars_bot = 15
+short_length = 300
+n = 3
+m = 3
+num_cars_left = 1
+num_cars_right = 1
+num_cars_top = 1
+num_cars_bot = 1
 rl_veh = 0
 tot_cars = (num_cars_left + num_cars_right) * m \
            + (num_cars_bot + num_cars_top) * n
@@ -98,7 +98,7 @@ vehicles.add(veh_id="idm",
              speed_mode="all_checks")
 
 initial_config, net_params = \
-    get_non_flow_params(v_enter, additional_net_params)
+    get_flow_params(v_enter, 300, n, m, additional_net_params)
 
 
 flow_params = dict(

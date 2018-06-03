@@ -16,7 +16,7 @@ from ray.tune.registry import register_env
 from flow.utils.rllib import FlowParamsEncoder
 
 # use this to specify the environment to run
-from benchmarks.lanedrop0 import flow_params, env_name, create_env
+from benchmarks.grid0 import flow_params, env_name, create_env
 
 # number of rollouts per training iteration
 N_ROLLOUTS = 4
