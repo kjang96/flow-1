@@ -7,7 +7,7 @@ Action Dimension: (13, )
 
 Observation Dimension: (65, )
 
-Horizon: 600 steps
+Horizon: 1500 steps
 """
 
 from flow.utils.rllib import make_create_env
@@ -15,10 +15,10 @@ from flow.core.params import SumoParams, EnvParams, InitialConfig, NetParams, \
     InFlows
 from flow.scenarios.merge.scenario import ADDITIONAL_NET_PARAMS
 from flow.core.vehicles import Vehicles
-from flow.controllers import IDMController, RLController
+from flow.controllers import SumoCarFollowingController, RLController
 
 # time horizon of a single rollout
-HORIZON = 600
+HORIZON = 1500
 # inflow rate at the highway
 FLOW_RATE = 2000
 # percent of autonomous vehicles
@@ -36,7 +36,7 @@ additional_net_params["pre_merge_length"] = 500
 # RL vehicles constitute 5% of the total number of vehicles
 vehicles = Vehicles()
 vehicles.add(veh_id="human",
-             acceleration_controller=(IDMController, {"noise": 0.2}),
+             acceleration_controller=(SumoCarFollowingController, {}),
              speed_mode="no_collide",
              num_vehicles=5)
 vehicles.add(veh_id="rl",
@@ -71,14 +71,14 @@ flow_params = dict(
 
     # sumo-related parameters (see flow.core.params.SumoParams)
     sumo=SumoParams(
-        sim_step=0.2,
+        sim_step=0.5,
         sumo_binary="sumo",
     ),
 
     # environment related parameters (see flow.core.params.EnvParams)
     env=EnvParams(
         horizon=HORIZON,
-        sims_per_step=5,
+        sims_per_step=2,
         warmup_steps=0,
         additional_params={
             "max_accel": 1.5,
