@@ -25,9 +25,7 @@ vehicles.add(veh_id="rl",
              acceleration_controller=(RLController, {}),
              routing_controller=(ContinuousRouter, {}),
              speed_mode="no_collide",
-             num_vehicles=14)
-
-print(14)
+             num_vehicles=16)
 
 flow_params = dict(
     # name of the experiment
