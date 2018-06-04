@@ -211,10 +211,10 @@ class WaveAttenuationPOEnv(WaveAttenuationEnv):
         max_scenario_length = 350.
 
         observation = np.array([
-            [self.vehicles.get_speed(rl_id) / max_speed],
-            [(self.vehicles.get_speed(lead_id) - self.vehicles.get_speed(
-                rl_id)) / max_speed],
-            [self.vehicles.get_headway(rl_id) / max_scenario_length]
+            self.vehicles.get_speed(rl_id) / max_speed,
+            (self.vehicles.get_speed(lead_id) - self.vehicles.get_speed(
+                rl_id)) / max_speed,
+            self.vehicles.get_headway(rl_id) / max_scenario_length
         ])
 
         return observation
