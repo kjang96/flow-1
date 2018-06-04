@@ -7,7 +7,7 @@ Action Dimension: (13, )
 
 Observation Dimension: (65, )
 
-Horizon: 1500 steps
+Horizon: 750 steps
 """
 
 from flow.utils.rllib import make_create_env
@@ -18,7 +18,7 @@ from flow.core.vehicles import Vehicles
 from flow.controllers import SumoCarFollowingController, RLController
 
 # time horizon of a single rollout
-HORIZON = 1500
+HORIZON = 750
 # inflow rate at the highway
 FLOW_RATE = 2000
 # percent of autonomous vehicles
