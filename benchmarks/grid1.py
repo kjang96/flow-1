@@ -98,7 +98,7 @@ vehicles.add(veh_id="idm",
              speed_mode="all_checks")
 
 initial_config, net_params = \
-    get_flow_params(v_enter, 300, n, m, additional_net_params)
+    get_flow_params(v_enter, 600, n, m, additional_net_params)
 
 
 flow_params = dict(
@@ -141,3 +141,4 @@ flow_params = dict(
 
 # get the env name and a creator for the environment (used by rllib)
 create_env, env_name = make_create_env(params=flow_params, version=0)
+djdkdjdj
