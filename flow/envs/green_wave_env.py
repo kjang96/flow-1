@@ -411,31 +411,27 @@ class PO_TrafficLightGridEnv(TrafficLightGridEnv):
                        self.scenario.inner_length)
 
         for node, edges in self.scenario.get_node_mapping():
-            observed_ids = self.k_closest_to_intersection(edges,
-                                                          self.num_observed)
+            for edge in edges:
+                observed_ids = self.k_closest_to_intersection(edge,
+                                                              self.num_observed)
 
-            # check which edges we have so we can always pad in the right
-            # positions
-            speeds += [self.vehicles.get_speed(veh_id) / max_speed
-                       for veh_id in observed_ids]
-            dist_to_intersec += [
-                (self.scenario.edge_length(self.vehicles.get_edge(veh_id)) -
-                 self.vehicles.get_position(veh_id)) / max_dist
-                for veh_id in observed_ids]
-            edge_number += [self._convert_edge(self.vehicles.get_edge(veh_id))
-                            / (self.scenario.num_edges - 1)
-                            for veh_id in observed_ids]
+                # check which edges we have so we can always pad in the right
+                # positions
+                speeds += [self.vehicles.get_speed(veh_id) / max_speed
+                           for veh_id in observed_ids]
+                dist_to_intersec += [
+                    (self.scenario.edge_length(self.vehicles.get_edge(veh_id)) -
+                     self.vehicles.get_position(veh_id)) / max_dist
+                    for veh_id in observed_ids]
+                edge_number += [self._convert_edge(self.vehicles.get_edge(veh_id))
+                                / (self.scenario.num_edges - 1)
+                                for veh_id in observed_ids]
 
-            # pad as needed
-            # FIXME (ev) you should pad in the position of missing edges
-            # i.e. the edge order is [bot, right, top, left] so if right is
-            # missing, you should pad at right rather than at the end. This
-            # should make learning easier
-            if len(observed_ids) < 4 * self.num_observed:
-                diff = 4 * self.num_observed - len(observed_ids)
-                speeds += [0] * diff
-                dist_to_intersec += [0] * diff
-                edge_number += [0] * diff
+                if len(observed_ids) < self.num_observed:
+                    diff = self.num_observed - len(observed_ids)
+                    speeds += [0] * diff
+                    dist_to_intersec += [0] * diff
+                    edge_number += [0] * diff
 
         # now add in the density and average velocity on the edges
         density = []
@@ -453,6 +449,8 @@ class PO_TrafficLightGridEnv(TrafficLightGridEnv):
                                         density, velocity_avg,
                                         self.last_change.flatten().tolist()]))
 
+    def compute_reward(self, state, rl_actions, **kwargs):
+        return rewards.min_delay(self)
 
 class GreenWaveTestEnv(TrafficLightGridEnv):
     """
