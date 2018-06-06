@@ -91,10 +91,7 @@ class WaveAttenuationMergePOEnv(Env):
 
     @property
     def observation_space(self):
-        return Box(low=-float("inf"),
-                   high=float("inf"),
-                   shape=(5 * self.num_rl,),
-                   dtype=np.float32)
+        return Box(low=0, high=1, shape=(5 * self.num_rl,), dtype=np.float32)
 
     def _apply_rl_actions(self, rl_actions):
         for i, rl_id in enumerate(self.rl_veh):
@@ -108,8 +105,9 @@ class WaveAttenuationMergePOEnv(Env):
         self.follower = []
 
         # normalizing constants
-        max_speed = 20
-        max_length = 50
+        max_speed = max(self.scenario.speed_limit(edge)
+                        for edge in self.scenario.get_edge_list())
+        max_length = self.scenario.length
 
         observation = [0 for _ in range(5 * self.num_rl)]
         for i, rl_id in enumerate(self.rl_veh):
@@ -152,7 +150,7 @@ class WaveAttenuationMergePOEnv(Env):
         # reward high system-level velocities
         cost1 = rewards.desired_velocity(self, fail=kwargs["fail"])
 
-        # penalize large time headways
+        # penalize small time headways
         cost2 = 0
         t_min = 1  # smallest acceptable time headway
         for rl_id in self.rl_veh:
@@ -161,12 +159,12 @@ class WaveAttenuationMergePOEnv(Env):
                     and self.vehicles.get_speed(rl_id) > 0:
                 t_headway = max(self.vehicles.get_headway(rl_id)
                                 / self.vehicles.get_speed(rl_id), 0)
-                cost2 += min(t_headway - t_min, 0)
+                cost2 += min((t_headway - t_min) / t_min, 0)
 
         # weights for cost1, cost2, and cost3, respectively
         eta1, eta2 = 1.00, 0.10
 
-        return eta1*cost1 + eta2*cost2
+        return max(eta1*cost1 + eta2*cost2, 0)
 
     def sort_by_position(self):
         # vehicles are sorted by their get_x_by_id value
