@@ -386,7 +386,7 @@ class PO_TrafficLightGridEnv(TrafficLightGridEnv):
         edge number (for nearby vehicles) traffic light state
         """
         tl_box = Box(low=0.,
-                     high=np.inf,
+                     high=1,
                      shape=(12 * self.num_observed * self.num_traffic_lights
                             + 2 * len(self.scenario.get_edge_list())
                             + 3 * self.num_traffic_lights,),
