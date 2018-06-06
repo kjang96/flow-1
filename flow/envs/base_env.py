@@ -433,7 +433,7 @@ class Env(gym.Env, Serializable):
         self.state = np.asarray(self.get_state()).T
 
         # collect observation new state associated with action
-        next_observation = list(self.state)
+        next_observation = np.copy(self.state)
 
         # compute the reward
         reward = self.compute_reward(self.state, rl_actions, fail=crash)
@@ -580,7 +580,7 @@ class Env(gym.Env, Serializable):
         self.state = np.asarray(self.get_state()).T
 
         # observation associated with the reset (no warm-up steps)
-        observation = list(self.state)
+        observation = np.copy(self.state)
 
         # perform (optional) warm-up steps before training
         for _ in range(self.env_params.warmup_steps):

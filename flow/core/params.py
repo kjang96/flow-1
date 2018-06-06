@@ -16,7 +16,7 @@ class SumoParams:
                  seed=None,
                  restart_instance=False,
                  print_warnings=True,
-                 teleport_time=-100):
+                 teleport_time=-1):
         """Sumo-specific parameters
 
         These parameters are used to customize a sumo simulation instance upon
