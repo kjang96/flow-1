@@ -108,7 +108,7 @@ class LaneChangeAccelEnv(Env):
         return np.array([[self.vehicles.get_speed(veh_id) / max_speed,
                           self.get_x_by_id(veh_id) / length,
                           self.vehicles.get_lane(veh_id) / max_lanes]
-                         for veh_id in self.vehicles.get_ids()])
+                         for veh_id in self.sorted_ids])
 
     def _apply_rl_actions(self, actions):
         acceleration = actions[::2]
