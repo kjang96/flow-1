@@ -11,6 +11,7 @@ import random
 import traci
 from traci import constants as tc
 import gym
+from gym.spaces import Box
 
 import sumolib
 
@@ -602,8 +603,16 @@ class Env(gym.Env, Serializable):
         rl_actions: list or numpy ndarray
             list of actions provided by the RL algorithm
         """
+        # ignore if no actions are issued
         if len(rl_actions) == 0:
             return
+
+        # clip according to the action space requirements
+        if isinstance(self.action_space, Box):
+            rl_actions = np.clip(rl_actions,
+                                 a_min=self.action_space.low,
+                                 a_max=self.action_space.high)
+
         self._apply_rl_actions(rl_actions)
 
     def _apply_rl_actions(self, rl_actions):
