@@ -865,7 +865,7 @@ class DesiredVelocityEnv(BottleneckEnv):
                                  num_vehicles=1 * self.scaling)
                     self.vehicles = vehicles
                     self.scenario = self.scenario.__class__(
-                        name=self.scenario.name,
+                        name=self.scenario.orig_name,
                         generator_class=self.scenario.generator_class,
                         vehicles=vehicles, net_params=net_params,
                         initial_config=self.scenario.initial_config,
