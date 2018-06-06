@@ -55,6 +55,8 @@ class WaveAttenuationEnv(Env):
             if p not in env_params.additional_params:
                 raise KeyError('Environment parameter "{}" not supplied'.
                                format(p))
+        self.max_accel = self.env_params.additional_params["max_accel"]
+        self.max_decel = -abs(self.env_params.additional_params["max_decel"])
         super().__init__(env_params, sumo_params, scenario)
 
     @property
@@ -67,13 +69,15 @@ class WaveAttenuationEnv(Env):
     @property
     def observation_space(self):
         self.obs_var_labels = ["Velocity", "Absolute_pos"]
-        speed = Box(low=0, high=np.inf, shape=(self.vehicles.num_vehicles,),
+        speed = Box(low=0, high=1, shape=(self.vehicles.num_vehicles,),
                     dtype=np.float32)
-        pos = Box(low=0., high=np.inf, shape=(self.vehicles.num_vehicles,),
+        pos = Box(low=0., high=1, shape=(self.vehicles.num_vehicles,),
                   dtype=np.float32)
         return Tuple((speed, pos))
 
     def _apply_rl_actions(self, rl_actions):
+        rl_actions = np.clip(rl_actions, a_min=self.max_decel,
+                             a_max=self.max_accel)
         sorted_rl_ids = [veh_id for veh_id in self.sorted_ids
                          if veh_id in self.vehicles.get_rl_ids()]
         self.apply_acceleration(sorted_rl_ids, rl_actions)
@@ -100,19 +104,19 @@ class WaveAttenuationEnv(Env):
         return float(reward)
 
     def get_state(self, **kwargs):
-        max_speed = 30
-        scaled_vel = [self.vehicles.get_speed(veh_id) / max_speed
-                      for veh_id in self.sorted_ids]
-        scaled_headway = \
-            [self.vehicles.get_headway(veh_id) / self.scenario.length
-             for veh_id in self.sorted_ids]
+        # speed normalizer
+        max_speed = max(self.scenario.speed_limit(edge)
+                        for edge in self.scenario.get_edge_list())
 
+        return np.array([[self.vehicles.get_speed(veh_id) / max_speed,
+                          self.get_x_by_id(veh_id) / self.scenario.length]
+                         for veh_id in self.sorted_ids])
+
+    def additional_command(self):
         # specify observed vehicles
         if self.vehicles.num_rl_vehicles > 0:
             for veh_id in self.vehicles.get_human_ids():
                 self.vehicles.set_observed(veh_id)
-
-        return np.array([scaled_vel, scaled_headway])
 
     def reset(self):
         """The sumo instance is reset with a new ring length, and a number of
@@ -202,19 +206,21 @@ class WaveAttenuationPOEnv(WaveAttenuationEnv):
 
     @property
     def observation_space(self):
-        return Box(low=-1, high=1, shape=(3,), dtype=np.float32)
+        return Box(low=0, high=1, shape=(3,), dtype=np.float32)
 
     def get_state(self, **kwargs):
         rl_id = self.vehicles.get_rl_ids()[0]
         lead_id = self.vehicles.get_leader(rl_id) or rl_id
+
+        # normalizers
         max_speed = 15.
-        max_scenario_length = 350.
+        max_length = self.env_params.additional_params["ring_length"][1]
 
         observation = np.array([
             self.vehicles.get_speed(rl_id) / max_speed,
             (self.vehicles.get_speed(lead_id) - self.vehicles.get_speed(
                 rl_id)) / max_speed,
-            self.vehicles.get_headway(rl_id) / max_scenario_length
+            self.vehicles.get_headway(rl_id) / max_length
         ])
 
         return observation

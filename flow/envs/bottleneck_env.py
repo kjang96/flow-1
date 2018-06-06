@@ -397,18 +397,9 @@ class BottleNeckAccelEnv(BottleneckEnv):
         num_edges = len(self.scenario.get_edge_list())
         num_rl_veh = self.num_rl
         num_obs = 2 * num_edges + 4 * MAX_LANES * self.scaling \
-                  * num_rl_veh + 4 * num_rl_veh
-        print("--------------")
-        print("--------------")
-        print("--------------")
-        print("--------------")
-        print(num_obs)
-        print("--------------")
-        print("--------------")
-        print("--------------")
-        print("--------------")
-        return Box(low=-float("inf"), high=float("inf"), shape=(num_obs,),
-                   dtype=np.float32)
+            * num_rl_veh + 4 * num_rl_veh
+
+        return Box(low=0, high=1, shape=(num_obs,), dtype=np.float32)
 
     def get_state(self):
         headway_scale = 1000
@@ -704,7 +695,7 @@ class DesiredVelocityEnv(BottleneckEnv):
         for segment in self.obs_segments:
             num_obs += 4 * segment[1] * self.scenario.num_lanes(segment[0])
         num_obs += 1
-        return Box(low=-float("inf"), high=float("inf"), shape=(num_obs,),
+        return Box(low=0.0, high=1.0, shape=(num_obs,),
                    dtype=np.float32)
 
     @property
@@ -788,7 +779,7 @@ class DesiredVelocityEnv(BottleneckEnv):
         Then they're split into segment actions.
         Then they're split into lane actions.
         """
-        rl_actions = actions
+        rl_actions = np.clip(actions, -1.5, 1.0)
 
         for rl_id in self.vehicles.get_rl_ids():
             edge = self.vehicles.get_edge(rl_id)
@@ -820,8 +811,10 @@ class DesiredVelocityEnv(BottleneckEnv):
                     self.traci_connection.vehicle.setMaxSpeed(rl_id, 23.0)
 
     def compute_reward(self, state, rl_actions, **kwargs):
+        ''' Outflow rate over last ten seconds normalized to max of 1'''
 
-        reward = self.vehicles.get_outflow_rate(10 * self.sim_step) / 200.0
+        reward = self.vehicles.get_outflow_rate(10 * self.sim_step) / \
+                (2000.0 * self.scaling)
         return reward
 
     def reset(self):

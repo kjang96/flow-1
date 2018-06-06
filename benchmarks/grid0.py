@@ -95,7 +95,7 @@ vehicles.add(veh_id="idm",
              ),
              routing_controller=(GridRouter, {}),
              num_vehicles=tot_cars,
-             speed_mode="all_checks")
+             speed_mode="right_of_way")
 
 initial_config, net_params = \
     get_flow_params(v_enter, 300, n, m, additional_net_params)

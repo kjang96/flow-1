@@ -42,7 +42,7 @@ def desired_velocity(env, fail=False):
     cost = vel - env.env_params.additional_params["target_velocity"]
     cost = np.linalg.norm(cost)
 
-    return max(max_cost - cost, 0)
+    return max(max_cost - cost, 0) / max_cost
 
 
 def reward_density(env):
@@ -124,7 +124,7 @@ def min_delay(env):
 
     max_cost = time_step * sum(vel.shape)
     cost = time_step * sum((v_top - vel) / v_top)
-    return max(max_cost - cost, 0)
+    return max((max_cost - cost)/max_cost, 0)
 
 
 def penalize_tl_changes(env, actions, gain=1):

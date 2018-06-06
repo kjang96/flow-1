@@ -62,6 +62,8 @@ class LaneChangeAccelEnv(Env):
                 raise KeyError('Environment parameter "{}" not supplied'.
                                format(p))
 
+        self.max_accel = self.env_params.additional_params["max_accel"]
+        self.max_decel = -abs(self.env_params.additional_params["max_decel"])
         super().__init__(env_params, sumo_params, scenario)
 
     @property
@@ -76,16 +78,13 @@ class LaneChangeAccelEnv(Env):
 
     @property
     def observation_space(self):
-        speed = Box(low=-np.inf, high=np.inf,
-                    shape=(self.vehicles.num_vehicles,),
+        speed = Box(low=0, high=1, shape=(self.vehicles.num_vehicles,),
                     dtype=np.float32)
-        lane = Box(low=0, high=self.scenario.lanes-1,
-                   shape=(self.vehicles.num_vehicles,),
+        lane = Box(low=0, high=1, shape=(self.vehicles.num_vehicles,),
                    dtype=np.float32)
-        absolute_pos = Box(low=0., high=np.inf,
-                           shape=(self.vehicles.num_vehicles,),
-                           dtype=np.float32)
-        return Tuple((speed, absolute_pos, lane))
+        pos = Box(low=0., high=1, shape=(self.vehicles.num_vehicles,),
+                  dtype=np.float32)
+        return Tuple((speed, pos, lane))
 
     def compute_reward(self, state, rl_actions, **kwargs):
         # compute the system-level performance of vehicles from a velocity
@@ -93,26 +92,31 @@ class LaneChangeAccelEnv(Env):
         reward = rewards.desired_velocity(self, fail=kwargs["fail"])
 
         # punish excessive lane changes by reducing the reward by a set value
-        # every time an rl car changes lanes
+        # every time an rl car changes lanes (10% of max reward)
         for veh_id in self.vehicles.get_rl_ids():
             if self.vehicles.get_state(veh_id, "last_lc") == self.time_counter:
-                reward -= 1
+                reward -= 0.1
 
         return reward
 
     def get_state(self):
         # normalizers
-        max_speed = 30
+        max_speed = max(self.scenario.speed_limit(edge)
+                        for edge in self.scenario.get_edge_list())
         length = self.scenario.length
+        max_lanes = max(self.scenario.num_lanes(edge)
+                        for edge in self.scenario.get_edge_list())
 
         return np.array([[self.vehicles.get_speed(veh_id) / max_speed,
-                          self.vehicles.get_absolute_position(veh_id) / length,
-                          self.vehicles.get_lane(veh_id)]
+                          self.get_x_by_id(veh_id) / length,
+                          self.vehicles.get_lane(veh_id) / max_lanes]
                          for veh_id in self.sorted_ids])
 
     def _apply_rl_actions(self, actions):
-        acceleration = actions[::2]
-        direction = np.round(actions[1::2])
+        acceleration = np.clip(actions[::2], a_min=self.max_decel,
+                               a_max=self.max_accel)
+        direction = np.round(np.clip(actions[1::2], a_min=-1.0,
+                                     a_max=1.0))
 
         # re-arrange actions according to mapping in observation space
         sorted_rl_ids = [veh_id for veh_id in self.sorted_ids
@@ -179,7 +183,7 @@ class LaneChangeAccelPOEnv(LaneChangeAccelEnv):
 
     @property
     def observation_space(self):
-        return Box(low=-float("inf"), high=float("inf"),
+        return Box(low=0, high=1,
                    shape=(4 * self.vehicles.num_rl_vehicles * self.num_lanes
                           + self.vehicles.num_rl_vehicles,),
                    dtype=np.float32)
@@ -191,13 +195,14 @@ class LaneChangeAccelPOEnv(LaneChangeAccelEnv):
         self.visible = []
         for i, rl_id in enumerate(self.vehicles.get_rl_ids()):
             # normalizers
-            max_length = 1000
-            max_speed = 30
+            max_length = self.scenario.length
+            max_speed = max(self.scenario.speed_limit(edge)
+                            for edge in self.scenario.get_edge_list())
 
             # set to 1000 since the absence of a vehicle implies a large
             # headway
-            headway = [1000] * self.num_lanes
-            tailway = [1000] * self.num_lanes
+            headway = [1] * self.num_lanes
+            tailway = [1] * self.num_lanes
             vel_in_front = [0] * self.num_lanes
             vel_behind = [0] * self.num_lanes
 
