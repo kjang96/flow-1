@@ -412,20 +412,21 @@ class PO_TrafficLightGridEnv(TrafficLightGridEnv):
 
         for node, edges in self.scenario.get_node_mapping():
             for edge in edges:
-                observed_ids = self.k_closest_to_intersection(edge,
-                                                              self.num_observed)
+                observed_ids = \
+                    self.k_closest_to_intersection(edge, self.num_observed)
 
                 # check which edges we have so we can always pad in the right
                 # positions
                 speeds += [self.vehicles.get_speed(veh_id) / max_speed
                            for veh_id in observed_ids]
                 dist_to_intersec += [
-                    (self.scenario.edge_length(self.vehicles.get_edge(veh_id)) -
-                     self.vehicles.get_position(veh_id)) / max_dist
+                    (self.scenario.edge_length(self.vehicles.get_edge(veh_id))
+                     - self.vehicles.get_position(veh_id)) / max_dist
                     for veh_id in observed_ids]
-                edge_number += [self._convert_edge(self.vehicles.get_edge(veh_id))
-                                / (self.scenario.num_edges - 1)
-                                for veh_id in observed_ids]
+                edge_number += \
+                    [self._convert_edge(self.vehicles.get_edge(veh_id))
+                     / (self.scenario.num_edges - 1)
+                     for veh_id in observed_ids]
 
                 if len(observed_ids) < self.num_observed:
                     diff = self.num_observed - len(observed_ids)
@@ -451,6 +452,7 @@ class PO_TrafficLightGridEnv(TrafficLightGridEnv):
 
     def compute_reward(self, state, rl_actions, **kwargs):
         return rewards.min_delay(self)
+
 
 class GreenWaveTestEnv(TrafficLightGridEnv):
     """

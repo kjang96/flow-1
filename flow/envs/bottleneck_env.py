@@ -397,18 +397,9 @@ class BottleNeckAccelEnv(BottleneckEnv):
         num_edges = len(self.scenario.get_edge_list())
         num_rl_veh = self.num_rl
         num_obs = 2 * num_edges + 4 * MAX_LANES * self.scaling \
-                  * num_rl_veh + 4 * num_rl_veh
-        print("--------------")
-        print("--------------")
-        print("--------------")
-        print("--------------")
-        print(num_obs)
-        print("--------------")
-        print("--------------")
-        print("--------------")
-        print("--------------")
-        return Box(low=-float("inf"), high=float("inf"), shape=(num_obs,),
-                   dtype=np.float32)
+            * num_rl_veh + 4 * num_rl_veh
+
+        return Box(low=0, high=1, shape=(num_obs,), dtype=np.float32)
 
     def get_state(self):
         headway_scale = 1000
