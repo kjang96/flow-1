@@ -80,7 +80,7 @@ class AccelEnv(Env):
         return rewards.desired_velocity(self, fail=kwargs["fail"])
 
     def get_state(self, **kwargs):
-        scaled_pos = [self.vehicles.get_absolute_position(veh_id) /
+        scaled_pos = [self.get_x_by_id(veh_id) /
                       self.scenario.length for veh_id in self.sorted_ids]
         scaled_vel = [self.vehicles.get_speed(veh_id) /
                       self.env_params.additional_params["target_velocity"]
