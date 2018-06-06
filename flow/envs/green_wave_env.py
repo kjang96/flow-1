@@ -99,22 +99,20 @@ class TrafficLightGridEnv(Env):
                                dtype=np.float32)
         edge_num = Box(low=0., high=1, shape=(self.vehicles.num_vehicles,),
                        dtype=np.float32)
-        traffic_lights = Box(low=0., high=np.inf,
+        traffic_lights = Box(low=0., high=1,
                              shape=(3 * self.rows * self.cols,),
                              dtype=np.float32)
         return Tuple((speed, dist_to_intersec, edge_num, traffic_lights))
 
     def get_state(self):
         # compute the normalizers
-        max_speed = max(self.scenario.speed_limit(edge)
-                        for edge in self.scenario.get_edge_list())
         max_dist = max(self.scenario.short_length,
                        self.scenario.long_length,
                        self.scenario.inner_length)
 
         # get the state arrays
-        speeds = [self.vehicles.get_speed(veh_id) / max_speed for veh_id in
-                  self.vehicles.get_ids()]
+        speeds = [self.vehicles.get_speed(veh_id) / self.scenario.max_speed
+                  for veh_id in self.vehicles.get_ids()]
         dist_to_intersec = [self.get_distance_to_intersection(veh_id)/max_dist
                             for veh_id in self.vehicles.get_ids()]
         edges = [self._convert_edge(self.vehicles.get_edge(veh_id)) / (

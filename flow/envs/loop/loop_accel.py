@@ -85,8 +85,7 @@ class AccelEnv(Env):
 
     def get_state(self, **kwargs):
         # speed normalizer
-        max_speed = max(self.scenario.speed_limit(edge)
-                        for edge in self.scenario.get_edge_list())
+        max_speed = self.scenario.max_speed
 
         return np.array([[self.vehicles.get_speed(veh_id) / max_speed,
                           self.get_x_by_id(veh_id) / self.scenario.length]

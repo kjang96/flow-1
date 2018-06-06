@@ -104,13 +104,10 @@ class WaveAttenuationEnv(Env):
         return float(reward)
 
     def get_state(self, **kwargs):
-        # speed normalizer
-        max_speed = max(self.scenario.speed_limit(edge)
-                        for edge in self.scenario.get_edge_list())
-
-        return np.array([[self.vehicles.get_speed(veh_id) / max_speed,
-                          self.get_x_by_id(veh_id) / self.scenario.length]
-                         for veh_id in self.sorted_ids])
+        return np.array(
+            [[self.vehicles.get_speed(veh_id) / self.scenario.max_speed,
+              self.get_x_by_id(veh_id) / self.scenario.length]
+             for veh_id in self.sorted_ids])
 
     def additional_command(self):
         # specify observed vehicles

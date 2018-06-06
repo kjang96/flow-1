@@ -101,8 +101,7 @@ class LaneChangeAccelEnv(Env):
 
     def get_state(self):
         # normalizers
-        max_speed = max(self.scenario.speed_limit(edge)
-                        for edge in self.scenario.get_edge_list())
+        max_speed = self.scenario.max_speed
         length = self.scenario.length
         max_lanes = max(self.scenario.num_lanes(edge)
                         for edge in self.scenario.get_edge_list())
@@ -196,8 +195,7 @@ class LaneChangeAccelPOEnv(LaneChangeAccelEnv):
         for i, rl_id in enumerate(self.vehicles.get_rl_ids()):
             # normalizers
             max_length = self.scenario.length
-            max_speed = max(self.scenario.speed_limit(edge)
-                            for edge in self.scenario.get_edge_list())
+            max_speed = self.scenario.max_speed
 
             # set to 1000 since the absence of a vehicle implies a large
             # headway
