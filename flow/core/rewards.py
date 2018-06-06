@@ -124,7 +124,7 @@ def min_delay(env):
 
     max_cost = time_step * sum(vel.shape)
     cost = time_step * sum((v_top - vel) / v_top)
-    return max(max_cost - cost, 0)
+    return max((max_cost - cost)/max_cost, 0)
 
 
 def penalize_tl_changes(env, actions, gain=1):

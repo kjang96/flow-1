@@ -124,11 +124,13 @@ class TrafficLightGridEnv(Env):
                  self.last_change.flatten().tolist()]
         return np.array(state)
 
-    def _apply_rl_actions(self, rl_actions):
+    def _apply_rl_actions(self, actions):
         # convert values less than 0.5 to zero and above to 1. 0's indicate
         # that should not switch the direction
         if self.tl_type == "actuated":
             return
+
+        rl_actions = np.clip(actions, a_min=0, a_max=1.0)
 
         rl_mask = rl_actions > 0.5
 
@@ -387,7 +389,7 @@ class PO_TrafficLightGridEnv(TrafficLightGridEnv):
         edge number (for nearby vehicles) traffic light state
         """
         tl_box = Box(low=0.,
-                     high=np.inf,
+                     high=1,
                      shape=(12 * self.num_observed * self.num_traffic_lights
                             + 2 * len(self.scenario.get_edge_list())
                             + 3 * self.num_traffic_lights,),

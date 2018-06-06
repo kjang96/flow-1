@@ -83,6 +83,9 @@ class TwoLoopsMergeEnv(Env):
         # normalizer for observations
         self.max_speed = 55
 
+        self.max_accel = self.env_params.additional_params["max_accel"]
+        self.max_decel = -abs(self.env_params.additional_params["max_decel"])
+
         super().__init__(env_params, sumo_params, scenario)
 
     @property
@@ -104,6 +107,8 @@ class TwoLoopsMergeEnv(Env):
                    dtype=np.float32)
 
     def _apply_rl_actions(self, rl_actions):
+        rl_actions = np.clip(rl_actions, a_min=self.max_decel,
+                             a_max=self.max_accel)
         sorted_rl_ids = [veh_id for veh_id in self.sorted_ids
                          if veh_id in self.vehicles.get_rl_ids()]
         self.apply_acceleration(sorted_rl_ids, rl_actions)
