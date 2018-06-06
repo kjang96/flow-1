@@ -62,8 +62,6 @@ class LaneChangeAccelEnv(Env):
                 raise KeyError('Environment parameter "{}" not supplied'.
                                format(p))
 
-        self.max_accel = self.env_params.additional_params["max_accel"]
-        self.max_decel = -abs(self.env_params.additional_params["max_decel"])
         super().__init__(env_params, sumo_params, scenario)
 
     @property
@@ -112,10 +110,8 @@ class LaneChangeAccelEnv(Env):
                          for veh_id in self.sorted_ids])
 
     def _apply_rl_actions(self, actions):
-        acceleration = np.clip(actions[::2], a_min=self.max_decel,
-                               a_max=self.max_accel)
-        direction = np.round(np.clip(actions[1::2], a_min=-1.0,
-                                     a_max=1.0))
+        acceleration = actions[::2]
+        direction = actions[1::2]
 
         # re-arrange actions according to mapping in observation space
         sorted_rl_ids = [veh_id for veh_id in self.sorted_ids
