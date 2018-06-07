@@ -58,7 +58,7 @@ flow_rate = 1900 * SCALING
 # percentage of flow coming out of each lane
 inflow = InFlows()
 inflow.add(veh_type="rl", edge="1",
-           vehs_per_hour=flow_rate * AV_FRAC,
+           vehs_per_hour=flow_rate,
            departLane="random", departSpeed=10)
 
 traffic_lights = TrafficLights()
