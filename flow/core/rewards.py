@@ -136,9 +136,8 @@ def penalize_tl_changes(env, actions, gain=1):
     :param gain: {float} - multiplicative factor on the action penalty
     :return: a penalty on vehicle delays and traffic light switches
     """
-    delay = min_delay(env)
-    action_penalty = gain * np.sum(actions)
-    return delay - action_penalty
+    action_penalty = gain * np.sum(np.round(actions))
+    return -action_penalty
 
 
 def penalize_headway_variance(vehicles, vids, normalization=1, penalty_gain=1,

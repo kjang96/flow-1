@@ -70,6 +70,7 @@ num_cars_left = 1
 num_cars_right = 1
 num_cars_top = 1
 num_cars_bot = 1
+edge_inflow = 300
 rl_veh = 0
 tot_cars = (num_cars_left + num_cars_right) * m \
            + (num_cars_bot + num_cars_top) * n
@@ -81,7 +82,8 @@ grid_array = {"short_length": short_length, "inner_length": inner_length,
               "rl_veh": rl_veh}
 
 additional_env_params = {"target_velocity": 50, "num_steps": HORIZON,
-                         "control-length": 150, "switch_time": 3.0}
+                         "control-length": 150, "switch_time": 2.0,
+                         "total_inflow": n*m*edge_inflow}
 
 additional_net_params = {"speed_limit": 35, "grid_array": grid_array,
                          "horizontal_lanes": 1, "vertical_lanes": 1}
@@ -98,7 +100,7 @@ vehicles.add(veh_id="idm",
              speed_mode="right_of_way")
 
 initial_config, net_params = \
-    get_flow_params(v_enter, 300, n, m, additional_net_params)
+    get_flow_params(v_enter, edge_inflow, n, m, additional_net_params)
 
 
 flow_params = dict(
