@@ -100,7 +100,7 @@ vehicles.add(veh_id="idm",
              speed_mode="right_of_way")
 
 initial_config, net_params = \
-    get_flow_params(v_enter, edge__inflow, n, m, additional_net_params)
+    get_flow_params(v_enter, edge_inflow, n, m, additional_net_params)
 
 
 flow_params = dict(
