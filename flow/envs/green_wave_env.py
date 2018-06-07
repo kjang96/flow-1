@@ -128,8 +128,6 @@ class TrafficLightGridEnv(Env):
         if self.tl_type == "actuated":
             return
 
-        rl_actions = np.clip(actions, a_min=0, a_max=1.0)
-
         rl_mask = rl_actions > 0.5
 
         for i, action in enumerate(rl_actions):
