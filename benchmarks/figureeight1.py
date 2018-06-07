@@ -3,9 +3,9 @@ Trains a fraction of vehicles in a ring road structure to regulate the flow of
 vehicles through an intersection. In this example, every other vehicle in the
 network is an autonomous vehicle.
 
-Action Dimension: (8, )
+Action Dimension: (7, )
 
-Observation Dimension: (32, )
+Observation Dimension: (28, )
 
 Horizon: 1500 steps
 """
@@ -21,7 +21,7 @@ HORIZON = 1500
 
 # We place 8 autonomous vehicle and 8 human-driven vehicles in the network
 vehicles = Vehicles()
-for i in range(8):
+for i in range(7):
     vehicles.add(veh_id="human{}".format(i),
                  acceleration_controller=(IDMController, {"noise": 0.2}),
                  routing_controller=(ContinuousRouter, {}),

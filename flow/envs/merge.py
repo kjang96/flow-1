@@ -79,8 +79,6 @@ class WaveAttenuationMergePOEnv(Env):
         # used for visualization
         self.leader = []
         self.follower = []
-        self.max_accel = self.env_params.additional_params["max_accel"]
-        self.max_decel = -abs(self.env_params.additional_params["max_decel"])
 
         super().__init__(env_params, sumo_params, scenario)
 
@@ -96,8 +94,6 @@ class WaveAttenuationMergePOEnv(Env):
         return Box(low=0, high=1, shape=(5 * self.num_rl,), dtype=np.float32)
 
     def _apply_rl_actions(self, rl_actions):
-        rl_actions = np.clip(rl_actions, a_min=self.max_decel,
-                             a_max=self.max_accel)
         for i, rl_id in enumerate(self.rl_veh):
             # ignore rl vehicles outside the network
             if rl_id not in self.vehicles.get_rl_ids():
@@ -109,8 +105,7 @@ class WaveAttenuationMergePOEnv(Env):
         self.follower = []
 
         # normalizing constants
-        max_speed = max(self.scenario.speed_limit(edge)
-                        for edge in self.scenario.get_edge_list())
+        max_speed = self.scenario.max_speed
         max_length = self.scenario.length
 
         observation = [0 for _ in range(5 * self.num_rl)]

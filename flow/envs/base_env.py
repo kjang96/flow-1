@@ -11,6 +11,7 @@ import random
 import traci
 from traci import constants as tc
 import gym
+from gym.spaces import Box
 
 import sumolib
 
@@ -432,7 +433,7 @@ class Env(gym.Env, Serializable):
         self.state = np.asarray(self.get_state()).T
 
         # collect observation new state associated with action
-        next_observation = list(self.state)
+        next_observation = np.copy(self.state)
 
         # compute the reward
         reward = self.compute_reward(self.state, rl_actions, fail=crash)
@@ -579,7 +580,7 @@ class Env(gym.Env, Serializable):
         self.state = np.asarray(self.get_state()).T
 
         # observation associated with the reset (no warm-up steps)
-        observation = list(self.state)
+        observation = np.copy(self.state)
 
         # perform (optional) warm-up steps before training
         for _ in range(self.env_params.warmup_steps):
@@ -602,8 +603,16 @@ class Env(gym.Env, Serializable):
         rl_actions: list or numpy ndarray
             list of actions provided by the RL algorithm
         """
+        # ignore if no actions are issued
         if len(rl_actions) == 0:
             return
+
+        # clip according to the action space requirements
+        if isinstance(self.action_space, Box):
+            rl_actions = np.clip(rl_actions,
+                                 a_min=self.action_space.low,
+                                 a_max=self.action_space.high)
+
         self._apply_rl_actions(rl_actions)
 
     def _apply_rl_actions(self, rl_actions):

@@ -62,8 +62,6 @@ class LaneChangeAccelEnv(Env):
                 raise KeyError('Environment parameter "{}" not supplied'.
                                format(p))
 
-        self.max_accel = self.env_params.additional_params["max_accel"]
-        self.max_decel = -abs(self.env_params.additional_params["max_decel"])
         super().__init__(env_params, sumo_params, scenario)
 
     @property
@@ -101,8 +99,7 @@ class LaneChangeAccelEnv(Env):
 
     def get_state(self):
         # normalizers
-        max_speed = max(self.scenario.speed_limit(edge)
-                        for edge in self.scenario.get_edge_list())
+        max_speed = self.scenario.max_speed
         length = self.scenario.length
         max_lanes = max(self.scenario.num_lanes(edge)
                         for edge in self.scenario.get_edge_list())
@@ -113,10 +110,8 @@ class LaneChangeAccelEnv(Env):
                          for veh_id in self.sorted_ids])
 
     def _apply_rl_actions(self, actions):
-        acceleration = np.clip(actions[::2], a_min=self.max_decel,
-                               a_max=self.max_accel)
-        direction = np.round(np.clip(actions[1::2], a_min=-1.0,
-                                     a_max=1.0))
+        acceleration = actions[::2]
+        direction = actions[1::2]
 
         # re-arrange actions according to mapping in observation space
         sorted_rl_ids = [veh_id for veh_id in self.sorted_ids
@@ -196,8 +191,7 @@ class LaneChangeAccelPOEnv(LaneChangeAccelEnv):
         for i, rl_id in enumerate(self.vehicles.get_rl_ids()):
             # normalizers
             max_length = self.scenario.length
-            max_speed = max(self.scenario.speed_limit(edge)
-                            for edge in self.scenario.get_edge_list())
+            max_speed = self.scenario.max_speed
 
             # set to 1000 since the absence of a vehicle implies a large
             # headway
