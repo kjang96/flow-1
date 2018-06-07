@@ -58,7 +58,7 @@ inflow.add(veh_type="human", edge="inflow_merge", vehs_per_hour=100,
 
 flow_params = dict(
     # name of the experiment
-    exp_tag="stabilizing_open_network_merges",
+    exp_tag="merge_1",
 
     # name of the flow environment the experiment is running on
     env_name="WaveAttenuationMergePOEnv",

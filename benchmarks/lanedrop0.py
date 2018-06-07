@@ -82,7 +82,7 @@ net_params = NetParams(in_flows=inflow,
 
 flow_params = dict(
     # name of the experiment
-    exp_tag="DesiredVelocity",
+    exp_tag="bottleneck_0",
 
     # name of the flow environment the experiment is running on
     env_name="DesiredVelocityEnv",

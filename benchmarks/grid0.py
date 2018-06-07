@@ -105,7 +105,7 @@ initial_config, net_params = \
 
 flow_params = dict(
     # name of the experiment
-    exp_tag="green_wave",
+    exp_tag="grid_0",
 
     # name of the flow environment the experiment is running on
     env_name="PO_TrafficLightGridEnv",

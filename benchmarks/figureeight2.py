@@ -29,7 +29,7 @@ vehicles.add(veh_id="rl",
 
 flow_params = dict(
     # name of the experiment
-    exp_tag="figure_eight_intersection_control",
+    exp_tag="figure_eight_2",
 
     # name of the flow environment the experiment is running on
     env_name="AccelEnv",
