@@ -772,15 +772,13 @@ class DesiredVelocityEnv(BottleneckEnv):
         return np.concatenate((num_vehicles_list, num_rl_vehicles_list,
                                mean_speed_norm, mean_rl_speed, [outflow]))
 
-    def _apply_rl_actions(self, actions):
+    def _apply_rl_actions(self, rl_actions):
         """
         RL actions are split up into 3 levels.
         First, they're split into edge actions.
         Then they're split into segment actions.
         Then they're split into lane actions.
         """
-        rl_actions = np.clip(actions, -1.5, 1.0)
-
         for rl_id in self.vehicles.get_rl_ids():
             edge = self.vehicles.get_edge(rl_id)
             lane = self.vehicles.get_lane(rl_id)
