@@ -127,11 +127,9 @@ def min_delay(env):
     return max((max_cost - cost)/max_cost, 0)
 
 
-def penalize_tl_changes(env, actions, gain=1):
+def penalize_tl_changes(actions, gain=1):
     """
     A reward function that penalizes delay and traffic light switches.
-    :param env: Environment
-        Contains the state of the environment at a time-step
     :param actions: {list of booleans} - indicates whether a switch is desired
     :param gain: {float} - multiplicative factor on the action penalty
     :return: a penalty on vehicle delays and traffic light switches
