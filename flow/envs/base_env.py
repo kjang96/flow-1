@@ -163,12 +163,12 @@ class Env(gym.Env, Serializable):
                     port = self.sumo_params.port
                 else:
                     # backoff to decrease likelihood of race condition
-                    time_stamp = ''.join(str(time.time()).split('.'))
-                    time.sleep(2.0 * int(time_stamp[-6:]) / 1e6)
+                    # time_stamp = ''.join(str(time.time()).split('.'))
+                    # time.sleep(2.0 * int(time_stamp[-6:]) / 1e6)
                     port = sumolib.miscutils.getFreeSocketPort()
 
-                s = socket.socket()
-                s.bind(('', port))
+                # s = socket.socket()
+                # s.bind(('', port))
 
                 # command used to start sumo
                 sumo_call = [self.sumo_params.sumo_binary,
@@ -222,7 +222,7 @@ class Env(gym.Env, Serializable):
                 logging.debug(" Emission file: " + str(emission_out))
                 logging.debug(" Step length: " + str(self.sim_step))
 
-                s.close()
+                # s.close()
                 # Opening the I/O thread to SUMO
                 self.sumo_proc = subprocess.Popen(sumo_call,
                                                   preexec_fn=os.setsid)
