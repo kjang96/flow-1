@@ -40,4 +40,4 @@ def start():
 	env.start_sumo()
 
 ray.init()
-results = ray.get([start.remote() for i in range(5)])
+results = ray.get([start.remote() for i in range(10000)])
