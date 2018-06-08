@@ -239,7 +239,12 @@ class Env(gym.Env, Serializable):
                 self.traci_connection.simulationStep()
                 return
             except Exception as e:
-                import ipdb; ipdb.set_trace()
+                print('====== SOCKET FAILED TO CONNECT ======')
+                print('====== SOCKET FAILED TO CONNECT ======')
+                print('====== SOCKET FAILED TO CONNECT ======')
+                print('====== SOCKET FAILED TO CONNECT ======')
+                print('====== SOCKET FAILED TO CONNECT ======')
+                print('port attempted was:', port)
                 print("Error during start: {}".format(traceback.format_exc()))
                 error = e
                 self.teardown_sumo()

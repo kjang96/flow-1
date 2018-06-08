@@ -24,7 +24,7 @@ PARALLEL_ROLLOUTS = 50
 if __name__ == "__main__":
     start = time.time()
     print("STARTTTTTT")
-    ray.init(redirect_output=True)
+    ray.init(redirect_output=False)
     flow_params["env"].horizon = 1
     horizon = flow_params["env"].horizon
     config = ppo.DEFAULT_CONFIG.copy()
