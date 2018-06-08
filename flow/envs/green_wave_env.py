@@ -454,7 +454,7 @@ class PO_TrafficLightGridEnv(TrafficLightGridEnv):
                                         self.last_change.flatten().tolist()]))
 
     def compute_reward(self, state, rl_actions, **kwargs):
-        hour_frac = self.horizon*self.sim_step/3600
+        hour_frac = self.env_params.horizon*self.sim_step/3600
         delay_reward = rewards.min_delay(self)/(self.total_inflow*hour_frac)
         switch_penalty = rewards.penalize_tl_changes(rl_actions, gain=0.2)
         switch_penalty_norm = switch_penalty/(self.rows*self.cols)
