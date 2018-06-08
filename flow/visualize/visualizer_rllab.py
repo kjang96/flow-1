@@ -43,9 +43,9 @@ if __name__ == "__main__":
 
     # Set sumo to make a video
     sumo_params = unwrapped_env.sumo_params
-    emission_path = "./test_time_rollout/"
+    sumo_params.emission_path = "./test_time_rollout/"
     sumo_binary = 'sumo-gui'
-    unwrapped_env.restart_sumo(emission_path=emission_path,
+    unwrapped_env.restart_sumo(sumo_params=sumo_params,
                                sumo_binary=sumo_binary)
 
     # Load data into arrays
