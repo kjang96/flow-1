@@ -103,7 +103,7 @@ if __name__ == "__main__":
     env_params = flow_params['env']
     sumo_params = flow_params['sumo']
     sumo_params.sumo_binary = "sumo-gui"
-    sumo_params.emission_path = "./test_time_rollout"
+    sumo_params.emission_path = "./test_time_rollout/"
 
     env = env_class(env_params=env_params,
                     sumo_params=sumo_params,
