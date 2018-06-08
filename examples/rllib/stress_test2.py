@@ -16,7 +16,7 @@ from ray.tune.registry import register_env
 from flow.utils.rllib import FlowParamsEncoder
 
 # use this to specify the environment to run
-from benchmarks.grid0 import flow_params, env_name, create_env
+from benchmarks.figureeight0 import flow_params, env_name, create_env
 
 # number of rollouts per training iteration
 N_ROLLOUTS = 50
@@ -38,6 +38,8 @@ if __name__ == "__main__":
     config["use_gae"] = True
     config["horizon"] = 1
     config["clip_param"] = 0.2
+    config["num_sgd_iter"] = 1
+    config["min_steps_per_task"] = 1
 
     # save the flow params for replay
     flow_json = json.dumps(flow_params, cls=FlowParamsEncoder, sort_keys=True,
