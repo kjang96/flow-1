@@ -2,6 +2,7 @@ import logging
 import os
 import signal
 import subprocess
+import socket
 from copy import deepcopy
 import time
 import traceback
@@ -166,6 +167,9 @@ class Env(gym.Env, Serializable):
                     time.sleep(2.0 * int(time_stamp[-6:]) / 1e6)
                     port = sumolib.miscutils.getFreeSocketPort()
 
+                s = socket.socket()
+                s.bind(('', port))
+
                 # command used to start sumo
                 sumo_call = [self.sumo_params.sumo_binary,
                              "-c", self.scenario.cfg,
@@ -218,6 +222,7 @@ class Env(gym.Env, Serializable):
                 logging.debug(" Emission file: " + str(emission_out))
                 logging.debug(" Step length: " + str(self.sim_step))
 
+                s.close()
                 # Opening the I/O thread to SUMO
                 self.sumo_proc = subprocess.Popen(sumo_call,
                                                   preexec_fn=os.setsid)
