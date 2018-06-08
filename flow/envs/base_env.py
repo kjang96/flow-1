@@ -140,8 +140,6 @@ class Env(gym.Env, Serializable):
         if sumo_binary is not None:
             self.sumo_params.sumo_binary = sumo_binary
 
-        self.sumo_params.port = sumolib.miscutils.getFreeSocketPort()
-
         if sumo_params.emission_path is not None:
             ensure_dir(sumo_params.emission_path)
             self.sumo_params.emission_path = sumo_params.emission_path
