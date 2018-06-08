@@ -40,6 +40,7 @@ if __name__ == "__main__":
     config["clip_param"] = 0.2
     config["num_sgd_iter"] = 1
     config["min_steps_per_task"] = 1
+    config["sgd_batchsize"] = horizon * N_ROLLOUTS
 
     # save the flow params for replay
     flow_json = json.dumps(flow_params, cls=FlowParamsEncoder, sort_keys=True,
