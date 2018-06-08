@@ -5,7 +5,6 @@ Repeatedly runs one step of an environment to test for possible race conditions
 import json
 import time
 import ray
-import ray.rllib.ppo as ppo
 import ray.rllib.ars as ars
 from ray.tune import run_experiments
 from ray.tune import grid_search

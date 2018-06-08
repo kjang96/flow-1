@@ -27,7 +27,7 @@ if __name__ == "__main__":
     ray.init(redirect_output=True)
     flow_params["env"].horizon = 1
     horizon = flow_params["env"].horizon
-    config = ars.DEFAULT_CONFIG.copy()
+    config = es.DEFAULT_CONFIG.copy()
     config["num_workers"] = PARALLEL_ROLLOUTS
     config["episodes_per_batch"] = PARALLEL_ROLLOUTS
     config["timesteps_per_batch"] = PARALLEL_ROLLOUTS
@@ -42,7 +42,7 @@ if __name__ == "__main__":
 
     trials = run_experiments({
         "highway_stabilize": {
-            "run": "ARS",
+            "run": "ES",
             "env": env_name,
             "config": {
                 **config
