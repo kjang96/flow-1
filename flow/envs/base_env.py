@@ -116,6 +116,8 @@ class Env(gym.Env, Serializable):
         # contains the subprocess.Popen instance used to start traci
         self.sumo_proc = None
 
+        self.hit_except = False
+
         self.start_sumo()
         self.setup_initial_state()
 
@@ -158,6 +160,16 @@ class Env(gym.Env, Serializable):
         error = None
         for _ in range(RETRIES_ON_ERROR):
             try:
+
+                if self.hit_except:
+                    print('------------- re-trying after an exception --------')
+                    print('------------- re-trying after an exception --------')
+                    print('------------- re-trying after an exception --------')
+                    print('------------- re-trying after an exception --------')
+                    print('------------- re-trying after an exception --------')
+                    print('------------- re-trying after an exception --------')
+                    print('------------- re-trying after an exception --------')
+
                 # port number the sumo instance will be run on
                 if self.sumo_params.port is not None:
                     port = self.sumo_params.port
@@ -245,6 +257,7 @@ class Env(gym.Env, Serializable):
                 print('====== SOCKET FAILED TO CONNECT ======')
                 print('====== SOCKET FAILED TO CONNECT ======')
                 print('port attempted was:', port)
+                self.hit_except = True
                 print("Error during start: {}".format(traceback.format_exc()))
                 error = e
                 self.teardown_sumo()
