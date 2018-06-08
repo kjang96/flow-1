@@ -1,10 +1,7 @@
 """
-Runner script for environments located in flow/benchmarks.
-
-The environment file can be modified in the imports to change the environment
-this runner script is executed on. Furthermore, the rllib specific algorithm/
-parameters can be specified here once and used on multiple environments.
+Repeatedly runs one step of an environment to test for possible race conditions
 """
+
 import json
 import time
 import ray
@@ -16,7 +13,7 @@ from ray.tune.registry import register_env
 from flow.utils.rllib import FlowParamsEncoder
 
 # use this to specify the environment to run
-from benchmarks.figureeight0 import flow_params, env_name, create_env
+from benchmarks.lanedrop0 import flow_params, env_name, create_env
 
 # number of rollouts per training iteration
 N_ROLLOUTS = 50
