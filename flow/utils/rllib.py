@@ -71,7 +71,6 @@ def make_create_env(params, version=0, sumo_binary=None):
     module = __import__("flow.scenarios", fromlist=[params["generator"]])
     generator_class = getattr(module, params["generator"])
 
-    sumo_params = params['sumo']
     env_params = params['env']
     net_params = params['net']
     vehicles = params['veh']
@@ -91,6 +90,12 @@ def make_create_env(params, version=0, sumo_binary=None):
     )
 
     def create_env(*_):
+        sumo_params = deepcopy(params['sumo'])
+        if sumo_params.port is None:
+            time_stamp = ''.join(str(time.time()).split('.'))
+            time.sleep(2.0 * int(time_stamp[-6:]) / 1e6)
+            sumo_params.port = sumolib.miscutils.getFreeSocketPort()
+
         register(
             id=env_name,
             entry_point='flow.envs:' + params["env_name"],
