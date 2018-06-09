@@ -16,12 +16,12 @@ from rllab.envs.gym_env import GymEnv
 from flow.core.params import InitialConfig
 from flow.core.traffic_lights import TrafficLights
 
-from benchmarks.merge2 import flow_params, HORIZON
+from benchmarks.figureeight1 import flow_params, HORIZON
 
 # number of rollouts per training iteration
 N_ROLLOUTS = 20
 # number of parallel workers
-PARALLEL_ROLLOUTS = 2
+PARALLEL_ROLLOUTS = 8
 
 
 def run_task(*_):
@@ -31,10 +31,8 @@ def run_task(*_):
     vehicles = flow_params["veh"]
     env_params = flow_params["env"]
     net_params = flow_params["net"]
-    initial_config = flow_params.get('initial', InitialConfig())
+    initial_config = flow_params.get("initial", InitialConfig())
     traffic_lights = flow_params.get("tls", TrafficLights())
-
-    # sumo_params.sumo_binary = "sumo-gui"
 
     # import the scenario and generator classes
     module = __import__("flow.scenarios", fromlist=[flow_params["scenario"]])
