@@ -170,14 +170,23 @@ class Env(gym.Env, Serializable):
                     print('------------- re-trying after an exception --------')
                     print('------------- re-trying after an exception --------')
 
-                # port number the sumo instance will be run on
-                if self.sumo_params.port is not None:
-                    port = self.sumo_params.port
-                else:
-                    # backoff to decrease likelihood of race condition
-                    # time_stamp = ''.join(str(time.time()).split('.'))
-                    # time.sleep(2.0 * int(time_stamp[-6:]) / 1e6)
-                    port = sumolib.miscutils.getFreeSocketPort()
+                # print(self.inits)
+                # if self.inits < self.num_workers:
+                #     self.sumo_params.port = sumolib.miscutils.getFreeSocketPort()
+                #     self.inits 
+
+                # # port number the sumo instance will be run on
+                # if self.sumo_params.port is not None and self.inits == 1:
+                #     self.sumo_params.port = sumolib.miscutils.getFreeSocketPort()
+                #     self.inits += 1
+                #     print('grabbing port again')
+                # elif self.inits == 0:
+                #     self.inits += 1
+                #     # backoff to decrease likelihood of race condition
+                #     # time_stamp = ''.join(str(time.time()).split('.'))+= 1
+                #     # time.sleep(2.0 * int(time_stamp[-6:]) / 1e6)
+                #     self.sumo_params.port = sumolib.miscutils.getFreeSocketPort()
+                #     print('first grab:', self.sumo_params.port)
 
                 # s = socket.socket()
                 # s.bind(('', port))
@@ -185,7 +194,7 @@ class Env(gym.Env, Serializable):
                 # command used to start sumo
                 sumo_call = [self.sumo_params.sumo_binary,
                              "-c", self.scenario.cfg,
-                             "--remote-port", str(port),
+                             "--remote-port", str(self.sumo_params.port),
                              "--step-length", str(self.sim_step)]
 
                 # add step logs (if requested)
@@ -229,7 +238,7 @@ class Env(gym.Env, Serializable):
                 sumo_call.append("--time-to-teleport")
                 sumo_call.append(str(int(self.sumo_params.teleport_time)))
 
-                logging.info(" Starting SUMO on port " + str(port))
+                logging.info(" Starting SUMO on port " + str(self.sumo_params.port))
                 logging.debug(" Cfg file: " + str(self.scenario.cfg))
                 logging.debug(" Emission file: " + str(emission_out))
                 logging.debug(" Step length: " + str(self.sim_step))
@@ -246,7 +255,7 @@ class Env(gym.Env, Serializable):
                 else:
                     time.sleep(config.SUMO_SLEEP)
 
-                self.traci_connection = traci.connect(port, numRetries=100)
+                self.traci_connection = traci.connect(self.sumo_params.port, numRetries=100)
 
                 self.traci_connection.simulationStep()
                 return
@@ -256,7 +265,7 @@ class Env(gym.Env, Serializable):
                 print('====== SOCKET FAILED TO CONNECT ======')
                 print('====== SOCKET FAILED TO CONNECT ======')
                 print('====== SOCKET FAILED TO CONNECT ======')
-                print('port attempted was:', port)
+                print('port attempted was:', self.sumo_params.port)
                 self.hit_except = True
                 print("Error during start: {}".format(traceback.format_exc()))
                 error = e
