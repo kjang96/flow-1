@@ -2,9 +2,9 @@
 Bottleneck in which the actions are specifying a desired velocity in a segment
 of space. The autonomous penetration rate in this example is 100%.
 
-Action Dimension: (?, )
+Action Dimension: (40, )
 
-Observation Dimension: (?, )
+Observation Dimension: (281, )
 
 Horizon: 1000 steps
 """
@@ -19,7 +19,7 @@ from flow.controllers import RLController, ContinuousRouter
 # time horizon of a single rollout
 HORIZON = 1000
 
-SCALING = 3
+SCALING = 2
 NUM_LANES = 4 * SCALING  # number of lanes in the widest highway
 DISABLE_TB = True
 DISABLE_RAMP_METER = True
