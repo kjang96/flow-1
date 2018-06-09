@@ -97,10 +97,13 @@ def make_create_env(params, version=0, sumo_binary=None):
         sumo_params = deepcopy(params['sumo'])
         if sumo_params.port is None:
             time_stamp = ''.join(str(time.time()).split('.'))
-            sumo_params.port = int(time_stamp[-6:]) % 20000 + 40000
+            time.sleep(2.0 * int(time_stamp[-6:]) / 1e6)
+            sumo_params.port = sumolib.miscutils.getFreeSocketPort()# int(time_stamp[-6:]) % 20000 + 40000
             print(sumo_params.port)
         else:
+            print('USING OLD PORT')
             print(sumo_params.port)
+        
         register(
             id=env_name,
             entry_point='flow.envs:' + params["env_name"],
