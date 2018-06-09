@@ -54,7 +54,7 @@ if __name__ == "__main__":
             },
             "checkpoint_freq": 5,
             "max_failures": 999,
-            "stop": {"training_iteration": 150},
+            "stop": {"training_iteration": 500},
             "repeat": 3,
             "upload_dir": "s3://cistar.experiments/rllib_results",
             "trial_resources": {
