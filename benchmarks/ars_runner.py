@@ -18,9 +18,9 @@ from flow.utils.rllib import FlowParamsEncoder
 from benchmarks.figureeight2 import flow_params, env_name, create_env
 
 # number of rollouts per training iteration
-N_ROLLOUTS = 50
+N_ROLLOUTS = 25
 # number of parallel workers
-PARALLEL_ROLLOUTS = 50
+PARALLEL_ROLLOUTS = 25
 
 
 if __name__ == "__main__":
