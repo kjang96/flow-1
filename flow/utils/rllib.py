@@ -95,10 +95,6 @@ def make_create_env(params, version=0, sumo_binary=None):
         )
 
         sumo_params = deepcopy(params['sumo'])
-        if sumo_params.port is None:
-            time_stamp = ''.join(str(time.time()).split('.'))
-            time.sleep(2.0 * int(time_stamp[-6:]) / 1e6)
-            sumo_params.port = sumolib.miscutils.getFreeSocketPort()
 
         register(
             id=env_name,
