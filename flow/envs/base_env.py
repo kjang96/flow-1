@@ -161,8 +161,9 @@ class Env(gym.Env, Serializable):
                 if self.sumo_params.port is not None:
                     port = self.sumo_params.port
                 else:
-                    # backoff to decrease likelihood of race condition
+                    # Don't do backoff when testing
                     if os.environ.get("TEST_FLAG", 0):
+                        # backoff to decrease likelihood of race condition
                         time_stamp = ''.join(str(time.time()).split('.'))
                         time.sleep(2.0 * int(time_stamp[-6:]) / 1e6)
                         port = sumolib.miscutils.getFreeSocketPort()
