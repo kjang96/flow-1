@@ -19,11 +19,11 @@ from flow.controllers import RLController, ContinuousRouter
 # time horizon of a single rollout
 HORIZON = 1000
 
-SCALING = 1
+SCALING = 3
 NUM_LANES = 4 * SCALING  # number of lanes in the widest highway
 DISABLE_TB = True
 DISABLE_RAMP_METER = True
-AV_FRAC = 1.00
+AV_FRAC = .10
 
 vehicles = Vehicles()
 vehicles.add(veh_id="rl",
@@ -31,6 +31,11 @@ vehicles.add(veh_id="rl",
                                       {"fail_safe": "safe_velocity"}),
              routing_controller=(ContinuousRouter, {}),
              speed_mode=9,
+             lane_change_mode=0,
+             num_vehicles=1 * SCALING)
+vehicles.add(veh_id="human",
+             speed_mode=9,
+             routing_controller=(ContinuousRouter, {}),
              lane_change_mode=0,
              num_vehicles=1 * SCALING)
 
@@ -58,7 +63,10 @@ flow_rate = 1900 * SCALING
 # percentage of flow coming out of each lane
 inflow = InFlows()
 inflow.add(veh_type="rl", edge="1",
-           vehs_per_hour=flow_rate,
+           vehs_per_hour=flow_rate * AV_FRAC,
+           departLane="random", departSpeed=10)
+inflow.add(veh_type="human", edge="1",
+           vehs_per_hour=flow_rate * (1 - AV_FRAC),
            departLane="random", departSpeed=10)
 
 traffic_lights = TrafficLights()
