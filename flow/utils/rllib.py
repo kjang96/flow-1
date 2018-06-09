@@ -84,16 +84,16 @@ def make_create_env(params, version=0, sumo_binary=None):
     if sumo_binary is not None:
         sumo_params.sumo_binary = sumo_binary
 
-    scenario = scenario_class(
-        name=exp_tag,
-        generator_class=generator_class,
-        vehicles=vehicles,
-        net_params=net_params,
-        initial_config=initial_config,
-        traffic_lights=traffic_lights,
-    )
-
     def create_env(*_):
+        scenario = scenario_class(
+            name=exp_tag,
+            generator_class=generator_class,
+            vehicles=vehicles,
+            net_params=net_params,
+            initial_config=initial_config,
+            traffic_lights=traffic_lights,
+        )
+
         sumo_params = deepcopy(params['sumo'])
         if sumo_params.port is None:
             time_stamp = ''.join(str(time.time()).split('.'))
