@@ -454,9 +454,7 @@ class PO_TrafficLightGridEnv(TrafficLightGridEnv):
                                         self.last_change.flatten().tolist()]))
 
     def compute_reward(self, state, rl_actions, **kwargs):
-        hour_frac = self.env_params.horizon*self.sim_step/3600
-        delay_reward = rewards.min_delay(self)/(self.total_inflow*hour_frac)
-        return delay_reward
+        return rewards.desired_velocity(self, fail=kwargs["fail"])
 
     def additional_command(self):
         # specify observed vehicles
