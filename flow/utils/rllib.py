@@ -12,6 +12,10 @@ from flow.core.params import SumoLaneChangeParams, SumoCarFollowingParams, \
 from flow.core.traffic_lights import TrafficLights
 from flow.core.vehicles import Vehicles
 
+import sumolib
+import time
+from copy import deepcopy
+
 
 def make_create_env(params, version=0, sumo_binary=None):
     """Creates a parametrized flow environment compatible with RLlib.
