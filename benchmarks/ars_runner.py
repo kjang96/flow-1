@@ -18,9 +18,9 @@ from flow.utils.rllib import FlowParamsEncoder
 from benchmarks.figureeight2 import flow_params, env_name, create_env
 
 # number of rollouts per training iteration
-N_ROLLOUTS = 50
+N_ROLLOUTS = 25
 # number of parallel workers
-PARALLEL_ROLLOUTS = 50
+PARALLEL_ROLLOUTS = 25
 
 
 if __name__ == "__main__":
@@ -28,7 +28,6 @@ if __name__ == "__main__":
     ray.init(redis_address="localhost:6379", redirect_output=True)
     config = ars.DEFAULT_CONFIG.copy()
     config["num_workers"] = PARALLEL_ROLLOUTS
-    config["gamma"] = .999
     config["num_deltas"] = N_ROLLOUTS
     config["deltas_used"] = grid_search([25, 50])
     config["sgd_stepsize"] = .01
