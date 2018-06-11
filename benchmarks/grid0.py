@@ -3,7 +3,7 @@ Grid/green wave example
 
 Action Dimension: (9, )
 
-Observation Dimension: (447, )
+Observation Dimension: (339, )
 
 Horizon: 400 steps
 """

@@ -64,13 +64,13 @@ v_enter = 30
 inner_length = 300
 long_length = 100
 short_length = 300
-n = 3
-m = 3
+n = 5
+m = 5
 num_cars_left = 1
 num_cars_right = 1
 num_cars_top = 1
 num_cars_bot = 1
-edge_inflow = 600
+edge_inflow = 300
 rl_veh = 0
 tot_cars = (num_cars_left + num_cars_right) * m \
            + (num_cars_bot + num_cars_top) * n

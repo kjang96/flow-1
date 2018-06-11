@@ -35,7 +35,7 @@ else
     echo "please pass the name of a script to run"
 fi
 
-ray create_or_update ray_autoscale.yaml -y
+# ray create_or_update ray_autoscale.yaml -y
 # ray2 setup ray_autoscale.yaml
 # eval $(ray2 login_cmd ray_autoscale.yaml)
 # "cd learning-traffic && python setup.py develop"
