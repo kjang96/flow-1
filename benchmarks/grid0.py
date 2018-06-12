@@ -81,8 +81,7 @@ grid_array = {"short_length": short_length, "inner_length": inner_length,
               "cars_top": num_cars_top, "cars_bot": num_cars_bot,
               "rl_veh": rl_veh}
 
-additional_env_params = {"target_velocity": 50, "num_steps": HORIZON,
-                         "control-length": 150, "switch_time": 2.0,
+additional_env_params = {"control-length": 150, "switch_time": 2.0,
                          "total_inflow": n*m*edge_inflow}
 
 additional_net_params = {"speed_limit": 35, "grid_array": grid_array,
