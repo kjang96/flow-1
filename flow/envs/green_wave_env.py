@@ -377,6 +377,9 @@ class PO_TrafficLightGridEnv(TrafficLightGridEnv):
         super().__init__(env_params, sumo_params, scenario)
         self.num_observed = self.grid_array.get("num_observed", 2)
         self.total_inflow = env_params.additional_params["total_inflow"]
+        v_top = max(self.scenario.speed_limit(edge)
+                    for edge in self.scenario.get_edge_list())
+        self.env_params.additional_params["target_velocity"] = v_top
         self.observed_ids = []
 
     @property
@@ -454,11 +457,7 @@ class PO_TrafficLightGridEnv(TrafficLightGridEnv):
                                         self.last_change.flatten().tolist()]))
 
     def compute_reward(self, state, rl_actions, **kwargs):
-        hour_frac = self.env_params.horizon*self.sim_step/3600
-        delay_reward = rewards.min_delay(self)/(self.total_inflow*hour_frac)
-        switch_penalty = rewards.penalize_tl_changes(rl_actions, gain=0.2)
-        switch_penalty_norm = switch_penalty/(self.rows*self.cols)
-        return delay_reward + switch_penalty_norm
+        return rewards.desired_velocity(self, fail=kwargs["fail"])
 
     def additional_command(self):
         # specify observed vehicles

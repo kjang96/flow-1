@@ -71,6 +71,9 @@ class Env(gym.Env, Serializable):
         self.env_params = env_params
         self.scenario = scenario
         self.sumo_params = sumo_params
+        time_stamp = ''.join(str(time.time()).split('.'))
+        time.sleep(8.0 * int(time_stamp[-6:]) / 1e6)
+        self.sumo_params.port = sumolib.miscutils.getFreeSocketPort()
         self.vehicles = scenario.vehicles
         self.traffic_lights = scenario.traffic_lights
         # time_counter: number of steps taken since the start of a rollout
@@ -161,10 +164,12 @@ class Env(gym.Env, Serializable):
                 if self.sumo_params.port is not None:
                     port = self.sumo_params.port
                 else:
-                    # backoff to decrease likelihood of race condition
-                    time_stamp = ''.join(str(time.time()).split('.'))
-                    time.sleep(2.0 * int(time_stamp[-6:]) / 1e6)
-                    port = sumolib.miscutils.getFreeSocketPort()
+                    # Don't do backoff when testing
+                    if os.environ.get("TEST_FLAG", 0):
+                        # backoff to decrease likelihood of race condition
+                        time_stamp = ''.join(str(time.time()).split('.'))
+                        time.sleep(2.0 * int(time_stamp[-6:]) / 1e6)
+                        port = sumolib.miscutils.getFreeSocketPort()
 
                 # command used to start sumo
                 sumo_call = [self.sumo_params.sumo_binary,

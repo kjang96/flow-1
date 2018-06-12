@@ -12,6 +12,8 @@ from gym.spaces.box import Box
 
 from flow.core import rewards
 from flow.envs.base_env import Env
+import os
+import glob
 
 MAX_LANES = 4  # base number of largest number of lanes in the network
 EDGE_LIST = ["1", "2", "3", "4", "5"]  # Edge 1 is before the toll booth
@@ -855,6 +857,17 @@ class DesiredVelocityEnv(BottleneckEnv):
                                  lane_change_mode=0,
                                  num_vehicles=1 * self.scaling)
                     self.vehicles = vehicles
+
+                    # delete the cfg and net files
+                    net_path = self.scenario.generator.net_path
+                    net_name = net_path + self.scenario.generator.name
+                    cfg_path = self.scenario.generator.cfg_path
+                    cfg_name = cfg_path + self.scenario.generator.name
+                    for f in glob.glob(net_name+'*'):
+                        os.remove(f)
+                    for f in glob.glob(cfg_name+'*'):
+                        os.remove(f)
+
                     self.scenario = self.scenario.__class__(
                         name=self.scenario.orig_name,
                         generator_class=self.scenario.generator_class,
