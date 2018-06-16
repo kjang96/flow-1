@@ -41,7 +41,7 @@ def make_create_env(params, version=0, sumo_binary=None):
            configuration files
          - sumo: sumo-related parameters (see flow.core.params.SumoParams)
          - env: environment related parameters (see flow.core.params.EnvParams)
-         - net: #network-related parameters (see flow.core.params.NetParams and
+         - net: network-related parameters (see flow.core.params.NetParams and
            the scenario's documentation or ADDITIONAL_NET_PARAMS component)
          - veh: vehicles to be placed in the network at the start of a rollout
            (see flow.core.vehicles.Vehicles)
