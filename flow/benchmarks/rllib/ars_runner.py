@@ -6,6 +6,7 @@ this runner script is executed on. Furthermore, the rllib specific algorithm/
 parameters can be specified here once and used on multiple environments.
 """
 import json
+
 import ray
 import ray.rllib.ars as ars
 from ray.tune import run_experiments, grid_search
@@ -14,7 +15,7 @@ from ray.tune.registry import register_env
 from flow.utils.rllib import make_create_env, FlowParamsEncoder
 
 # use this to specify the environment to run
-from benchmarks.figureeight2 import flow_params
+from flow.benchmarks.figureeight2 import flow_params
 
 # number of rollouts per training iteration
 N_ROLLOUTS = 25

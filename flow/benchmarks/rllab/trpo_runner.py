@@ -6,18 +6,18 @@ this runner script is executed on. This script than handles running the rllab
 specific RL algorithm. Specifically, this script is designed for hyperparameter
 tuning of the TRPO algorithm.
 """
-from rllab.envs.normalized_env import normalize
-from rllab.misc.instrument import run_experiment_lite
 from rllab.algos.trpo import TRPO
 from rllab.baselines.linear_feature_baseline import LinearFeatureBaseline
-from rllab.policies.gaussian_mlp_policy import GaussianMLPPolicy
 from rllab.envs.gym_env import GymEnv
+from rllab.envs.normalized_env import normalize
+from rllab.misc.instrument import run_experiment_lite
+from rllab.policies.gaussian_mlp_policy import GaussianMLPPolicy
 
 from flow.core.params import InitialConfig
 from flow.core.traffic_lights import TrafficLights
 
 # use this to specify the environment to run
-from benchmarks.grid1 import flow_params
+from flow.benchmarks.grid1 import flow_params
 
 # number of rollouts per training iteration
 N_ROLLOUTS = 50
