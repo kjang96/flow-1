@@ -124,7 +124,7 @@ if __name__ == "__main__":
                 break
         rets.append(ret)
         print("Return:", ret)
-    print("Average Return", np.mean(rets))
+    print("Average, std return: {}, {}".format(np.mean(rets), np.std(rets)))
 
     # terminate the environment
     env.terminate()

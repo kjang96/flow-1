@@ -67,7 +67,7 @@ if __name__ == "__main__":
         rew.append(sum(new_rewards))
 
     # print the average cumulative reward across rollouts
-    print("Average return: {}".format(np.mean(rew)))
+    print("Average, std return: {}, {}".format(np.mean(rew), np.std(rew)))
 
     # ensure that a reward_plots folder exists in the directory, and if not,
     # create one
