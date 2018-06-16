@@ -3,11 +3,9 @@ Repeatedly runs one step of an environment to test for possible race conditions
 """
 
 import json
-import time
 import ray
 import ray.rllib.ppo as ppo
 from ray.tune import run_experiments
-from ray.tune import grid_search
 from ray.tune.registry import register_env
 
 from flow.utils.rllib import FlowParamsEncoder
@@ -22,8 +20,6 @@ PARALLEL_ROLLOUTS = 50
 
 
 if __name__ == "__main__":
-    start = time.time()
-    print("STARTTTTTT")
     ray.init(redirect_output=True)
     flow_params["env"].horizon = 1
     horizon = flow_params["env"].horizon
@@ -64,7 +60,3 @@ if __name__ == "__main__":
             },
         },
     })
-
-    end = time.time()
-
-    print("IT TOOK " + str(end-start))
