@@ -55,8 +55,7 @@ def merge_example(sumo_binary=None):
                            additional_params=additional_net_params)
 
     initial_config = InitialConfig(spacing="uniform",
-                                   perturbation=5.0,
-                                   lanes_distribution=float("inf"))
+                                   perturbation=5.0)
 
     scenario = MergeScenario(name="merge-baseline",
                              generator_class=MergeGenerator,

@@ -193,7 +193,7 @@ class InitialConfig:
                  perturbation=0.0,
                  x0=0,
                  bunching=0,
-                 lanes_distribution=1,
+                 lanes_distribution=float("inf"),
                  edges_distribution="all",
                  positions=None,
                  lanes=None,

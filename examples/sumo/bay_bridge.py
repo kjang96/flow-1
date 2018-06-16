@@ -125,7 +125,6 @@ def bay_bridge_example(sumo_binary=None,
         f.write(data_to_write)
 
     initial_config = InitialConfig(spacing="uniform",
-                                   lanes_distribution=float("inf"),
                                    min_gap=15)
 
     scenario = BayBridgeScenario(name="bay_bridge",

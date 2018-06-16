@@ -31,7 +31,8 @@ def gen_edges(row_num, col_num):
     return edges
 
 
-def get_flow_params(v_enter, vehs_per_hour, col_num, row_num, additional_net_params):
+def get_flow_params(v_enter, vehs_per_hour, col_num, row_num,
+                    additional_net_params):
     initial_config = InitialConfig(spacing="uniform",
                                    lanes_distribution=float("inf"),
                                    shuffle=True)
@@ -39,7 +40,8 @@ def get_flow_params(v_enter, vehs_per_hour, col_num, row_num, additional_net_par
     inflow = InFlows()
     outer_edges = gen_edges(col_num, row_num)
     for i in range(len(outer_edges)):
-        inflow.add(veh_type="idm", edge=outer_edges[i], vehs_per_hour=vehs_per_hour,
+        inflow.add(veh_type="idm", edge=outer_edges[i],
+                   vehs_per_hour=vehs_per_hour,
                    departLane="free", departSpeed=v_enter)
 
     net_params = NetParams(in_flows=inflow,
@@ -100,7 +102,8 @@ def run_task(*_):
     additional_net_params = {"speed_limit": 35, "grid_array": grid_array,
                              "horizontal_lanes": 1, "vertical_lanes": 1}
 
-    initial_config, net_params = get_flow_params(10, 300, n, m, additional_net_params)
+    initial_config, net_params = get_flow_params(10, 300, n, m,
+                                                 additional_net_params)
 
     scenario = SimpleGridScenario(name="grid-intersection",
                                   generator_class=SimpleGridGenerator,
@@ -110,7 +113,6 @@ def run_task(*_):
                                   traffic_lights=tl_logic)
 
     env_name = "PO_TrafficLightGridEnv"
-    # env_name = "TrafficLightGridEnv"
     pass_params = (env_name, sumo_params, vehicles, env_params, net_params,
                    initial_config, scenario)
 
@@ -150,9 +152,7 @@ for seed in [6]:  # , 7, 8]:
         # Specifies the seed for the experiment. If this is not provided, a
         # random seed will be used
         seed=seed,
-        # mode="local",
-        mode="local",
-        # mode="local",  # "local_docker", "ec2"
+        mode="local",  # "local_docker", "ec2"
         exp_prefix="green-wave",
         # plot=True,
     )
