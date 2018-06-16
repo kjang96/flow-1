@@ -117,8 +117,6 @@ if __name__ == "__main__":
         done = False
         ret = 0
         for _ in range(env_params.horizon):
-            if isinstance(state, list):
-                state = np.concatenate(state)
             action = agent.compute_action(state)
             state, reward, done, _ = env.step(action)
             ret += reward

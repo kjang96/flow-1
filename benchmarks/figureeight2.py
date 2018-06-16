@@ -3,9 +3,9 @@ Trains a fraction of vehicles in a ring road structure to regulate the flow of
 vehicles through an intersection. In this example, every vehicle in the
 network is an autonomous vehicle.
 
-Action Dimension: (16, )
+Action Dimension: (14, )
 
-Observation Dimension: (32, )
+Observation Dimension: (28, )
 
 Horizon: 1500 steps
 """
@@ -25,7 +25,7 @@ vehicles.add(veh_id="rl",
              acceleration_controller=(RLController, {}),
              routing_controller=(ContinuousRouter, {}),
              speed_mode="no_collide",
-             num_vehicles=16)
+             num_vehicles=14)
 
 flow_params = dict(
     # name of the experiment
@@ -50,7 +50,7 @@ flow_params = dict(
     env=EnvParams(
         horizon=HORIZON,
         additional_params={
-            "target_velocity": 30,
+            "target_velocity": 20,
             "max_accel": 3,
             "max_decel": 3,
         },

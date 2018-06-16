@@ -53,8 +53,6 @@ class AccelEnv(Env):
                 raise KeyError('Environment parameter "{}" not supplied'.
                                format(p))
 
-        self.max_accel = self.env_params.additional_params["max_accel"]
-        self.max_decel = -abs(self.env_params.additional_params["max_decel"])
         super().__init__(env_params, sumo_params, scenario)
 
     @property
@@ -74,8 +72,6 @@ class AccelEnv(Env):
         return Tuple((speed, pos))
 
     def _apply_rl_actions(self, rl_actions):
-        rl_actions = np.clip(rl_actions, a_min=self.max_decel,
-                             a_max=self.max_accel)
         sorted_rl_ids = [veh_id for veh_id in self.sorted_ids
                          if veh_id in self.vehicles.get_rl_ids()]
         self.apply_acceleration(sorted_rl_ids, rl_actions)
@@ -85,8 +81,7 @@ class AccelEnv(Env):
 
     def get_state(self, **kwargs):
         # speed normalizer
-        max_speed = max(self.scenario.speed_limit(edge)
-                        for edge in self.scenario.get_edge_list())
+        max_speed = self.scenario.max_speed
 
         return np.array([[self.vehicles.get_speed(veh_id) / max_speed,
                           self.get_x_by_id(veh_id) / self.scenario.length]

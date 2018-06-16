@@ -12,6 +12,8 @@ from gym.spaces.box import Box
 
 from flow.core import rewards
 from flow.envs.base_env import Env
+import os
+import glob
 
 MAX_LANES = 4  # base number of largest number of lanes in the network
 EDGE_LIST = ["1", "2", "3", "4", "5"]  # Edge 1 is before the toll booth
@@ -772,15 +774,13 @@ class DesiredVelocityEnv(BottleneckEnv):
         return np.concatenate((num_vehicles_list, num_rl_vehicles_list,
                                mean_speed_norm, mean_rl_speed, [outflow]))
 
-    def _apply_rl_actions(self, actions):
+    def _apply_rl_actions(self, rl_actions):
         """
         RL actions are split up into 3 levels.
         First, they're split into edge actions.
         Then they're split into segment actions.
         Then they're split into lane actions.
         """
-        rl_actions = np.clip(actions, -1.5, 1.0)
-
         for rl_id in self.vehicles.get_rl_ids():
             edge = self.vehicles.get_edge(rl_id)
             lane = self.vehicles.get_lane(rl_id)
@@ -857,6 +857,17 @@ class DesiredVelocityEnv(BottleneckEnv):
                                  lane_change_mode=0,
                                  num_vehicles=1 * self.scaling)
                     self.vehicles = vehicles
+
+                    # delete the cfg and net files
+                    net_path = self.scenario.generator.net_path
+                    net_name = net_path + self.scenario.generator.name
+                    cfg_path = self.scenario.generator.cfg_path
+                    cfg_name = cfg_path + self.scenario.generator.name
+                    for f in glob.glob(net_name+'*'):
+                        os.remove(f)
+                    for f in glob.glob(cfg_name+'*'):
+                        os.remove(f)
+
                     self.scenario = self.scenario.__class__(
                         name=self.scenario.orig_name,
                         generator_class=self.scenario.generator_class,

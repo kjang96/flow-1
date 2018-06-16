@@ -99,22 +99,20 @@ class TrafficLightGridEnv(Env):
                                dtype=np.float32)
         edge_num = Box(low=0., high=1, shape=(self.vehicles.num_vehicles,),
                        dtype=np.float32)
-        traffic_lights = Box(low=0., high=np.inf,
+        traffic_lights = Box(low=0., high=1,
                              shape=(3 * self.rows * self.cols,),
                              dtype=np.float32)
         return Tuple((speed, dist_to_intersec, edge_num, traffic_lights))
 
     def get_state(self):
         # compute the normalizers
-        max_speed = max(self.scenario.speed_limit(edge)
-                        for edge in self.scenario.get_edge_list())
         max_dist = max(self.scenario.short_length,
                        self.scenario.long_length,
                        self.scenario.inner_length)
 
         # get the state arrays
-        speeds = [self.vehicles.get_speed(veh_id) / max_speed for veh_id in
-                  self.vehicles.get_ids()]
+        speeds = [self.vehicles.get_speed(veh_id) / self.scenario.max_speed
+                  for veh_id in self.vehicles.get_ids()]
         dist_to_intersec = [self.get_distance_to_intersection(veh_id)/max_dist
                             for veh_id in self.vehicles.get_ids()]
         edges = [self._convert_edge(self.vehicles.get_edge(veh_id)) / (
@@ -124,13 +122,11 @@ class TrafficLightGridEnv(Env):
                  self.last_change.flatten().tolist()]
         return np.array(state)
 
-    def _apply_rl_actions(self, actions):
+    def _apply_rl_actions(self, rl_actions):
         # convert values less than 0.5 to zero and above to 1. 0's indicate
         # that should not switch the direction
         if self.tl_type == "actuated":
             return
-
-        rl_actions = np.clip(actions, a_min=0, a_max=1.0)
 
         rl_mask = rl_actions > 0.5
 
@@ -379,7 +375,12 @@ class PO_TrafficLightGridEnv(TrafficLightGridEnv):
 
     def __init__(self, env_params, sumo_params, scenario):
         super().__init__(env_params, sumo_params, scenario)
-        self.num_observed = self.grid_array.get("num_observed", 3)
+        self.num_observed = self.grid_array.get("num_observed", 2)
+        self.total_inflow = env_params.additional_params["total_inflow"]
+        v_top = max(self.scenario.speed_limit(edge)
+                    for edge in self.scenario.get_edge_list())
+        self.env_params.additional_params["target_velocity"] = v_top
+        self.observed_ids = []
 
     @property
     def observation_space(self):
@@ -411,11 +412,13 @@ class PO_TrafficLightGridEnv(TrafficLightGridEnv):
                         for edge in self.scenario.get_edge_list())
         max_dist = max(self.scenario.short_length, self.scenario.long_length,
                        self.scenario.inner_length)
+        all_observed_ids = []
 
         for node, edges in self.scenario.get_node_mapping():
             for edge in edges:
                 observed_ids = \
                     self.k_closest_to_intersection(edge, self.num_observed)
+                all_observed_ids += observed_ids
 
                 # check which edges we have so we can always pad in the right
                 # positions
@@ -448,12 +451,18 @@ class PO_TrafficLightGridEnv(TrafficLightGridEnv):
             else:
                 density += [0]
                 velocity_avg += [0]
+        self.observed_ids = all_observed_ids
         return np.array(np.concatenate([speeds, dist_to_intersec, edge_number,
                                         density, velocity_avg,
                                         self.last_change.flatten().tolist()]))
 
     def compute_reward(self, state, rl_actions, **kwargs):
-        return rewards.min_delay(self)
+        return rewards.desired_velocity(self, fail=kwargs["fail"])
+
+    def additional_command(self):
+        # specify observed vehicles
+        [self.vehicles.set_observed(veh_id) for veh_id in self.observed_ids]
+
 
 
 class GreenWaveTestEnv(TrafficLightGridEnv):

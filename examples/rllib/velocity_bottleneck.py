@@ -166,7 +166,7 @@ if __name__ == '__main__':
     register_env(env_name, create_env)
 
     trials = run_experiments({
-        "DesiredVelocity": {
+        flow_params["exp_tag"]: {
             "run": "PPO",
             "env": "DesiredVelocityEnv-v0",
             "config": {

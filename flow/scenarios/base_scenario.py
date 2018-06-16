@@ -76,6 +76,10 @@ class Scenario(Serializable):
         self._junction_list = list(set(self._edges.keys()) -
                                    set(self._edge_list))
 
+        # maximum achievable speed on any edge in the network
+        self.max_speed = max(self.speed_limit(edge)
+                             for edge in self.get_edge_list())
+
         # parameters to be specified under each unique subclass's
         # __init__() function
         self.edgestarts = self.specify_edge_starts()

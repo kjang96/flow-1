@@ -12,6 +12,10 @@ from flow.core.params import SumoLaneChangeParams, SumoCarFollowingParams, \
 from flow.core.traffic_lights import TrafficLights
 from flow.core.vehicles import Vehicles
 
+import sumolib
+import time
+from copy import deepcopy
+
 
 def make_create_env(params, version=0, sumo_binary=None):
     """Creates a parametrized flow environment compatible with RLlib.
@@ -71,7 +75,6 @@ def make_create_env(params, version=0, sumo_binary=None):
     module = __import__("flow.scenarios", fromlist=[params["generator"]])
     generator_class = getattr(module, params["generator"])
 
-    sumo_params = params['sumo']
     env_params = params['env']
     net_params = params['net']
     vehicles = params['veh']
@@ -81,16 +84,18 @@ def make_create_env(params, version=0, sumo_binary=None):
     if sumo_binary is not None:
         sumo_params.sumo_binary = sumo_binary
 
-    scenario = scenario_class(
-        name=exp_tag,
-        generator_class=generator_class,
-        vehicles=vehicles,
-        net_params=net_params,
-        initial_config=initial_config,
-        traffic_lights=traffic_lights,
-    )
-
     def create_env(*_):
+        scenario = scenario_class(
+            name=exp_tag,
+            generator_class=generator_class,
+            vehicles=vehicles,
+            net_params=net_params,
+            initial_config=initial_config,
+            traffic_lights=traffic_lights,
+        )
+
+        sumo_params = deepcopy(params['sumo'])
+
         register(
             id=env_name,
             entry_point='flow.envs:' + params["env_name"],

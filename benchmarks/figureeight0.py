@@ -1,11 +1,11 @@
 """
 Trains a fraction of vehicles in a ring road structure to regulate the flow of
-vehicles through an intersection. In this example, every fourth vehicle in the
+vehicles through an intersection. In this example, the last vehicle in the
 network is an autonomous vehicle.
 
-Action Dimension: (4, )
+Action Dimension: (1, )
 
-Observation Dimension: (32, )
+Observation Dimension: (28, )
 
 Horizon: 1500 steps
 """
@@ -19,19 +19,18 @@ from flow.scenarios.figure8.figure8_scenario import ADDITIONAL_NET_PARAMS
 # time horizon of a single rollout
 HORIZON = 1500
 
-# We place 4 autonomous vehicle and 12 human-driven vehicles in the network
+# We place 1 autonomous vehicle and 13 human-driven vehicles in the network
 vehicles = Vehicles()
-for i in range(4):
-    vehicles.add(veh_id="human{}".format(i),
-                 acceleration_controller=(IDMController, {"noise": 0.2}),
-                 routing_controller=(ContinuousRouter, {}),
-                 speed_mode="no_collide",
-                 num_vehicles=3)
-    vehicles.add(veh_id="rl{}".format(i),
-                 acceleration_controller=(RLController, {}),
-                 routing_controller=(ContinuousRouter, {}),
-                 speed_mode="no_collide",
-                 num_vehicles=1)
+vehicles.add(veh_id="human",
+             acceleration_controller=(IDMController, {"noise": 0.2}),
+             routing_controller=(ContinuousRouter, {}),
+             speed_mode="no_collide",
+             num_vehicles=13)
+vehicles.add(veh_id="rl",
+             acceleration_controller=(RLController, {}),
+             routing_controller=(ContinuousRouter, {}),
+             speed_mode="no_collide",
+             num_vehicles=1)
 
 flow_params = dict(
     # name of the experiment

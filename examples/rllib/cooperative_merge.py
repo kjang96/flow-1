@@ -1,5 +1,7 @@
 """
-(blank)
+Cooperative merging example, consisting of 1 learning agent and 6 additional
+vehicles in an inner ring, and 10 vehicles in an outer ring attempting to
+merge into the inner ring.
 """
 
 import json
@@ -9,44 +11,74 @@ import ray.rllib.ppo as ppo
 from ray.tune import run_experiments
 from ray.tune.registry import register_env
 
+from flow.controllers import RLController, IDMController, ContinuousRouter, \
+    SumoLaneChangeController
+from flow.core.params import SumoCarFollowingParams, SumoLaneChangeParams, \
+    SumoParams, EnvParams, InitialConfig, NetParams
 from flow.utils.rllib import make_create_env, FlowParamsEncoder
-from flow.core.params import SumoParams, EnvParams, InitialConfig, NetParams
 from flow.core.vehicles import Vehicles
-from flow.controllers import IDMController, ContinuousRouter, RLController
-from flow.scenarios.figure8.figure8_scenario import ADDITIONAL_NET_PARAMS
 
 # time horizon of a single rollout
-HORIZON = 1500
+HORIZON = 100
 # number of rollouts per training iteration
-N_ROLLOUTS = 20
+N_ROLLOUTS = 10
 # number of parallel workers
 PARALLEL_ROLLOUTS = 2
 
-# We place one autonomous vehicle and 13 human-driven vehicles in the network
+RING_RADIUS = 100
+NUM_MERGE_HUMANS = 9
+NUM_MERGE_RL = 1
+
+# note that the vehicles are added sequentially by the generator,
+# so place the merging vehicles after the vehicles in the ring
 vehicles = Vehicles()
+# Inner ring vehicles
 vehicles.add(veh_id="human",
              acceleration_controller=(IDMController, {"noise": 0.2}),
+             lane_change_controller=(SumoLaneChangeController, {}),
              routing_controller=(ContinuousRouter, {}),
-             speed_mode="no_collide",
-             num_vehicles=13)
+             num_vehicles=6,
+             sumo_car_following_params=SumoCarFollowingParams(
+                 minGap=0.0,
+                 tau=0.5
+             ),
+             sumo_lc_params=SumoLaneChangeParams())
+# A single learning agent in the inner ring
 vehicles.add(veh_id="rl",
              acceleration_controller=(RLController, {}),
+             lane_change_controller=(SumoLaneChangeController, {}),
              routing_controller=(ContinuousRouter, {}),
              speed_mode="no_collide",
-             num_vehicles=1)
+             num_vehicles=1,
+             sumo_car_following_params=SumoCarFollowingParams(
+                 minGap=0.01,
+                 tau=0.5
+             ),
+             sumo_lc_params=SumoLaneChangeParams())
+# Outer ring vehicles
+vehicles.add(veh_id="merge-human",
+             acceleration_controller=(IDMController, {"noise": 0.2}),
+             lane_change_controller=(SumoLaneChangeController, {}),
+             routing_controller=(ContinuousRouter, {}),
+             num_vehicles=10,
+             sumo_car_following_params=SumoCarFollowingParams(
+                 minGap=0.0,
+                 tau=0.5
+             ),
+             sumo_lc_params=SumoLaneChangeParams())
 
 flow_params = dict(
     # name of the experiment
-    exp_tag="figure_eight_intersection_control",
+    exp_tag="cooperative_merge",
 
     # name of the flow environment the experiment is running on
-    env_name="AccelEnv",
+    env_name="TwoLoopsMergeEnv",
 
     # name of the scenario class the experiment is running on
-    scenario="Figure8Scenario",
+    scenario="TwoLoopsOneMergingScenario",
 
     # name of the generator used to create/modify network configuration files
-    generator="Figure8Generator",
+    generator="TwoLoopOneMergingGenerator",
 
     # sumo-related parameters (see flow.core.params.SumoParams)
     sumo=SumoParams(
@@ -57,11 +89,10 @@ flow_params = dict(
     # environment related parameters (see flow.core.params.EnvParams)
     env=EnvParams(
         horizon=HORIZON,
-        warmup_steps=750,
         additional_params={
             "target_velocity": 20,
-            "max_accel": 3,
-            "max_decel": 3,
+            "max_accel": 1,
+            "max_decel": 1.5,
         },
     ),
 
@@ -69,7 +100,13 @@ flow_params = dict(
     # scenario's documentation or ADDITIONAL_NET_PARAMS component)
     net=NetParams(
         no_internal_links=False,
-        additional_params=ADDITIONAL_NET_PARAMS,
+        additional_params={
+            "ring_radius": 50,
+            "lanes": 1,
+            "lane_length": 75,
+            "speed_limit": 30,
+            "resolution": 40,
+        },
     ),
 
     # vehicles to be placed in the network at the start of a rollout (see
@@ -78,7 +115,13 @@ flow_params = dict(
 
     # parameters specifying the positioning of vehicles upon initialization/
     # reset (see flow.core.params.InitialConfig)
-    initial=InitialConfig(),
+    initial=InitialConfig(
+        x0=50,
+        spacing="custom",
+        additional_params={
+            "merge_bunching": 0,
+        },
+    ),
 )
 
 
@@ -89,14 +132,13 @@ if __name__ == "__main__":
     config["num_workers"] = PARALLEL_ROLLOUTS
     config["timesteps_per_batch"] = HORIZON * N_ROLLOUTS
     config["gamma"] = 0.999  # discount rate
-    config["model"].update({"fcnet_hiddens": [100, 50, 25]})
+    config["model"].update({"fcnet_hiddens": [16, 16, 16]})
     config["use_gae"] = True
     config["lambda"] = 0.97
     config["sgd_batchsize"] = min(16 * 1024, config["timesteps_per_batch"])
     config["kl_target"] = 0.02
     config["num_sgd_iter"] = 10
     config["horizon"] = HORIZON
-    config["observation_filter"] = "NoFilter"
 
     # save the flow params for replay
     flow_json = json.dumps(flow_params, cls=FlowParamsEncoder, sort_keys=True,
@@ -109,22 +151,21 @@ if __name__ == "__main__":
     register_env(env_name, create_env)
 
     trials = run_experiments({
-        "figure_eight": {
+        flow_params["exp_tag"]: {
             "run": "PPO",
             "env": env_name,
             "config": {
                 **config
             },
-            "checkpoint_freq": 1,
+            "checkpoint_freq": 20,
             "max_failures": 999,
             "stop": {
-                "training_iteration": 200
+                "training_iteration": 200,
             },
-            "repeat": 3,
             "trial_resources": {
                 "cpu": 1,
                 "gpu": 0,
                 "extra_cpu": PARALLEL_ROLLOUTS - 1,
             },
-        },
+        }
     })
