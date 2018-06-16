@@ -9,7 +9,6 @@ Observation Dimension: (?, )
 Horizon: 1000 steps
 """
 
-from flow.utils.rllib import make_create_env
 from flow.core.params import SumoParams, EnvParams, InitialConfig, NetParams, \
     InFlows
 from flow.core.traffic_lights import TrafficLights
@@ -32,8 +31,7 @@ vehicles.add(veh_id="human",
              lane_change_mode=0,
              num_vehicles=1 * SCALING)
 vehicles.add(veh_id="rl",
-             acceleration_controller=(RLController,
-                                      {"fail_safe": "safe_velocity"}),
+             acceleration_controller=(RLController, {}),
              routing_controller=(ContinuousRouter, {}),
              speed_mode=9,
              lane_change_mode=0,
@@ -134,6 +132,3 @@ flow_params = dict(
     # flow.core.traffic_lights.TrafficLights)
     tls=traffic_lights,
 )
-
-# get the env name and a creator for the environment (used by rllib)
-create_env, env_name = make_create_env(params=flow_params, version=0)

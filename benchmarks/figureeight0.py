@@ -10,7 +10,6 @@ Observation Dimension: (28, )
 Horizon: 1500 steps
 """
 
-from flow.utils.rllib import make_create_env
 from flow.core.params import SumoParams, EnvParams, InitialConfig, NetParams
 from flow.core.vehicles import Vehicles
 from flow.controllers import IDMController, ContinuousRouter, RLController
@@ -76,6 +75,3 @@ flow_params = dict(
     # reset (see flow.core.params.InitialConfig)
     initial=InitialConfig(),
 )
-
-# get the env name and a creator for the environment (used by rllib)
-create_env, env_name = make_create_env(params=flow_params, version=0)

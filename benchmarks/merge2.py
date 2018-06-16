@@ -10,7 +10,6 @@ Observation Dimension: (85, )
 Horizon: 750 steps
 """
 
-from flow.utils.rllib import make_create_env
 from flow.core.params import SumoParams, EnvParams, InitialConfig, NetParams, \
     InFlows
 from flow.scenarios.merge.scenario import ADDITIONAL_NET_PARAMS
@@ -105,6 +104,3 @@ flow_params = dict(
     # reset (see flow.core.params.InitialConfig)
     initial=InitialConfig(),
 )
-
-# get the env name and a creator for the environment (used by rllib)
-create_env, env_name = make_create_env(params=flow_params, version=0)

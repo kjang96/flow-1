@@ -6,28 +6,29 @@ this runner script is executed on. Furthermore, the rllib specific algorithm/
 parameters can be specified here once and used on multiple environments.
 """
 import json
-import time
 import ray
 import ray.rllib.ppo as ppo
 from ray.tune import run_experiments
-from ray.tune import grid_search
 from ray.tune.registry import register_env
 
-from flow.utils.rllib import FlowParamsEncoder
+from flow.utils.rllib import make_create_env, FlowParamsEncoder
 
 # use this to specify the environment to run
-from benchmarks.grid0 import flow_params, env_name, create_env
+from benchmarks.grid1 import flow_params
 
 # number of rollouts per training iteration
-N_ROLLOUTS = 4
+N_ROLLOUTS = 3
 # number of parallel workers
-PARALLEL_ROLLOUTS = 4
+PARALLEL_ROLLOUTS = 3
 
 
 if __name__ == "__main__":
-    start = time.time()
-    print("STARTTTTTT")
+    # get the env name and a creator for the environment (used by rllib)
+    create_env, env_name = make_create_env(params=flow_params, version=0)
+
+    # initialize a ray instance
     ray.init(redirect_output=True)
+
     horizon = flow_params["env"].horizon
     config = ppo.DEFAULT_CONFIG.copy()
     config["num_workers"] = PARALLEL_ROLLOUTS
@@ -36,18 +37,7 @@ if __name__ == "__main__":
     config["kl_target"] = 0.02
     config["use_gae"] = True
     config["horizon"] = horizon
-    #config["ADB"] = grid_search([True, False])
-    #config["gamma"] = grid_search([0.995, 0.999, 1.0])  # discount rate
-    #config["model"].update({"fcnet_hiddens": grid_search([[100, 50, 25], [256, 256], [32, 32]])})
-    #config["lambda"] = grid_search([0.9, 0.99])
-    #config["sgd_batchsize"] = grid_search([64, 1024, min(16 * 1024, config["timesteps_per_batch"])])
-    #config["num_sgd_iter"] = grid_search([10, 30])
-    #config["entropy_coeff"] = grid_search([0, -1e-4, 1e-4])
-    #config["kl_coeff"] = grid_search([0.0, 0.2])
-    #config["clip_param"] = grid_search([0.2, 0.3])
-    #
     config["clip_param"] = 0.2
-    #config["ADB"] = False
 
     # save the flow params for replay
     flow_json = json.dumps(flow_params, cls=FlowParamsEncoder, sort_keys=True,
@@ -75,7 +65,3 @@ if __name__ == "__main__":
             },
         },
     })
-
-    end = time.time()
-
-    print("IT TOOK " + str(end-start))

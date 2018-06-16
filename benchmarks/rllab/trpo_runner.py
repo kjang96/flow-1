@@ -16,10 +16,11 @@ from rllab.envs.gym_env import GymEnv
 from flow.core.params import InitialConfig
 from flow.core.traffic_lights import TrafficLights
 
-from benchmarks.figureeight1 import flow_params, HORIZON
+# use this to specify the environment to run
+from benchmarks.grid1 import flow_params
 
 # number of rollouts per training iteration
-N_ROLLOUTS = 20
+N_ROLLOUTS = 50
 # number of parallel workers
 PARALLEL_ROLLOUTS = 8
 
@@ -58,17 +59,18 @@ def run_task(*_):
 
     policy = GaussianMLPPolicy(
         env_spec=env.spec,
-        hidden_sizes=(32, 32, 32)
+        hidden_sizes=(100, 50, 25)
     )
 
     baseline = LinearFeatureBaseline(env_spec=env.spec)
+    horizon = flow_params["env"].horizon
 
     algo = TRPO(
         env=env,
         policy=policy,
         baseline=baseline,
-        batch_size=HORIZON * N_ROLLOUTS,
-        max_path_length=HORIZON,
+        batch_size=horizon * (N_ROLLOUTS - PARALLEL_ROLLOUTS + 1),
+        max_path_length=horizon,
         n_itr=500,
         discount=0.999,
         step_size=0.01,
@@ -88,4 +90,5 @@ for seed in [5, 20, 68, 100, 128]:
         seed=seed,
         mode="local",
         exp_prefix=flow_params["exp_tag"],
+        sync_s3_pkl=True,
     )
