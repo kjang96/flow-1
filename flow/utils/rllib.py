@@ -12,8 +12,6 @@ from flow.core.params import SumoLaneChangeParams, SumoCarFollowingParams, \
 from flow.core.traffic_lights import TrafficLights
 from flow.core.vehicles import Vehicles
 
-import sumolib
-import time
 from copy import deepcopy
 
 
@@ -81,9 +79,6 @@ def make_create_env(params, version=0, sumo_binary=None):
     initial_config = params.get('initial', InitialConfig())
     traffic_lights = params.get("tls", TrafficLights())
 
-    if sumo_binary is not None:
-        sumo_params.sumo_binary = sumo_binary
-
     def create_env(*_):
         scenario = scenario_class(
             name=exp_tag,
@@ -95,6 +90,9 @@ def make_create_env(params, version=0, sumo_binary=None):
         )
 
         sumo_params = deepcopy(params['sumo'])
+
+        if sumo_binary is not None:
+            sumo_params.sumo_binary = sumo_binary
 
         register(
             id=env_name,
