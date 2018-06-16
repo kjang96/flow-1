@@ -24,7 +24,7 @@ PARALLEL_ROLLOUTS = 3
 
 
 if __name__ == "__main__":
-    # get the env name and a creator for the environment (used by rllib)
+    # get the env name and a creator for the environment
     create_env, env_name = make_create_env(params=flow_params, version=0)
 
     # initialize a ray instance

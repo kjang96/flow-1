@@ -3,15 +3,14 @@ Repeatedly runs one step of an environment to test for possible race conditions
 """
 
 import json
+
 import ray
 import ray.rllib.ppo as ppo
 from ray.tune import run_experiments
 from ray.tune.registry import register_env
 
-from flow.utils.rllib import FlowParamsEncoder
-
-# use this to specify the environment to run
-from benchmarks.lanedrop0 import flow_params, env_name, create_env
+from flow.benchmarks.bottleneck0 import flow_params
+from flow.utils.rllib import make_create_env, FlowParamsEncoder
 
 # number of rollouts per training iteration
 N_ROLLOUTS = 50
@@ -20,6 +19,9 @@ PARALLEL_ROLLOUTS = 50
 
 
 if __name__ == "__main__":
+    # get the env name and a creator for the environment
+    create_env, env_name = make_create_env(params=flow_params, version=0)
+
     ray.init(redirect_output=True)
     flow_params["env"].horizon = 1
     horizon = flow_params["env"].horizon
