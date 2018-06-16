@@ -12,7 +12,7 @@ either from terminal or via an editor. For example, in order to execute the
 sugiyama example in *<flow-path>/tutorials/exercises/sumo*, we run:
 
 ```shell
-python3 <flow-path>/examples/sumo/sugiyama.py
+python <flow-path>/examples/sumo/sugiyama.py
 ```
 
 The examples are distributed into the following sections:
