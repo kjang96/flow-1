@@ -7,7 +7,8 @@ import ray.rllib.ppo as ppo
 from ray.tune import run_experiments
 from ray.tune.registry import register_env
 
-from flow.utils.rllib import make_create_env, FlowParamsEncoder
+from flow.utils.registry import make_create_env
+from flow.utils.rllib import FlowParamsEncoder
 
 from flow.benchmarks.figureeight0 import flow_params as figgureeight0
 from flow.benchmarks.figureeight1 import flow_params as figgureeight1

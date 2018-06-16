@@ -12,7 +12,8 @@ import ray.rllib.ppo as ppo
 from ray.tune import run_experiments
 from ray.tune.registry import register_env
 
-from flow.utils.rllib import make_create_env, FlowParamsEncoder
+from flow.utils.registry import make_create_env
+from flow.utils.rllib import FlowParamsEncoder
 
 # use this to specify the environment to run
 from flow.benchmarks.grid1 import flow_params

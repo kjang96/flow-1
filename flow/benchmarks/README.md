@@ -1,12 +1,12 @@
-# Flow Benchmarks for Mixed Autonomy Traffic
+# Flow Benchmarks
 
-1-2 liner description
+This folder contains several (blank) for mixed-autonomy traffic.
 
 ## Description of Benchmarks
 
-blank
-
-The traffic benchmarks presented in this folder are as follows:
+For a detailed description of each benchmark, we refer the user to the Flow 
+Benchmarks paper, see *Citing Flow Benchmarks*. At a slightly higher level,
+the traffic benchmarks presented in this folder are as follows:
 
 **Stabilizing open network merges:** description. how discrete problems differ.
 - `flow.benchmarks.merge0` description
@@ -54,7 +54,7 @@ from foo import myAlgorithm
 from flow.benchmarks.figureeight0 import flow_params
 
 # import the make_create_env to register the environment with OpenAI gym
-from flow.utils.rllib import make_create_env
+from flow.utils.registry import make_create_env
 
 if __name__ == "__main__":
     # the make_create_env function produces a method that can be used to 
@@ -75,8 +75,11 @@ if __name__ == "__main__":
 
 ## Reporting Optimal Scores
 
-blank
+In order to encourage (blank).
 
 ## Citing Flow Benchmarks
 
-blank
+If you use the following benchmarks for academic research, you are highly 
+encouraged to cite our paper:
+
+*paper to be specified at a later date

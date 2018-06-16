@@ -10,7 +10,8 @@ from ray.tune import run_experiments
 from ray.tune.registry import register_env
 
 from flow.benchmarks.bottleneck0 import flow_params
-from flow.utils.rllib import make_create_env, FlowParamsEncoder
+from flow.utils.registry import make_create_env
+from flow.utils.rllib import FlowParamsEncoder
 
 # number of rollouts per training iteration
 N_ROLLOUTS = 50

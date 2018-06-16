@@ -12,7 +12,8 @@ import ray.rllib.ars as ars
 from ray.tune import run_experiments, grid_search
 from ray.tune.registry import register_env
 
-from flow.utils.rllib import make_create_env, FlowParamsEncoder
+from flow.utils.registry import make_create_env
+from flow.utils.rllib import FlowParamsEncoder
 
 # use this to specify the environment to run
 from flow.benchmarks.figureeight2 import flow_params
