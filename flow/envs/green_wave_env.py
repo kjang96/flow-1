@@ -10,6 +10,9 @@ from flow.envs.base_env import Env
 ADDITIONAL_ENV_PARAMS = {
     # minimum switch time for each traffic light (in seconds)
     "switch_time": 2.0,
+    # whether to use sumo's traffic light actuation or control
+    # "actuated" for sumo control, "controlled" for RL
+    "tl_logic": "controlled",
 }
 
 
@@ -54,11 +57,7 @@ class TrafficLightGridEnv(Env):
         self.cols = self.grid_array["col_num"]
         # self.num_observed = self.grid_array.get("num_observed", 3)
         self.num_traffic_lights = self.rows * self.cols
-        tl_logic = scenario.net_params.additional_params.get('tl_logic')
-        if tl_logic and tl_logic.baseline:
-            self.tl_type = "actuated"
-        else:
-            self.tl_type = "static"
+        self.tl_type = scenario.net_params.additional_params.get('tl_logic')
 
         super().__init__(env_params, sumo_params, scenario)
 
