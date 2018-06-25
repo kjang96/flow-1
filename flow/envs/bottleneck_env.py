@@ -349,6 +349,13 @@ class BottleneckEnv(Env):
         return Box(low=-float("inf"), high=float("inf"), shape=(1,),
                    dtype=np.float32)
 
+    def compute_reward(self, state, rl_actions, **kwargs):
+        """ Outflow rate over last ten seconds normalized to max of 1 """
+
+        reward = self.vehicles.get_outflow_rate(10 * self.sim_step) / \
+            (2000.0 * self.scaling)
+        return reward
+
     def get_state(self):
         return np.asarray([1])
 
