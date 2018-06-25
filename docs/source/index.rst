@@ -19,7 +19,7 @@ Flow is a work in progress - input is welcome. The available documentation is li
    flow_setup
    tutorial
    visualizing
-   flow
+   modules
 
 
 

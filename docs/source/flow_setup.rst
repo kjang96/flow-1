@@ -9,7 +9,7 @@ tool. Follow the shell commands below to get started.
 Installation (RLlib version)
 ============================
 
-Install `Anaconda <https://www.anaconda.com/download>`_ for python and enable
+Install `Anaconda <https://www.anaconda.com/download>`_ for Python and enable
 it right away.
 ::
 
@@ -20,7 +20,7 @@ Optionally create a conda environment named ``flow``:
 
     conda create -n flow python=3.6 anaconda
 
-Install flow
+Install Flow
 ::
 
     git clone https://github.com/cathywu/flow.git
@@ -56,6 +56,7 @@ Test the installation
 
 To run any of the examples, make sure to run
 ::
+    
     source activate flow
     
 Running the following should result in the loading of the SUMO GUI.
@@ -94,10 +95,7 @@ To visualize the training progress:
 
     tensorboard --logdir=~/ray_results
 
-For information on how to deploy a cluster, see [instructions]
-(http://ray.readthedocs.io/en/latest/autoscaling.html). The basic workflow is
- running the following locally, ssh-ing into the host machine, and starting
- jobs from there.
+For information on how to deploy a cluster, see `instructions <http://ray.readthedocs.io/en/latest/autoscaling.html>`_. The basic workflow is running the following locally, ssh-ing into the host machine, and starting jobs from there.
 ::
 
     ray create_or_update scripts/ray_autoscale.yaml
