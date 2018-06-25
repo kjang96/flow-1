@@ -7,7 +7,6 @@ import json
 import time
 import ray
 from ray.tune import run_experiments
-from ray.tune import grid_search
 from ray.tune.registry import register_env
 
 from flow.utils.rllib import FlowParamsEncoder
@@ -46,7 +45,7 @@ if __name__ == "__main__":
     ray.init(redirect_output=False)
     flow_params["env"].horizon = 1
     horizon = flow_params["env"].horizon
-    if alg == 'ARS': 
+    if alg == 'ARS':
         import ray.rllib.ars as ars
         config = ars.DEFAULT_CONFIG.copy()
         config["num_workers"] = PARALLEL_ROLLOUTS
@@ -82,7 +81,7 @@ if __name__ == "__main__":
 
     trials = run_experiments({
         "highway_stabilize": {
-            "run": alg, # Pulled from command line args
+            "run": alg,  # Pulled from command line args
             "env": env_name,
             "config": {
                 **config

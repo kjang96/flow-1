@@ -40,5 +40,6 @@ def start():
     env = AccelEnv(env_params, sumo_params, scenario)
     env.start_sumo()
 
+
 ray.init()
 results = ray.get([start.remote() for i in range(10000)])
