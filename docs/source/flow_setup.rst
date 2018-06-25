@@ -1,22 +1,21 @@
 Setup Instructions
 *****************************
 
-To get flow running, you need three things: flow (or
-flow), SUMO, and rllab. Once each component is installed successfully,
+To get Flow running, you need three things: Flow, SUMO, and RLlib. Once each component is installed successfully,
 you might get some missing module bugs from python. Just install the
 missing module using your OS-specific package manager / installation
 tool. Follow the shell commands below to get started.
 
-Installation (rllib version)
-=================
+Installation (RLlib version)
+============================
 
-Install [Anaconda](https://www.anaconda.com/download) for python and enable
+Install `Anaconda <https://www.anaconda.com/download>`_ for python and enable
 it right away.
 ::
 
     source ~/.bashrc
 
-Optionally create a conda environment named `flow`:
+Optionally create a conda environment named ``flow``:
 ::
 
     conda create -n flow python=3.6 anaconda
@@ -30,10 +29,10 @@ Install flow
     python setup.py develop  # (install flow and dependencies)
     popd
 
-If using Ubuntu, run the appropriate SUMO setup script in the `scripts`
+If using Ubuntu, run the appropriate SUMO setup script in the ``scripts``
 directory.
 
-Add the following to `~/.bashrc`
+Add the following to ``~/.bashrc``
 ::
 
     export SUMO_HOME="<DESIRED_PATH_TO_SUMO>/sumo"
@@ -86,10 +85,9 @@ rllib. Congratulations, you now have Flow set up!
 
 
 Getting started (rllib version)
-=================
+===============================
 
-See [getting started with rllib](http://ray.readthedocs.io/en/latest/rllib
-.html#getting-started) for sample commands.
+See `getting started with rllib <http://ray.readthedocs.io/en/latest/rllib.html#getting-started>`_ for sample commands.
 
 To visualize the training progress:
 ::
@@ -107,7 +105,7 @@ For information on how to deploy a cluster, see [instructions]
 
 
 Installation (rllab version)
-=================
+============================
 
 Install rllab-multiagent
 ::
@@ -132,10 +130,9 @@ For Linux
     sudo apt-get build-dep python-pygame
     sudo apt-get build-dep python-scipy
 
-::
-
 Now for both Linux and OSX, run
 ::
+
     python setup.py develop
 
 Install flow within the rllab-multiagent repo
@@ -158,4 +155,5 @@ Custom configuration
 
 You may define user-specific config parameters as follows
 ::
+
     cp flow/core/config.template.py flow/core/config.py  # Create template for users using pycharm

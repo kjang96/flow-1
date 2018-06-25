@@ -24,36 +24,34 @@ class LaneChangeAccelEnv(Env):
     when lane-change and acceleration actions are permitted by the rl agent.
 
     Required from env_params:
-    - max_accel: maximum acceleration for autonomous vehicles, in m/s^2
-    - max_decel: maximum deceleration for autonomous vehicles, in m/s^2
-    - lane_change_duration: lane change duration for autonomous vehicles, in s
-    - target_velocity: desired velocity for all vehicles in the network, in m/s
+    * max_accel: maximum acceleration for autonomous vehicles, in m/s^2
+    * max_decel: maximum deceleration for autonomous vehicles, in m/s^2
+    * lane_change_duration: lane change duration for autonomous vehicles, in s
+    * target_velocity: desired velocity for all vehicles in the network, in m/s
 
     States
-    ------
-    The state consists of the velocities, absolute position, and lane index of
-    all vehicles in the network. This assumes a constant number of vehicles.
+        The state consists of the velocities, absolute position, and lane index of
+        all vehicles in the network. This assumes a constant number of vehicles.
 
     Actions
-    -------
-    Actions consist of:
-    - a (continuous) acceleration from -abs(max_decel) to max_accel, specified
-      in env_params
-    - a (continuous) lane-change action from -1 to 1, used to determine the
-      lateral direction the vehicle will take.
-    Lane change actions are performed only if the vehicle has not changed lanes
-    for the lane change duration specified in env_params.
+        Actions consist of:
+        
+        * a (continuous) acceleration from -abs(max_decel) to max_accel, specified
+          in env_params
+        * a (continuous) lane-change action from -1 to 1, used to determine the
+          lateral direction the vehicle will take.
+
+        Lane change actions are performed only if the vehicle has not changed lanes
+        for the lane change duration specified in env_params.
 
     Rewards
-    -------
-    The reward function is the two-norm of the distance of the speed of the
-    vehicles in the network from a desired speed, combined with a penalty to
-    discourage excess lane changes by the rl vehicle.
+        The reward function is the two-norm of the distance of the speed of the
+        vehicles in the network from a desired speed, combined with a penalty to
+        discourage excess lane changes by the rl vehicle.
 
     Termination
-    -----------
-    A rollout is terminated if the time horizon is reached or if two vehicles
-    collide into one another.
+        A rollout is terminated if the time horizon is reached or if two vehicles
+        collide into one another.
     """
 
     def __init__(self, env_params, sumo_params, scenario):
@@ -141,29 +139,25 @@ class LaneChangeAccelPOEnv(LaneChangeAccelEnv):
     """POMDP version of LaneChangeAccelEnv.
 
     Required from env_params:
-    - max_accel: maximum acceleration for autonomous vehicles, in m/s^2
-    - max_decel: maximum deceleration for autonomous vehicles, in m/s^2
-    - lane_change_duration: lane change duration for autonomous vehicles, in s
-    - target_velocity: desired velocity for all vehicles in the network, in m/s
+    * max_accel: maximum acceleration for autonomous vehicles, in m/s^2
+    * max_decel: maximum deceleration for autonomous vehicles, in m/s^2
+    * lane_change_duration: lane change duration for autonomous vehicles, in s
+    * target_velocity: desired velocity for all vehicles in the network, in m/s
 
     States
-    ------
-    States are a list of rl vehicles speeds, as well as the speeds and bumper-
-    to-bumper headawys between the rl vehicles and their leaders/followers in
-    all lanes. There is no assumption on the number of vehicles in the network,
-    so long as the number of rl vehicles is static.
+        States are a list of rl vehicles speeds, as well as the speeds and bumper-
+        to-bumper headawys between the rl vehicles and their leaders/followers in
+        all lanes. There is no assumption on the number of vehicles in the network,
+        so long as the number of rl vehicles is static.
 
     Actions
-    -------
-    See parent class.
+        See parent class.
 
     Rewards
-    -------
-    See parent class.
+        See parent class.
 
     Termination
-    -----------
-    See parent class.
+        See parent class.
     """
 
     def __init__(self, env_params, sumo_params, scenario):

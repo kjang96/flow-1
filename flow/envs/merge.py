@@ -23,45 +23,41 @@ class WaveAttenuationMergePOEnv(Env):
     and propagation of waves in an open merge network.
 
     Required from env_params:
-    - max_accel: maximum acceleration for autonomous vehicles, in m/s^2
-    - max_decel: maximum deceleration for autonomous vehicles, in m/s^2
-    - target_velocity: desired velocity for all vehicles in the network, in m/s
-    - num_rl: maximum number of controllable vehicles in the network
+    * max_accel: maximum acceleration for autonomous vehicles, in m/s^2
+    * max_decel: maximum deceleration for autonomous vehicles, in m/s^2
+    * target_velocity: desired velocity for all vehicles in the network, in m/s
+    * num_rl: maximum number of controllable vehicles in the network
 
     States
-    ------
-    The observation consists of the speeds and bumper-to-bumper headways of the
-    vehicles immediately preceding and following autonomous vehicle, as well as
-    the ego speed of the autonomous vehicles.
+        The observation consists of the speeds and bumper-to-bumper headways of the
+        vehicles immediately preceding and following autonomous vehicle, as well as
+        the ego speed of the autonomous vehicles.
 
-    In order to maintain a fixed observation size, when the number of AVs in
-    the network is less than "num_rl", the extra entries are filled in with
-    zeros. Conversely, if the number of autonomous vehicles is greater than
-    "num_rl", the observations from the additional vehicles are not included
-    in the state space.
+        In order to maintain a fixed observation size, when the number of AVs in
+        the network is less than "num_rl", the extra entries are filled in with
+        zeros. Conversely, if the number of autonomous vehicles is greater than
+        "num_rl", the observations from the additional vehicles are not included
+        in the state space.
 
     Actions
-    -------
-    The action space consists of a vector of bounded accelerations for each
-    autonomous vehicle $i$. In order to ensure safety, these actions are
-    bounded by failsafes provided by the simulator at every time step.
+        The action space consists of a vector of bounded accelerations for each
+        autonomous vehicle $i$. In order to ensure safety, these actions are
+        bounded by failsafes provided by the simulator at every time step.
 
-    In order to account for variability in the number of autonomous vehicles,
-    if n_AV < "num_rl" the additional actions provided by the agent are not
-    assigned to any vehicle. Moreover, if n_AV > "num_rl", the additional
-    vehicles are not provided with actions from the learning agent, and instead
-    act as human-driven vehicles as well.
+        In order to account for variability in the number of autonomous vehicles,
+        if n_AV < "num_rl" the additional actions provided by the agent are not
+        assigned to any vehicle. Moreover, if n_AV > "num_rl", the additional
+        vehicles are not provided with actions from the learning agent, and instead
+        act as human-driven vehicles as well.
 
     Rewards
-    -------
-    The reward function encourages proximity of the system-level velocity to a
-    desired velocity, while slightly penalizing small time headways among
-    autonomous vehicles.
+        The reward function encourages proximity of the system-level velocity to a
+        desired velocity, while slightly penalizing small time headways among
+        autonomous vehicles.
 
     Termination
-    -----------
-    A rollout is terminated if the time horizon is reached or if two vehicles
-    collide into one another.
+        A rollout is terminated if the time horizon is reached or if two vehicles
+        collide into one another.
     """
 
     def __init__(self, env_params, sumo_params, scenario):

@@ -24,30 +24,26 @@ class WaveAttenuationEnv(Env):
     and propagation of waves in a variable density ring road.
 
     Required from env_params:
-    - max_accel: maximum acceleration of autonomous vehicles
-    - max_decel: maximum deceleration of autonomous vehicles
-    - ring_length: bounds on the ranges of ring road lengths the autonomous
+    * max_accel: maximum acceleration of autonomous vehicles
+    * max_decel: maximum deceleration of autonomous vehicles
+    * ring_length: bounds on the ranges of ring road lengths the autonomous
       vehicle is trained on
 
     States
-    ------
-    The state consists of the velocities and absolute position of all vehicles
-    in the network. This assumes a constant number of vehicles.
+        The state consists of the velocities and absolute position of all vehicles
+        in the network. This assumes a constant number of vehicles.
 
     Actions
-    -------
-    Actions are a list of acceleration for each rl vehicles, bounded by the
-    maximum accelerations and decelerations specified in EnvParams.
+        Actions are a list of acceleration for each rl vehicles, bounded by the
+        maximum accelerations and decelerations specified in EnvParams.
 
     Rewards
-    -------
-    The reward function rewards high average speeds from all vehicles in the
-    network, and penalizes accelerations by the rl vehicle.
+        The reward function rewards high average speeds from all vehicles in the
+        network, and penalizes accelerations by the rl vehicle.
 
     Termination
-    -----------
-    A rollout is terminated if the time horizon is reached or if two vehicles
-    collide into one another.
+        A rollout is terminated if the time horizon is reached or if two vehicles
+        collide into one another.
     """
 
     def __init__(self, env_params, sumo_params, scenario):
@@ -170,31 +166,27 @@ class WaveAttenuationPOEnv(WaveAttenuationEnv):
     """POMDP version of WaveAttenuationEnv.
 
     Required from env_params:
-    - max_accel: maximum acceleration of autonomous vehicles
-    - max_decel: maximum deceleration of autonomous vehicles
-    - ring_length: bounds on the ranges of ring road lengths the autonomous
+    * max_accel: maximum acceleration of autonomous vehicles
+    * max_decel: maximum deceleration of autonomous vehicles
+    * ring_length: bounds on the ranges of ring road lengths the autonomous
       vehicle is trained on
 
     Note that this environment only works when there is one autonomous vehicle
     on the network.
 
     States
-    ------
-    The state consists of the speed and headway of the ego vehicle, as well as
-    the difference in speed between the ego vehicle and its leader. There is no
-    assumption on the number of vehicles in the network.
+        The state consists of the speed and headway of the ego vehicle, as well as
+        the difference in speed between the ego vehicle and its leader. There is no
+        assumption on the number of vehicles in the network.
 
     Actions
-    -------
-    See parent class
+        See parent class
 
     Rewards
-    -------
-    See parent class
+        See parent class
 
     Termination
-    -----------
-    See parent class
+        See parent class
 
     """
 

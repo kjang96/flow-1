@@ -63,12 +63,14 @@ class TrafficLights:
             list of phases to be followed by the traffic light, defaults
             to default sumo traffic light behavior. Each element in the list
             must consist of a dict with two keys:
-            - "duration": length of the current phase cycle (in sec)
-            - "state": string consist the sequence of states in the phase
-            - "minDur": optional
+
+            * "duration": length of the current phase cycle (in sec)
+            * "state": string consist the sequence of states in the phase
+            * "minDur": optional
                 The minimum duration of the phase when using type actuated
-            - "maxDur": optional
+            * "maxDur": optional
                 The maximum duration of the phase when using type actuated
+
         maxGap : int, used for actuated traffic lights
             describes the maximum time gap between successive vehicle that
             will cause the current phase to be prolonged
@@ -87,6 +89,7 @@ class TrafficLights:
         For information on defining traffic light properties, see:
         http://sumo.dlr.de/wiki/Simulation/Traffic_Lights#Defining_New_TLS-Programs
         """
+        
         # increment the number of traffic lights
         self.num_traffic_lights += 1
 
