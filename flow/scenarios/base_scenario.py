@@ -54,7 +54,7 @@ class Scenario(Serializable):
         if Serializable is not object:
             Serializable.quick_init(self, locals())
 
-        self.orig_name = name
+        self.orig_name = name  # To avoid repeated concatenation upon reset
         self.name = name + str(time.time())
 
         self.generator_class = generator_class
