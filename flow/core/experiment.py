@@ -55,6 +55,7 @@ class SumoExperiment:
 
         rets = []
         mean_rets = []
+        ret_lists = []
         vels = []
         mean_vels = []
         std_vels = []
@@ -76,6 +77,7 @@ class SumoExperiment:
             rets.append(ret)
             vels.append(vel)
             mean_rets.append(np.mean(ret_list))
+            ret_lists.append(ret_list)
             mean_vels.append(np.mean(vel))
             std_vels.append(np.std(vel))
             print("Round {0}, return: {1}".format(i, ret))
@@ -83,6 +85,7 @@ class SumoExperiment:
         info_dict["returns"] = rets
         info_dict["velocities"] = vels
         info_dict["mean_returns"] = mean_rets
+        info_dict["per_step_returns"] = ret_lists
 
         print("Average, std return: {}, {}".format(np.mean(rets),
                                                    np.std(rets)))

@@ -126,6 +126,30 @@ def min_delay(env):
     cost = time_step * sum((v_top - vel) / v_top)
     return max((max_cost - cost)/max_cost, 0)
 
+def min_delay_unscaled(env):
+    """A reward function used to encourage minimization of total delay in the
+    system. Distance travelled is used as a scaled value of delay.
+
+    This function measures the deviation of a system of vehicles from all the
+    vehicles smoothly travelling at a fixed speed to their destinations.
+
+    Parameters
+    ----------
+    env: flow.envs.Env type
+        the environment variable, which contains information on the current
+        state of the system.
+    """
+
+    vel = np.array(env.vehicles.get_speed(env.vehicles.get_ids()))
+
+    vel = vel[vel >= -1e-6]
+    v_top = max(env.scenario.speed_limit(edge)
+                for edge in env.scenario.get_edge_list())
+    time_step = env.sim_step
+
+    max_cost = time_step * sum(vel.shape)
+    cost = time_step * sum((v_top - vel) / v_top)
+    return max((max_cost - cost), 0)
 
 def penalize_tl_changes(actions, gain=1):
     """
