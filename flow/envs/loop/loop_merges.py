@@ -29,13 +29,14 @@ class TwoLoopsMergeEnv(Env):
     WARNING: only supports 1 RL vehicle
 
     Required from env_params:
-        * max_accel: maximum acceleration for autonomous vehicles, in m/s^2
-        * max_decel: maximum deceleration for autonomous vehicles, in m/s^2
-        * target_velocity: desired velocity for all vehicles in the network, in m/s
-        * n_preceding: number of observable vehicles preceding the rl vehicle
-        * n_following: number of observable vehicles following the rl vehicle
-        * n_merging_in: number of observable merging-in vehicle from the larger
-          loop
+
+    * max_accel: maximum acceleration for autonomous vehicles, in m/s^2
+    * max_decel: maximum deceleration for autonomous vehicles, in m/s^2
+    * target_velocity: desired velocity for all vehicles in the network, in m/s
+    * n_preceding: number of observable vehicles preceding the rl vehicle
+    * n_following: number of observable vehicles following the rl vehicle
+    * n_merging_in: number of observable merging-in vehicle from the larger
+      loop
 
     States
         Observation space is the single RL vehicle, the 2 vehicles preceding

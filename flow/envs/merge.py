@@ -23,10 +23,11 @@ class WaveAttenuationMergePOEnv(Env):
     and propagation of waves in an open merge network.
 
     Required from env_params:
-        * max_accel: maximum acceleration for autonomous vehicles, in m/s^2
-        * max_decel: maximum deceleration for autonomous vehicles, in m/s^2
-        * target_velocity: desired velocity for all vehicles in the network, in m/s
-        * num_rl: maximum number of controllable vehicles in the network
+    
+    * max_accel: maximum acceleration for autonomous vehicles, in m/s^2
+    * max_decel: maximum deceleration for autonomous vehicles, in m/s^2
+    * target_velocity: desired velocity for all vehicles in the network, in m/s
+    * num_rl: maximum number of controllable vehicles in the network
 
     States
         The observation consists of the speeds and bumper-to-bumper headways of

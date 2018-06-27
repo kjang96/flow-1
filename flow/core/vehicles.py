@@ -262,7 +262,7 @@ class Vehicles:
         the current time step.
 
         The following actions are performed:
-
+        
         * The state of all vehicles is modified to match their state at the
           current time step. This includes states specified by sumo, and states
           explicitly defined by flow, e.g. "absolute_position".
