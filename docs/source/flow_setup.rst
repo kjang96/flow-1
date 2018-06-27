@@ -1,9 +1,9 @@
 Setup Instructions
 ******************
 
-To get Flow running, you need three things: flow,
+To get Flow running, you need three things: Flow,
 SUMO, and rllab. Once each component is installed successfully,
-you might get some missing module bugs from python. Just install the
+you might get some missing module bugs from Python. Just install the
 missing module using your OS-specific package manager / installation
 tool. Follow the shell commands below to get started.
 
@@ -11,7 +11,7 @@ Dependencies
 ============
 We begin by installing dependencies needed by the four repositories mentioned
 above.
-It will be useful to install `Anaconda <https://www.anaconda.com/down    load>` for python and enable it right away.
+It will be useful to install `Anaconda <https://www.anaconda.com/download>`_ for Python and enable it right away.
 For Ubuntu 16.04:
 ::
 
@@ -92,7 +92,7 @@ Testing the Installation
 Once the above modules have been successfully installed, we can test the
 installation by running a few examples.
 
-To run any of the rllab examples, make sure to run
+To run any of the RL examples, make sure to run
 ::
 
     source activate flow
@@ -123,7 +123,7 @@ rllib. Congratulations, you now have Flow set up!
 Getting started (Ray/RLlib)
 ===========================
 
-See `getting started with rllib <http://ray.readthedocs.io/en/latest/rllib.html#getting-started>`_ for sample commands.
+See `getting started with RLlib <http://ray.readthedocs.io/en/latest/rllib.html#getting-started>`_ for sample commands.
 
 To visualize the training progress:
 ::
