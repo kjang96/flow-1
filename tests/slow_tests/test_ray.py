@@ -9,7 +9,7 @@ import ray
 import ray.rllib.ppo as ppo
 import ray.tune.registry as registry
 
-from tutorials.examples.rllib.stabilizing_the_ring import make_create_env
+from examples.rllib.stabilizing_the_ring import make_create_env
 
 from flow.scenarios.loop.loop_scenario import LoopScenario
 from flow.controllers.rlcontroller import RLController

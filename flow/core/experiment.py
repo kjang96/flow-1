@@ -63,7 +63,8 @@ class SumoExperiment:
             rets.append(ret)
             print("Round {0}, return: {1}".format(i, ret))
 
-        print("Average Return", np.mean(rets))
+        print("Average, std return: {}, {}".format(np.mean(rets),
+                                                   np.std(rets)))
         self.env.terminate()
 
         if convert_to_csv:

@@ -16,7 +16,7 @@ class SumoParams:
                  seed=None,
                  restart_instance=False,
                  print_warnings=True,
-                 teleport_time=-100):
+                 teleport_time=-1):
         """Sumo-specific parameters
 
         These parameters are used to customize a sumo simulation instance upon
@@ -193,7 +193,7 @@ class InitialConfig:
                  perturbation=0.0,
                  x0=0,
                  bunching=0,
-                 lanes_distribution=1,
+                 lanes_distribution=float("inf"),
                  edges_distribution="all",
                  positions=None,
                  lanes=None,

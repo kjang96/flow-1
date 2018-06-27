@@ -80,9 +80,6 @@ class TwoLoopsMergeEnv(Env):
         self.obs_var_labels = \
             ["speed", "pos", "queue_length", "velocity_stats"]
 
-        # normalizer for observations
-        self.max_speed = 55
-
         super().__init__(env_params, sumo_params, scenario)
 
     @property
@@ -180,7 +177,7 @@ class TwoLoopsMergeEnv(Env):
 
         # normalize the speed
         # FIXME(cathywu) can divide by self.max_speed
-        normalized_vel = np.array(vel) / self.max_speed
+        normalized_vel = np.array(vel) / self.scenario.max_speed
 
         # normalize the position
         normalized_pos = np.array(pos) / self.scenario.length

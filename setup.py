@@ -34,7 +34,7 @@ class BinaryDistribution(Distribution):
 
 setup(
     name='flow',
-    version='0.0.1',
+    version='0.1.0',
     distclass=BinaryDistribution,
     cmdclass={"build_ext": build_ext},
     packages=find_packages(),

@@ -12,6 +12,8 @@ from gym.spaces.box import Box
 
 from flow.core import rewards
 from flow.envs.base_env import Env
+import os
+import glob
 
 MAX_LANES = 4  # base number of largest number of lanes in the network
 EDGE_LIST = ["1", "2", "3", "4", "5"]  # Edge 1 is before the toll booth
@@ -397,18 +399,9 @@ class BottleNeckAccelEnv(BottleneckEnv):
         num_edges = len(self.scenario.get_edge_list())
         num_rl_veh = self.num_rl
         num_obs = 2 * num_edges + 4 * MAX_LANES * self.scaling \
-                  * num_rl_veh + 4 * num_rl_veh
-        print("--------------")
-        print("--------------")
-        print("--------------")
-        print("--------------")
-        print(num_obs)
-        print("--------------")
-        print("--------------")
-        print("--------------")
-        print("--------------")
-        return Box(low=-float("inf"), high=float("inf"), shape=(num_obs,),
-                   dtype=np.float32)
+            * num_rl_veh + 4 * num_rl_veh
+
+        return Box(low=0, high=1, shape=(num_obs,), dtype=np.float32)
 
     def get_state(self):
         headway_scale = 1000
@@ -693,7 +686,8 @@ class DesiredVelocityEnv(BottleneckEnv):
                 else:
                     num_lanes = self.scenario.num_lanes(edge)
                     self.action_index[edge] = [action_list[index]]
-                    action_list += [action_list[index] + num_segments * controlled * num_lanes]
+                    action_list += [action_list[index]
+                                    + num_segments * controlled * num_lanes]
                 index += 1
 
     @property
@@ -704,7 +698,7 @@ class DesiredVelocityEnv(BottleneckEnv):
         for segment in self.obs_segments:
             num_obs += 4 * segment[1] * self.scenario.num_lanes(segment[0])
         num_obs += 1
-        return Box(low=-float("inf"), high=float("inf"), shape=(num_obs,),
+        return Box(low=0.0, high=1.0, shape=(num_obs,),
                    dtype=np.float32)
 
     @property
@@ -762,9 +756,9 @@ class DesiredVelocityEnv(BottleneckEnv):
             rl_speeds_list += rl_vehicle_speeds.flatten().tolist()
 
         unnorm_veh_list = np.asarray(num_vehicles_list) * \
-                          NUM_VEHICLE_NORM
+            NUM_VEHICLE_NORM
         unnorm_rl_list = np.asarray(num_rl_vehicles_list) * \
-                         NUM_VEHICLE_NORM
+            NUM_VEHICLE_NORM
         # compute the mean speed if the speed isn't zero
         num_rl = len(num_rl_vehicles_list)
         num_veh = len(num_vehicles_list)
@@ -781,15 +775,13 @@ class DesiredVelocityEnv(BottleneckEnv):
         return np.concatenate((num_vehicles_list, num_rl_vehicles_list,
                                mean_speed_norm, mean_rl_speed, [outflow]))
 
-    def _apply_rl_actions(self, actions):
+    def _apply_rl_actions(self, rl_actions):
         """
         RL actions are split up into 3 levels.
         First, they're split into edge actions.
         Then they're split into segment actions.
         Then they're split into lane actions.
         """
-        rl_actions = actions
-
         for rl_id in self.vehicles.get_rl_ids():
             edge = self.vehicles.get_edge(rl_id)
             lane = self.vehicles.get_lane(rl_id)
@@ -820,8 +812,10 @@ class DesiredVelocityEnv(BottleneckEnv):
                     self.traci_connection.vehicle.setMaxSpeed(rl_id, 23.0)
 
     def compute_reward(self, state, rl_actions, **kwargs):
+        """ Outflow rate over last ten seconds normalized to max of 1 """
 
-        reward = self.vehicles.get_outflow_rate(10 * self.sim_step) / 200.0
+        reward = self.vehicles.get_outflow_rate(10 * self.sim_step) / \
+            (2000.0 * self.scaling)
         return reward
 
     def reset(self):
@@ -864,8 +858,19 @@ class DesiredVelocityEnv(BottleneckEnv):
                                  lane_change_mode=0,
                                  num_vehicles=1 * self.scaling)
                     self.vehicles = vehicles
+
+                    # delete the cfg and net files
+                    net_path = self.scenario.generator.net_path
+                    net_name = net_path + self.scenario.generator.name
+                    cfg_path = self.scenario.generator.cfg_path
+                    cfg_name = cfg_path + self.scenario.generator.name
+                    for f in glob.glob(net_name+'*'):
+                        os.remove(f)
+                    for f in glob.glob(cfg_name+'*'):
+                        os.remove(f)
+
                     self.scenario = self.scenario.__class__(
-                        name=self.scenario.name,
+                        name=self.scenario.orig_name,
                         generator_class=self.scenario.generator_class,
                         vehicles=vehicles, net_params=net_params,
                         initial_config=self.scenario.initial_config,
