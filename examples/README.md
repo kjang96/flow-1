@@ -6,10 +6,9 @@ https://berkeleyflow.readthedocs.io/en/latest/flow_setup.html).
 
 The **examples** folder provides several examples demonstrating how 
 both simulation and RL-oriented experiments can be setup and executed within 
-the Flow framework on a variety of traffic problems. These examples are not 
-written on jupyter notebook, but instead are .py files that may be executed 
-either from terminal or via an editor. For example, in order to execute the 
-sugiyama example in *<flow-path>/tutorials/exercises/sumo*, we run:
+the Flow framework on a variety of traffic problems. These examples are .py 
+files that may be executed  either from terminal or via an editor. For example,
+in order to execute the  sugiyama example in *examples/sumo*, we run:
 
 ```shell
 python <flow-path>/examples/sumo/sugiyama.py
