@@ -38,26 +38,27 @@ class TwoLoopsMergeEnv(Env):
     WARNING: only supports 1 RL vehicle
 
     States
-        Observation space is the single RL vehicle, the 2 vehicles preceding it,
-        the 2 vehicles following it, the next 2 vehicles to merge in, the queue
-        length, and the average velocity of the inner and outer rings.
+        Observation space is the single RL vehicle, the 2 vehicles preceding
+        it, the 2 vehicles following it, the next 2 vehicles to merge in, the
+        queue length, and the average velocity of the inner and outer rings.
 
     Actions
         Actions are a list of acceleration for each rl vehicles, bounded by the
-        maximum accelerations and decelerations specified in EnvParams. The actions
-        are assigned in order of a sorting mechanism (see Sorting).
+        maximum accelerations and decelerations specified in EnvParams. The
+        actions are assigned in order of a sorting mechanism (see Sorting).
 
     Rewards
         Rewards system-level proximity to a desired velocity while penalizing
         variances in the headways between consecutive vehicles.
 
     Termination
-        A rollout is terminated if the time horizon is reached or if two vehicles
-        collide into one another.
+        A rollout is terminated if the time horizon is reached or if two
+        vehicles collide into one another.
 
     Sorting
-        Vehicles in this environment are sorted by their get_x_by_id values. The
-        vehicle ids are then sorted by rl vehicles, then human-driven vehicles.
+        Vehicles in this environment are sorted by their get_x_by_id values.
+        The vehicle ids are then sorted by rl vehicles, then human-driven
+        vehicles.
     """
 
     def __init__(self, env_params, sumo_params, scenario):

@@ -358,22 +358,22 @@ class BottleNeckAccelEnv(BottleneckEnv):
        pass through a bottleneck.
 
        States
-           An observation is the edge position, speed, lane, and edge number of the
-           AV, the distance to and velocity of the vehicles
+           An observation is the edge position, speed, lane, and edge number of
+           the AV, the distance to and velocity of the vehicles
            in front and behind the AV for all lanes. Additionally, we pass the
-           density and average velocity of all edges. Finally, we pad with zeros
-           in case an AV has exited the system.
+           density and average velocity of all edges. Finally, we pad with
+           zeros in case an AV has exited the system.
            Note: the vehicles are arranged in an initial order, so we pad
            the missing vehicle at its normal position in the order
 
        Actions
            The action space consist of a list in which the first half
-           is accelerations and the second half is a direction for lane changing
-           that we round
+           is accelerations and the second half is a direction for lane
+           changing that we round
 
        Rewards
-           The reward is the two-norm of the difference between the speed of all
-           vehicles in the network and some desired speed. To this we add
+           The reward is the two-norm of the difference between the speed of
+           all vehicles in the network and some desired speed. To this we add
            a positive reward for moving the vehicles forward
 
        Termination
@@ -582,8 +582,8 @@ class DesiredVelocityEnv(BottleneckEnv):
 
        Actions
            The action space consist of a list in which each element
-           corresponds to the desired speed that RL vehicles should travel in that
-           region of space
+           corresponds to the desired speed that RL vehicles should travel in
+           that region of space
 
        Rewards
            The reward is the outflow of the bottleneck plus a reward

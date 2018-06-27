@@ -100,7 +100,7 @@ class Generator(Serializable):
                 Key = lane index
                 Element = list of edge/lane pairs that a vehicle can traverse
                 from the arriving edge/lane pairs
-        
+
         """
         nodfn = "%s.nod.xml" % self.name
         edgfn = "%s.edg.xml" % self.name
@@ -418,7 +418,7 @@ class Generator(Serializable):
             * id {string} -- name of the edge
             * from {string} -- name of node the directed edge starts from
             * to {string} -- name of the node the directed edge ends at
-            
+
             In addition, the attributes must contain at least one of the
             following:
 

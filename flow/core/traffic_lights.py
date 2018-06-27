@@ -89,7 +89,7 @@ class TrafficLights:
         For information on defining traffic light properties, see:
         http://sumo.dlr.de/wiki/Simulation/Traffic_Lights#Defining_New_TLS-Programs
         """
-        
+
         # increment the number of traffic lights
         self.num_traffic_lights += 1
 

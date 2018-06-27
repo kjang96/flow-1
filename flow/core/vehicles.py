@@ -130,7 +130,7 @@ class Vehicles:
             * int values may be used to define custom lane change modes for the
               given vehicles, specified at:
               http://sumo.dlr.de/wiki/TraCI/Change_Vehicle_State#lane_change_mode_.280xb6.29
-              
+
         sumo_car_following_params: flow.core.params.SumoCarFollowingParams type
             Params object specifying attributes for Sumo car following model.
         sumo_lc_params: flow.core.params.SumoLaneChangeParams type

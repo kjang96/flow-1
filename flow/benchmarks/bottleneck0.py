@@ -52,7 +52,7 @@ additional_env_params = {
     "lane_change_duration": 5,
     "max_accel": 3,
     "max_decel": 3,
-    "inflow_range": [1000,2000]
+    "inflow_range": [1000, 2000]
 }
 
 # flow rate

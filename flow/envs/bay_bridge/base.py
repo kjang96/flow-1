@@ -51,11 +51,12 @@ class BayBridgeEnv(Env):
         No actions are issued by this class.
 
     Rewards
-        The reward is the average speed of vehicles in the network (temporarily).
+        The reward is the average speed of vehicles in the network
+        (temporarily).
 
     Termination
-        A rollout is terminated if the time horizon is reached or if two vehicles
-        collide into one another.
+        A rollout is terminated if the time horizon is reached or if two
+        vehicles collide into one another.
     """
 
     def __init__(self, env_params, sumo_params, scenario):
