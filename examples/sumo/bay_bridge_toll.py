@@ -85,7 +85,6 @@ def bay_bridge_bottleneck_example(sumo_binary=None,
         f.write(data_to_write)
 
     initial_config = InitialConfig(spacing="uniform",  # "random",
-                                   lanes_distribution=float("inf"),
                                    min_gap=15)
 
     scenario = BayBridgeTollScenario(name="bay_bridge_toll",

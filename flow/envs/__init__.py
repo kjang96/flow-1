@@ -15,4 +15,4 @@ __all__ = ["Env", "AccelEnv", "LaneChangeAccelEnv", "LaneChangeAccelPOEnv",
            "GreenWaveTestEnv", "GreenWaveTestEnv", "WaveAttenuationMergePOEnv",
            "TwoLoopsMergeEnv", "BottleneckEnv", "BottleNeckAccelEnv",
            "WaveAttenuationEnv", "WaveAttenuationPOEnv", "TrafficLightGridEnv",
-           "PO_TrafficLightGridEnv"]
+           "PO_TrafficLightGridEnv", "DesiredVelocityEnv"]

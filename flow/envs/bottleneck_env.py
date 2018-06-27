@@ -686,7 +686,8 @@ class DesiredVelocityEnv(BottleneckEnv):
                 else:
                     num_lanes = self.scenario.num_lanes(edge)
                     self.action_index[edge] = [action_list[index]]
-                    action_list += [action_list[index] + num_segments * controlled * num_lanes]
+                    action_list += [action_list[index]
+                                    + num_segments * controlled * num_lanes]
                 index += 1
 
     @property
@@ -755,9 +756,9 @@ class DesiredVelocityEnv(BottleneckEnv):
             rl_speeds_list += rl_vehicle_speeds.flatten().tolist()
 
         unnorm_veh_list = np.asarray(num_vehicles_list) * \
-                          NUM_VEHICLE_NORM
+            NUM_VEHICLE_NORM
         unnorm_rl_list = np.asarray(num_rl_vehicles_list) * \
-                         NUM_VEHICLE_NORM
+            NUM_VEHICLE_NORM
         # compute the mean speed if the speed isn't zero
         num_rl = len(num_rl_vehicles_list)
         num_veh = len(num_vehicles_list)
@@ -811,10 +812,10 @@ class DesiredVelocityEnv(BottleneckEnv):
                     self.traci_connection.vehicle.setMaxSpeed(rl_id, 23.0)
 
     def compute_reward(self, state, rl_actions, **kwargs):
-        ''' Outflow rate over last ten seconds normalized to max of 1'''
+        """ Outflow rate over last ten seconds normalized to max of 1 """
 
         reward = self.vehicles.get_outflow_rate(10 * self.sim_step) / \
-                (2000.0 * self.scaling)
+            (2000.0 * self.scaling)
         return reward
 
     def reset(self):
