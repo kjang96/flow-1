@@ -27,42 +27,37 @@ class TwoLoopsMergeEnv(Env):
     merge scenario.
 
     Required from env_params:
-    - max_accel: maximum acceleration for autonomous vehicles, in m/s^2
-    - max_decel: maximum deceleration for autonomous vehicles, in m/s^2
-    - target_velocity: desired velocity for all vehicles in the network, in m/s
-    - n_preceding: number of observable vehicles preceding the rl vehicle
-    - n_following: number of observable vehicles following the rl vehicle
-    - n_merging_in: number of observable merging-in vehicle from the larger
+    * max_accel: maximum acceleration for autonomous vehicles, in m/s^2
+    * max_decel: maximum deceleration for autonomous vehicles, in m/s^2
+    * target_velocity: desired velocity for all vehicles in the network, in m/s
+    * n_preceding: number of observable vehicles preceding the rl vehicle
+    * n_following: number of observable vehicles following the rl vehicle
+    * n_merging_in: number of observable merging-in vehicle from the larger
       loop
 
     WARNING: only supports 1 RL vehicle
 
     States
-    ------
-    Observation space is the single RL vehicle, the 2 vehicles preceding it,
-    the 2 vehicles following it, the next 2 vehicles to merge in, the queue
-    length, and the average velocity of the inner and outer rings.
+        Observation space is the single RL vehicle, the 2 vehicles preceding it,
+        the 2 vehicles following it, the next 2 vehicles to merge in, the queue
+        length, and the average velocity of the inner and outer rings.
 
     Actions
-    -------
-    Actions are a list of acceleration for each rl vehicles, bounded by the
-    maximum accelerations and decelerations specified in EnvParams. The actions
-    are assigned in order of a sorting mechanism (see Sorting).
+        Actions are a list of acceleration for each rl vehicles, bounded by the
+        maximum accelerations and decelerations specified in EnvParams. The actions
+        are assigned in order of a sorting mechanism (see Sorting).
 
     Rewards
-    -------
-    Rewards system-level proximity to a desired velocity while penalizing
-    variances in the headways between consecutive vehicles.
+        Rewards system-level proximity to a desired velocity while penalizing
+        variances in the headways between consecutive vehicles.
 
     Termination
-    -----------
-    A rollout is terminated if the time horizon is reached or if two vehicles
-    collide into one another.
+        A rollout is terminated if the time horizon is reached or if two vehicles
+        collide into one another.
 
     Sorting
-    -------
-    Vehicles in this environment are sorted by their get_x_by_id values. The
-    vehicle ids are then sorted by rl vehicles, then human-driven vehicles.
+        Vehicles in this environment are sorted by their get_x_by_id values. The
+        vehicle ids are then sorted by rl vehicles, then human-driven vehicles.
     """
 
     def __init__(self, env_params, sumo_params, scenario):

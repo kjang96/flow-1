@@ -21,30 +21,26 @@ class AccelEnv(Env):
     when acceleration actions are permitted by the rl agent.
 
     Required from env_params:
-    - max_accel: maximum acceleration for autonomous vehicles, in m/s^2
-    - max_decel: maximum deceleration for autonomous vehicles, in m/s^2
-    - target_velocity: desired velocity for all vehicles in the network, in m/s
+    * max_accel: maximum acceleration for autonomous vehicles, in m/s^2
+    * max_decel: maximum deceleration for autonomous vehicles, in m/s^2
+    * target_velocity: desired velocity for all vehicles in the network, in m/s
 
     States
-    ------
-    The state consists of the velocities and absolute position of all vehicles
-    in the network. This assumes a constant number of vehicles.
+        The state consists of the velocities and absolute position of all vehicles
+        in the network. This assumes a constant number of vehicles.
 
     Actions
-    -------
-    Actions are a list of acceleration for each rl vehicles, bounded by the
-    maximum accelerations and decelerations specified in EnvParams.
+        Actions are a list of acceleration for each rl vehicles, bounded by the
+        maximum accelerations and decelerations specified in EnvParams.
 
     Rewards
-    -------
-    The reward function is the two-norm of the distance of the speed of the
-    vehicles in the network from the "target_velocity" term. For a description
-    of the reward, see: flow.core.rewards.desired_speed
+        The reward function is the two-norm of the distance of the speed of the
+        vehicles in the network from the "target_velocity" term. For a description
+        of the reward, see: flow.core.rewards.desired_speed
 
     Termination
-    -----------
-    A rollout is terminated if the time horizon is reached or if two vehicles
-    collide into one another.
+        A rollout is terminated if the time horizon is reached or if two vehicles
+        collide into one another.
     """
 
     def __init__(self, env_params, sumo_params, scenario):
