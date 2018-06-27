@@ -11,7 +11,7 @@ Dependencies
 ============
 We begin by installing dependencies needed by the four repositories mentioned
 above.
-
+It will be useful to install `Anaconda <https://www.anaconda.com/down    load>` for python and enable it right away.
 For Ubuntu 16.04:
 ::
 
@@ -26,9 +26,6 @@ For OSX:
     brew install swig sdl sdl_image sdl_mixer sdl_ttf portmidi
     # sumo dependencies
     brew install Caskroom/cask/xquartz autoconf automake pkg-config libtool gdal proj xerces-c fox
-
-Also, if you have not done, install `Anaconda <https://www.anaconda.com/download>`_
-for python and enable it right away.
 
 sumo
 ====
@@ -87,6 +84,7 @@ repository. The installation process for this library is as follows:
     sudo python3 setup.py develop
     popd
 
+If missing libraries cause errors, please also install the required libraries as specified at <http://ray.readthedocs.io/en/latest/installation.html> and then follow the setup instructions.
 
 Testing the Installation
 ========================
