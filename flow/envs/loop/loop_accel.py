@@ -65,9 +65,9 @@ class AccelEnv(Env):
     @property
     def observation_space(self):
         self.obs_var_labels = ["Velocity", "Absolute_pos"]
-        speed = Box(low=0, high=np.inf, shape=(self.vehicles.num_vehicles,),
+        speed = Box(low=0, high=1, shape=(self.vehicles.num_vehicles,),
                     dtype=np.float32)
-        pos = Box(low=0., high=np.inf, shape=(self.vehicles.num_vehicles,),
+        pos = Box(low=0., high=1, shape=(self.vehicles.num_vehicles,),
                   dtype=np.float32)
         return Tuple((speed, pos))
 
@@ -80,14 +80,12 @@ class AccelEnv(Env):
         return rewards.desired_velocity(self, fail=kwargs["fail"])
 
     def get_state(self, **kwargs):
-        scaled_pos = [self.vehicles.get_absolute_position(veh_id) /
-                      self.scenario.length for veh_id in self.sorted_ids]
-        scaled_vel = [self.vehicles.get_speed(veh_id) /
-                      self.env_params.additional_params["target_velocity"]
-                      for veh_id in self.sorted_ids]
-        state = [[vel, pos] for vel, pos in zip(scaled_vel, scaled_pos)]
+        # speed normalizer
+        max_speed = self.scenario.max_speed
 
-        return np.array(state)
+        return np.array([[self.vehicles.get_speed(veh_id) / max_speed,
+                          self.get_x_by_id(veh_id) / self.scenario.length]
+                         for veh_id in self.sorted_ids])
 
     def additional_command(self):
         # specify observed vehicles

@@ -11,7 +11,7 @@ import traci.constants as tc
 
 from flow.core.params import SumoCarFollowingParams, SumoLaneChangeParams
 
-SPEED_MODES = {"aggressive": 0, "no_collide": 1, "custom_model": 25,
+SPEED_MODES = {"aggressive": 0, "no_collide": 1, "right_of_way": 25,
                "all_checks": 31}
 LC_MODES = {"aggressive": 0, "no_lat_collide": 512, "strategic": 853}
 
@@ -74,7 +74,7 @@ class Vehicles:
             routing_controller=None,
             initial_speed=0,
             num_vehicles=1,
-            speed_mode='all_checks',
+            speed_mode='right_of_way',
             lane_change_mode="no_lat_collide",
             sumo_car_following_params=None,
             sumo_lc_params=None):
@@ -108,7 +108,7 @@ class Vehicles:
              - "aggressive": Human and RL cars are not limited by sumo with
                regard to their accelerations, and can crash longitudinally
              - "all_checks": all sumo safety checks are activated
-             - "custom_model": respect safe speed, right of way and
+             - "right_of_way": respect safe speed, right of way and
                brake hard at red lights if needed. DOES NOT respect
                max accel and decel which enables emergency stopping.
                Necessary to prevent custom models from crashing

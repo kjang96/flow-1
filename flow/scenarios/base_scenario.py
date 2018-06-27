@@ -54,7 +54,9 @@ class Scenario(Serializable):
         if Serializable is not object:
             Serializable.quick_init(self, locals())
 
+        self.orig_name = name  # To avoid repeated concatenation upon reset
         self.name = name + str(time.time())
+
         self.generator_class = generator_class
         self.vehicles = vehicles
         self.net_params = net_params
@@ -73,6 +75,10 @@ class Scenario(Serializable):
                            if edge_id[0] != ":"]
         self._junction_list = list(set(self._edges.keys()) -
                                    set(self._edge_list))
+
+        # maximum achievable speed on any edge in the network
+        self.max_speed = max(self.speed_limit(edge)
+                             for edge in self.get_edge_list())
 
         # parameters to be specified under each unique subclass's
         # __init__() function
