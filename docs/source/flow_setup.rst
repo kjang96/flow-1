@@ -1,8 +1,8 @@
 Setup Instructions
 ******************
 
-To get Flow running, you need three things: flow (or
-flow), SUMO, and rllab. Once each component is installed successfully,
+To get Flow running, you need three things: flow,
+SUMO, and rllab. Once each component is installed successfully,
 you might get some missing module bugs from python. Just install the
 missing module using your OS-specific package manager / installation
 tool. Follow the shell commands below to get started.

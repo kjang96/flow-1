@@ -1,16 +1,15 @@
 """
 Trains a small percentage of autonomous vehicles to dissipate shockwaves caused
 by merges in an open network. The autonomous penetration rate in this example
-is 33.3%.
+is 10%.
 
-Action Dimension: (17, )
+Action Dimension: (5, )
 
-Observation Dimension: (85, )
+Observation Dimension: (25, )
 
 Horizon: 750 steps
 """
 
-from flow.utils.rllib import make_create_env
 from flow.core.params import SumoParams, EnvParams, InitialConfig, NetParams, \
     InFlows
 from flow.scenarios.merge.scenario import ADDITIONAL_NET_PARAMS
@@ -22,9 +21,9 @@ HORIZON = 750
 # inflow rate at the highway
 FLOW_RATE = 2000
 # percent of autonomous vehicles
-RL_PENETRATION = 0.333
+RL_PENETRATION = 0.1
 # num_rl term (see ADDITIONAL_ENV_PARAMs)
-NUM_RL = 17
+NUM_RL = 5
 
 # We consider a highway network with an upstream merging lane producing
 # shockwaves
@@ -58,7 +57,7 @@ inflow.add(veh_type="human", edge="inflow_merge", vehs_per_hour=100,
 
 flow_params = dict(
     # name of the experiment
-    exp_tag="stabilizing_open_network_merges",
+    exp_tag="merge_0",
 
     # name of the flow environment the experiment is running on
     env_name="WaveAttenuationMergePOEnv",
@@ -105,6 +104,3 @@ flow_params = dict(
     # reset (see flow.core.params.InitialConfig)
     initial=InitialConfig(),
 )
-
-# get the env name and a creator for the environment (used by rllib)
-create_env, env_name = make_create_env(params=flow_params, version=0)

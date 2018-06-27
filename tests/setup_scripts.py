@@ -84,7 +84,7 @@ def ring_road_exp_setup(sumo_params=None,
 
     if initial_config is None:
         # set default initial_config configuration
-        initial_config = InitialConfig()
+        initial_config = InitialConfig(lanes_distribution=1)
 
     if traffic_lights is None:
         # set default to no traffic lights
@@ -168,7 +168,7 @@ def figure_eight_exp_setup(sumo_params=None,
 
     if initial_config is None:
         # set default initial_config configuration
-        initial_config = InitialConfig()
+        initial_config = InitialConfig(lanes_distribution=1)
 
     if traffic_lights is None:
         # set default to no traffic lights

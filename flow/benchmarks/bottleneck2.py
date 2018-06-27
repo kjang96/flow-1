@@ -1,15 +1,14 @@
 """
 Bottleneck in which the actions are specifying a desired velocity in a segment
-of space. The autonomous penetration rate in this example is 10%.
+of space. The autonomous penetration rate in this example is 100%.
 
-Action Dimension: (?, )
+Action Dimension: (40, )
 
-Observation Dimension: (?, )
+Observation Dimension: (281, )
 
 Horizon: 1000 steps
 """
 
-from flow.utils.rllib import make_create_env
 from flow.core.params import SumoParams, EnvParams, InitialConfig, NetParams, \
     InFlows
 from flow.core.traffic_lights import TrafficLights
@@ -19,23 +18,22 @@ from flow.controllers import RLController, ContinuousRouter
 # time horizon of a single rollout
 HORIZON = 1000
 
-SCALING = 1
+SCALING = 2
 NUM_LANES = 4 * SCALING  # number of lanes in the widest highway
 DISABLE_TB = True
 DISABLE_RAMP_METER = True
-AV_FRAC = 0.10
+AV_FRAC = .10
 
 vehicles = Vehicles()
+vehicles.add(veh_id="rl",
+             acceleration_controller=(RLController, {}),
+             routing_controller=(ContinuousRouter, {}),
+             speed_mode=9,
+             lane_change_mode=0,
+             num_vehicles=1 * SCALING)
 vehicles.add(veh_id="human",
              speed_mode=9,
              routing_controller=(ContinuousRouter, {}),
-             lane_change_mode=0,
-             num_vehicles=1 * SCALING)
-vehicles.add(veh_id="rl",
-             acceleration_controller=(RLController,
-                                      {"fail_safe": "safe_velocity"}),
-             routing_controller=(ContinuousRouter, {}),
-             speed_mode=9,
              lane_change_mode=0,
              num_vehicles=1 * SCALING)
 
@@ -54,7 +52,7 @@ additional_env_params = {
     "lane_change_duration": 5,
     "max_accel": 3,
     "max_decel": 3,
-    "inflow_range": [1000,2000]
+    "inflow_range": [1000, 2000]
 }
 
 # flow rate
@@ -62,11 +60,11 @@ flow_rate = 1900 * SCALING
 
 # percentage of flow coming out of each lane
 inflow = InFlows()
-inflow.add(veh_type="human", edge="1",
-           vehs_per_hour=flow_rate * (1 - AV_FRAC),
-           departLane="random", departSpeed=10)
 inflow.add(veh_type="rl", edge="1",
            vehs_per_hour=flow_rate * AV_FRAC,
+           departLane="random", departSpeed=10)
+inflow.add(veh_type="human", edge="1",
+           vehs_per_hour=flow_rate * (1 - AV_FRAC),
            departLane="random", departSpeed=10)
 
 traffic_lights = TrafficLights()
@@ -82,7 +80,7 @@ net_params = NetParams(in_flows=inflow,
 
 flow_params = dict(
     # name of the experiment
-    exp_tag="DesiredVelocity",
+    exp_tag="bottleneck_2",
 
     # name of the flow environment the experiment is running on
     env_name="DesiredVelocityEnv",
@@ -134,6 +132,3 @@ flow_params = dict(
     # flow.core.traffic_lights.TrafficLights)
     tls=traffic_lights,
 )
-
-# get the env name and a creator for the environment (used by rllib)
-create_env, env_name = make_create_env(params=flow_params, version=0)

@@ -7,10 +7,19 @@ from gym.spaces.tuple_space import Tuple
 from flow.core import rewards
 from flow.envs.base_env import Env
 
+ADDITIONAL_ENV_PARAMS = {
+    # minimum switch time for each traffic light (in seconds)
+    "switch_time": 2.0,
+}
+
 
 class TrafficLightGridEnv(Env):
     """Environment used to train traffic lights to regulate traffic flow
     through an n x m grid.
+
+    Required from env_params:
+    - switch_time: minimum switch time for each traffic light (in seconds).
+      Earlier RL commands are ignored.
 
     States
         An observation is the distance of each vehicle to its intersection, a
@@ -49,7 +58,7 @@ class TrafficLightGridEnv(Env):
         super().__init__(env_params, sumo_params, scenario)
 
         # Saving env variables for plotting
-        self.steps = env_params.additional_params.get('num_steps', 0)
+        self.steps = env_params.horizon
         self.obs_var_labels = {
             'edges': np.zeros((self.steps, self.vehicles.num_vehicles)),
             'velocities': np.zeros((self.steps, self.vehicles.num_vehicles)),
@@ -118,11 +127,11 @@ class TrafficLightGridEnv(Env):
         return np.array(state)
 
     def _apply_rl_actions(self, rl_actions):
-        # convert values less than 0.5 to zero and above to 1. 0's indicate
-        # that should not switch the direction
         if self.tl_type == "actuated":
             return
 
+        # convert values less than 0.5 to zero and above to 1. 0's indicate
+        # that should not switch the direction
         rl_mask = rl_actions > 0.5
 
         for i, action in enumerate(rl_actions):
@@ -155,7 +164,7 @@ class TrafficLightGridEnv(Env):
                     self.last_change[i, 2] = 0
 
     def compute_reward(self, state, rl_actions, **kwargs):
-        return rewards.penalize_tl_changes(self, rl_actions >= 0.5, gain=1.0)
+        return rewards.penalize_tl_changes(rl_actions >= 0.5, gain=1.0)
 
     # ===============================
     # ============ UTILS ============
@@ -338,6 +347,12 @@ class PO_TrafficLightGridEnv(TrafficLightGridEnv):
     """Environment used to train traffic lights to regulate traffic flow
     through an n x m grid.
 
+    Required from env_params:
+    - switch_time: minimum switch time for each traffic light (in seconds).
+      Earlier RL commands are ignored.
+    - num_observed: number of vehicles nearest each intersection that is
+      observed in the state space; defaults to 2
+
     States
         An observation is the number of observe vehicles in each intersection
         closest to the traffic lights, a
@@ -365,11 +380,17 @@ class PO_TrafficLightGridEnv(TrafficLightGridEnv):
 
     def __init__(self, env_params, sumo_params, scenario):
         super().__init__(env_params, sumo_params, scenario)
-        self.num_observed = self.grid_array.get("num_observed", 2)
-        self.total_inflow = env_params.additional_params["total_inflow"]
-        v_top = max(self.scenario.speed_limit(edge)
-                    for edge in self.scenario.get_edge_list())
-        self.env_params.additional_params["target_velocity"] = v_top
+
+        # number of vehicles nearest each intersection that is observed in the
+        # state space; defaults to 2
+        self.num_observed = env_params.additional_params.get("num_observed", 2)
+
+        # used while computing the reward
+        self.env_params.additional_params["target_velocity"] = \
+            max(self.scenario.speed_limit(edge)
+                for edge in self.scenario.get_edge_list())
+
+        # used during visualization
         self.observed_ids = []
 
     @property
@@ -387,9 +408,6 @@ class PO_TrafficLightGridEnv(TrafficLightGridEnv):
         return tl_box
 
     def get_state(self):
-        return self.get_po_state()
-
-    def get_po_state(self):
         """
         Returns self.num_observed number of vehicles closest to each traffic
         light and for each vehicle its velocity, distance to intersection,
@@ -452,7 +470,6 @@ class PO_TrafficLightGridEnv(TrafficLightGridEnv):
     def additional_command(self):
         # specify observed vehicles
         [self.vehicles.set_observed(veh_id) for veh_id in self.observed_ids]
-
 
 
 class GreenWaveTestEnv(TrafficLightGridEnv):
