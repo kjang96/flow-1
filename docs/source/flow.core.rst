@@ -4,6 +4,14 @@ flow.core package
 Submodules
 ----------
 
+flow.core.config.template module
+--------------------------------
+
+.. automodule:: flow.core.config.template
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 flow.core.experiment module
 ---------------------------
 

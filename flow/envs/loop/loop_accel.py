@@ -21,9 +21,9 @@ class AccelEnv(Env):
     when acceleration actions are permitted by the rl agent.
 
     Required from env_params:
-    * max_accel: maximum acceleration for autonomous vehicles, in m/s^2
-    * max_decel: maximum deceleration for autonomous vehicles, in m/s^2
-    * target_velocity: desired velocity for all vehicles in the network, in m/s
+        * max_accel: maximum acceleration for autonomous vehicles, in m/s^2
+        * max_decel: maximum deceleration for autonomous vehicles, in m/s^2
+        * target_velocity: desired velocity for all vehicles in the network, in m/s
 
     States
         The state consists of the velocities and absolute position of all

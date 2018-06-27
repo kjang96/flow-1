@@ -24,10 +24,10 @@ class WaveAttenuationEnv(Env):
     and propagation of waves in a variable density ring road.
 
     Required from env_params:
-    * max_accel: maximum acceleration of autonomous vehicles
-    * max_decel: maximum deceleration of autonomous vehicles
-    * ring_length: bounds on the ranges of ring road lengths the autonomous
-      vehicle is trained on
+        * max_accel: maximum acceleration of autonomous vehicles
+        * max_decel: maximum deceleration of autonomous vehicles
+        * ring_length: bounds on the ranges of ring road lengths the autonomous
+          vehicle is trained on
 
     States
         The state consists of the velocities and absolute position of all
@@ -165,14 +165,14 @@ class WaveAttenuationEnv(Env):
 class WaveAttenuationPOEnv(WaveAttenuationEnv):
     """POMDP version of WaveAttenuationEnv.
 
-    Required from env_params:
-    * max_accel: maximum acceleration of autonomous vehicles
-    * max_decel: maximum deceleration of autonomous vehicles
-    * ring_length: bounds on the ranges of ring road lengths the autonomous
-      vehicle is trained on
-
     Note that this environment only works when there is one autonomous vehicle
     on the network.
+    
+    Required from env_params:
+        * max_accel: maximum acceleration of autonomous vehicles
+        * max_decel: maximum deceleration of autonomous vehicles
+        * ring_length: bounds on the ranges of ring road lengths the autonomous
+          vehicle is trained on
 
     States
         The state consists of the speed and headway of the ego vehicle, as well

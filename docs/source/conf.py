@@ -19,7 +19,7 @@
 #
 import os
 import sys
-sys.path.insert(0, os.path.abspath('../..'))
+sys.path.insert(0, os.path.abspath('../../flow'))
 
 
 # -- General configuration ------------------------------------------------
@@ -51,7 +51,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'Flow'
-copyright = '2017, Cathy Wu'
+copyright = '2018, Cathy Wu'
 author = 'Cathy Wu'
 
 # The version info for the project you're documenting, acts as replacement for

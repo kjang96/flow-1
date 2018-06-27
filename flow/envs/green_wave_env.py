@@ -18,8 +18,8 @@ class TrafficLightGridEnv(Env):
     through an n x m grid.
 
     Required from env_params:
-    - switch_time: minimum switch time for each traffic light (in seconds).
-      Earlier RL commands are ignored.
+        * switch_time: minimum switch time for each traffic light (in seconds).
+          Earlier RL commands are ignored.
 
     States
         An observation is the distance of each vehicle to its intersection, a
@@ -349,10 +349,10 @@ class PO_TrafficLightGridEnv(TrafficLightGridEnv):
     through an n x m grid.
 
     Required from env_params:
-    - switch_time: minimum switch time for each traffic light (in seconds).
-      Earlier RL commands are ignored.
-    - num_observed: number of vehicles nearest each intersection that is
-      observed in the state space; defaults to 2
+        * switch_time: minimum switch time for each traffic light (in seconds).
+          Earlier RL commands are ignored.
+        * num_observed: number of vehicles nearest each intersection that is
+          observed in the state space; defaults to 2
 
     States
         An observation is the number of observe vehicles in each intersection
