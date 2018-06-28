@@ -11,7 +11,8 @@ from flow.scenarios.bay_bridge_toll.gen import BayBridgeTollGenerator
 from flow.scenarios.bay_bridge_toll.scenario import BayBridgeTollScenario
 from flow.controllers import SumoCarFollowingController, BayBridgeRouter
 
-NETFILE = "bottleneck.net.xml"
+NETFILE = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                       "bottleneck.net.xml")
 
 
 def bay_bridge_bottleneck_example(sumo_binary=None,
@@ -79,11 +80,11 @@ def bay_bridge_bottleneck_example(sumo_binary=None,
     my_file = urllib.request.urlopen(my_url)
     data_to_write = my_file.read()
 
-    with open(os.path.join(net_params.cfg_path, NETFILE), "wb+") as f:
+    with open(os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                           NETFILE), "wb+") as f:
         f.write(data_to_write)
 
     initial_config = InitialConfig(spacing="uniform",  # "random",
-                                   lanes_distribution=float("inf"),
                                    min_gap=15)
 
     scenario = BayBridgeTollScenario(name="bay_bridge_toll",

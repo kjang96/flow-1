@@ -24,8 +24,6 @@ ADDITIONAL_NET_PARAMS = {
         # number of cars starting at the edges heading to the right
         "cars_right": 20,
     },
-    # specifies whether to add traffic lights to the intersections of the grid
-    "traffic_lights": True,
     # number of lanes in the horizontal edges
     "horizontal_lanes": 1,
     # number of lanes in the vertical edges
@@ -33,14 +31,13 @@ ADDITIONAL_NET_PARAMS = {
     # speed limit for all edges, may be represented as a float value, or a
     # dictionary with separate values for vertical and horizontal lanes
     "speed_limit": {"vertical": 35, "horizontal": 35},
-    # specifies traffic light states, durations, baseline vs. actuated, etc
-    "tl_logic": TrafficLights(baseline=False)
 }
 
 
 class SimpleGridScenario(Scenario):
     def __init__(self, name, generator_class, vehicles, net_params,
-                 initial_config=InitialConfig()):
+                 initial_config=InitialConfig(),
+                 traffic_lights=TrafficLights()):
         """Initializes an nxm grid scenario.
 
         The grid scenario consists of m vertical lanes and n horizontal lanes,
@@ -60,8 +57,6 @@ class SimpleGridScenario(Scenario):
           - cars_left: number of cars starting at the edges heading to the left
           - cars_right: number of cars starting at the edges heading to the
             right
-        - traffic_lights: specifies whether to add traffic lights to the
-          intersections of the grid
         - horizontal_lanes: number of lanes in the horizontal edges
         - vertical_lanes: number of lanes in the vertical edges
         - speed_limit: speed limit for all edges. This may be represented as a
@@ -101,7 +96,7 @@ class SimpleGridScenario(Scenario):
         self.long_length = self.grid_array["long_length"]
 
         super().__init__(name, generator_class, vehicles, net_params,
-                         initial_config, TrafficLights())
+                         initial_config, traffic_lights)
 
     # TODO, make this make any sense at all
     def specify_edge_starts(self):
@@ -131,7 +126,6 @@ class SimpleGridScenario(Scenario):
         per_edge = int(num_vehicles/(2 * (row_num+col_num)))
         start_positions = []
         d_inc = 10
-        # import ipdb; ipdb.set_trace()
         for i in range(self.col_num):
             x = 6
             for k in range(per_edge):
