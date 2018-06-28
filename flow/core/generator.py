@@ -64,16 +64,17 @@ class Generator(Serializable):
         """Generates Net files for the transportation network.
 
         Creates different network configuration files for:
-        - nodes: x,y position of points which are connected together to form
+
+        * nodes: x,y position of points which are connected together to form
           links. The nodes may also be fitted with traffic lights, or can be
           treated as priority or zipper merge regions if they combines several
           lanes or edges together.
-        - edges: directed edges combining nodes together. These constitute the
+        * edges: directed edges combining nodes together. These constitute the
           lanes vehicles will be allowed to drive on.
-        - types (optional): parameters used to describe common features amount
+        * types (optional): parameters used to describe common features amount
           several edges of similar types. If edges are not defined with common
           types, this is not needed.
-        - connections (optional): describes how incoming and outgoing edge/lane
+        * connections (optional): describes how incoming and outgoing edge/lane
           pairs on a specific node as connected. If none is specified, SUMO
           handles these connections by default.
 
@@ -99,6 +100,7 @@ class Generator(Serializable):
                 Key = lane index
                 Element = list of edge/lane pairs that a vehicle can traverse
                 from the arriving edge/lane pairs
+
         """
         nodfn = "%s.nod.xml" % self.name
         edgfn = "%s.edg.xml" % self.name
@@ -384,11 +386,13 @@ class Generator(Serializable):
         Returns
         -------
         nodes: list of dict
+
             A list of node attributes (a separate dict for each node). Nodes
             attributes must include:
-             - id {string} -- name of the node
-             - x {float} -- x coordinate of the node
-             - y {float} -- y coordinate of the node
+
+            * id {string} -- name of the node
+            * x {float} -- x coordinate of the node
+            * y {float} -- y coordinate of the node
 
         Other attributes may also be specified. See:
         http://sumo.dlr.de/wiki/Networks/Building_Networks_from_own_XML-descriptions#Node_Descriptions
@@ -407,18 +411,22 @@ class Generator(Serializable):
         Returns
         -------
         edges: list of dict
+
             A list of edges attributes (a separate dict for each edge). Edge
             attributes must include:
-             - id {string} -- name of the edge
-             - from {string} -- name of node the directed edge starts from
-             - to {string} -- name of the node the directed edge ends at
+
+            * id {string} -- name of the edge
+            * from {string} -- name of node the directed edge starts from
+            * to {string} -- name of the node the directed edge ends at
+
             In addition, the attributes must contain at least one of the
             following:
-             - "numLanes" {int} and "speed" {float} -- the number of lanes and
-               speed limit of the edge, respectively
-             - type {string} -- a type identifier for the edge, which can be
-               used if several edges are supposed to possess the same number of
-               lanes, speed limits, etc...
+
+            * "numLanes" {int} and "speed" {float} -- the number of lanes and
+              speed limit of the edge, respectively
+            * type {string} -- a type identifier for the edge, which can be
+              used if several edges are supposed to possess the same number of
+              lanes, speed limits, etc...
 
         Other attributes may also be specified. See:
         http://sumo.dlr.de/wiki/Networks/Building_Networks_from_own_XML-descriptions#Edge_Descriptions

@@ -551,7 +551,7 @@ class InFlows:
         ----
         For information on the parameters start, end, vehs_per_hour, period,
         probability, number, as well as other vehicle type and routing
-        parameters that may be added via **kwargs, refer to:
+        parameters that may be added via \*\*kwargs, refer to:
         http://sumo.dlr.de/wiki/Definition_of_Vehicles,_Vehicle_Types,_and_Routes
 
         """

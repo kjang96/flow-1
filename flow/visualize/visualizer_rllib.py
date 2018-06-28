@@ -5,6 +5,7 @@ Attributes
 EXAMPLE_USAGE : str
     Example call to the function, which is
     ::
+
         python ./visualizer_rllib.py /tmp/ray/result_dir 1 --run PPO
 
 parser : ArgumentParser

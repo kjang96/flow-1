@@ -355,33 +355,29 @@ class BottleneckEnv(Env):
 
 class BottleNeckAccelEnv(BottleneckEnv):
     """Environment used to train vehicles to effectively
-        pass through a bottleneck.
+       pass through a bottleneck.
 
        States
-       ------
-       An observation is the edge position, speed, lane, and edge number of the
-       AV, the distance to and velocity of the vehicles
-       in front and behind the AV for all lanes. Additionally, we pass the
-       density and average velocity of all edges. Finally, we pad with zeros
-       in case an AV has exited the system.
-       Note: the vehicles are arranged in an initial order, so we pad
-       the missing vehicle at its normal position in the order
+           An observation is the edge position, speed, lane, and edge number of
+           the AV, the distance to and velocity of the vehicles
+           in front and behind the AV for all lanes. Additionally, we pass the
+           density and average velocity of all edges. Finally, we pad with
+           zeros in case an AV has exited the system.
+           Note: the vehicles are arranged in an initial order, so we pad
+           the missing vehicle at its normal position in the order
 
        Actions
-       -------
-       The action space consist of a list in which the first half
-       is accelerations and the second half is a direction for lane changing
-       that we round
+           The action space consist of a list in which the first half
+           is accelerations and the second half is a direction for lane
+           changing that we round
 
        Rewards
-       -------
-       The reward is the two-norm of the difference between the speed of all
-       vehicles in the network and some desired speed. To this we add
-       a positive reward for moving the vehicles forward
+           The reward is the two-norm of the difference between the speed of
+           all vehicles in the network and some desired speed. To this we add
+           a positive reward for moving the vehicles forward
 
        Termination
-       -----------
-       A rollout is terminated once the time horizon is reached.
+           A rollout is terminated once the time horizon is reached.
 
        """
 
@@ -581,20 +577,17 @@ class DesiredVelocityEnv(BottleneckEnv):
        should attempt to travel in certain regions of space
 
        States
-       ------
-       An observation is the number of vehicles in each lane in each
-       segment
+           An observation is the number of vehicles in each lane in each
+           segment
 
        Actions
-       -------
-       The action space consist of a list in which each element
-       corresponds to the desired speed that RL vehicles should travel in that
-       region of space
+           The action space consist of a list in which each element
+           corresponds to the desired speed that RL vehicles should travel in
+           that region of space
 
        Rewards
-       -------
-       The reward is the outflow of the bottleneck plus a reward
-       for RL vehicles making forward progress
+           The reward is the outflow of the bottleneck plus a reward
+           for RL vehicles making forward progress
     """
 
     def __init__(self, env_params, sumo_params, scenario):

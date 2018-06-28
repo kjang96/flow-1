@@ -18,35 +18,32 @@ class TrafficLightGridEnv(Env):
     through an n x m grid.
 
     Required from env_params:
-    - switch_time: minimum switch time for each traffic light (in seconds).
+
+    * switch_time: minimum switch time for each traffic light (in seconds).
       Earlier RL commands are ignored.
 
     States
-    ------
-    An observation is the distance of each vehicle to its intersection, a
-    number uniquely identifying which edge the vehicle is on, and the speed of
-    the vehicle.
+        An observation is the distance of each vehicle to its intersection, a
+        number uniquely identifying which edge the vehicle is on, and the speed
+        of the vehicle.
 
     Actions
-    -------
-    The action space consist of a list of float variables ranging from 0-1
-    specifying whether a traffic light is supposed to switch or not. The
-    actions are sent to the traffic light in the grid from left to right and
-    then top to bottom.
+        The action space consist of a list of float variables ranging from 0-1
+        specifying whether a traffic light is supposed to switch or not. The
+        actions are sent to the traffic light in the grid from left to right
+        and then top to bottom.
 
     Rewards
-    -------
-    The reward is the negative per vehicle delay minus a penalty for switching
-    traffic lights
+        The reward is the negative per vehicle delay minus a penalty for
+        switching traffic lights
 
     Termination
-    -----------
-    A rollout is terminated once the time horizon is reached.
+        A rollout is terminated once the time horizon is reached.
 
     Additional
-    ----------
-    Vehicles are rerouted to the start of their original routes once they reach
-    the end of the network in order to ensure a constant number of vehicles.
+        Vehicles are rerouted to the start of their original routes once they
+        reach the end of the network in order to ensure a constant number of
+        vehicles.
     """
     def __init__(self, env_params, sumo_params, scenario):
         self.grid_array = scenario.net_params.additional_params["grid_array"]
@@ -353,38 +350,35 @@ class PO_TrafficLightGridEnv(TrafficLightGridEnv):
     through an n x m grid.
 
     Required from env_params:
-    - switch_time: minimum switch time for each traffic light (in seconds).
+
+    * switch_time: minimum switch time for each traffic light (in seconds).
       Earlier RL commands are ignored.
-    - num_observed: number of vehicles nearest each intersection that is
+    * num_observed: number of vehicles nearest each intersection that is
       observed in the state space; defaults to 2
 
     States
-    ------
-    An observation is the number of observe vehicles in each intersection
-    closest to the traffic lights, a
-    number uniquely identifying which edge the vehicle is on, and the speed of
-    the vehicle.
+        An observation is the number of observe vehicles in each intersection
+        closest to the traffic lights, a
+        number uniquely identifying which edge the vehicle is on, and the speed
+        of the vehicle.
 
     Actions
-    -------
-    The action space consist of a list of float variables ranging from 0-1
-    specifying whether a traffic light is supposed to switch or not. The
-    actions are sent to the traffic light in the grid from left to right and
-    then top to bottom.
+        The action space consist of a list of float variables ranging from 0-1
+        specifying whether a traffic light is supposed to switch or not. The
+        actions are sent to the traffic light in the grid from left to right
+        and then top to bottom.
 
     Rewards
-    -------
-    The reward is the delay of each vehicle minus a penalty for switching
-    traffic lights
+        The reward is the delay of each vehicle minus a penalty for switching
+        traffic lights
 
     Termination
-    -----------
-    A rollout is terminated once the time horizon is reached.
+        A rollout is terminated once the time horizon is reached.
 
     Additional
-    ----------
-    Vehicles are rerouted to the start of their original routes once they reach
-    the end of the network in order to ensure a constant number of vehicles.
+        Vehicles are rerouted to the start of their original routes once they
+        reach the end of the network in order to ensure a constant number of
+        vehicles.
 
     """
 
