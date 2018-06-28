@@ -68,8 +68,18 @@ for edge in outer_edges:
     inflow.add(veh_type="human", edge=edge, vehs_per_hour=EDGE_INFLOW,
                departLane="free", departSpeed="max")
 
-# set up the traffic lights
-traffic_light = TrafficLights(baseline=False)
+# define the traffic light logic
+tl_logic = TrafficLights(baseline=False)
+phases = [{"duration": "31", "minDur": "8", "maxDur": "45",
+           "state": "GGGrrrGGGrrr"},
+          {"duration": "6", "minDur": "3", "maxDur": "6",
+           "state": "yyyrrryyyrrr"},
+          {"duration": "31", "minDur": "8", "maxDur": "45",
+           "state": "rrrGGGrrrGGG"},
+          {"duration": "6", "minDur": "3", "maxDur": "6",
+           "state": "rrryyyrrryyy"}]
+for i in range(N_ROWS*N_COLUMNS):
+    tl_logic.add("center"+str(i), tls_type="actuated", phases=phases, programID=1)
 
 net_params = NetParams(
         in_flows=inflow,
@@ -89,6 +99,7 @@ net_params = NetParams(
             },
             "horizontal_lanes": 1,
             "vertical_lanes": 1,
+            "tl_logic": "actuated",
         },
     )
 
@@ -114,7 +125,7 @@ scenario = SimpleGridScenario(name="grid",
                               vehicles=vehicles,
                               net_params=net_params,
                               initial_config=initial_config,
-                              traffic_lights=traffic_light)
+                              traffic_lights=tl_logic)
 
 env = PO_TrafficLightGridEnv(env_params, sumo_params, scenario)
 

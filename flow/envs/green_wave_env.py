@@ -131,7 +131,7 @@ class TrafficLightGridEnv(Env):
         return np.array(state)
 
     def _apply_rl_actions(self, rl_actions):
-        if self.tl_type == "actuated":
+        if self.env_params.evaluate:
             return
 
         # convert values less than 0.5 to zero and above to 1. 0's indicate
