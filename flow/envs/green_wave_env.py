@@ -10,9 +10,6 @@ from flow.envs.base_env import Env
 ADDITIONAL_ENV_PARAMS = {
     # minimum switch time for each traffic light (in seconds)
     "switch_time": 2.0,
-    # whether to use sumo's traffic light actuation or control
-    # "actuated" for sumo control, "controlled" for RL
-    "tl_logic": "controlled",
 }
 
 
