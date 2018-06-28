@@ -79,7 +79,8 @@ phases = [{"duration": "31", "minDur": "8", "maxDur": "45",
           {"duration": "6", "minDur": "3", "maxDur": "6",
            "state": "rrryyyrrryyy"}]
 for i in range(N_ROWS*N_COLUMNS):
-    tl_logic.add("center"+str(i), tls_type="actuated", phases=phases, programID=1)
+    tl_logic.add("center"+str(i), tls_type="actuated", phases=phases,
+                 programID=1)
 
 net_params = NetParams(
         in_flows=inflow,
@@ -116,7 +117,6 @@ env_params = EnvParams(
             "switch_time": 2.0,
             "num_observed": 2,
         },
-        #additional_params=ADDITIONAL_ENV_PARAMS
     )
 
 initial_config = InitialConfig(shuffle=True)

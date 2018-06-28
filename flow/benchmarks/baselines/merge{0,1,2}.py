@@ -63,7 +63,7 @@ sumo_params = SumoParams(
 
 env_params = EnvParams(
     horizon=HORIZON,
-    sims_per_step=2,
+    sims_per_step=5,  # value raised to ensure sec/step match experiment
     warmup_steps=0,
     evaluate=True,  # Set to True to evaluate traffic metric performance
     additional_params={
