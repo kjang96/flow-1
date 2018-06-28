@@ -37,7 +37,7 @@ class LaneChangeAccelEnv(Env):
 
     Actions
         Actions consist of:
-        
+
         * a (continuous) acceleration from -abs(max_decel) to max_accel,
           specified in env_params
         * a (continuous) lane-change action from -1 to 1, used to determine the

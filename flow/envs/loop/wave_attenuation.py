@@ -168,9 +168,9 @@ class WaveAttenuationPOEnv(WaveAttenuationEnv):
 
     Note that this environment only works when there is one autonomous vehicle
     on the network.
-    
+
     Required from env_params:
-    
+
     * max_accel: maximum acceleration of autonomous vehicles
     * max_decel: maximum deceleration of autonomous vehicles
     * ring_length: bounds on the ranges of ring road lengths the autonomous

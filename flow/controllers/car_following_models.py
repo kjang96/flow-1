@@ -3,8 +3,8 @@ This script contains several car-following control models for
 flow-controlled vehicles.
 
 Controllers can have their output delayed by some duration. Each controller
-includes the function ``get_accel(self, env) -> acc`` which, using the 
-current state of the world and existing parameters, uses the control 
+includes the function ``get_accel(self, env) -> acc`` which, using the
+current state of the world and existing parameters, uses the control
 model to return a vehicle acceleration.
 
 """

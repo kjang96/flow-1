@@ -350,7 +350,7 @@ class PO_TrafficLightGridEnv(TrafficLightGridEnv):
     through an n x m grid.
 
     Required from env_params:
-    
+
     * switch_time: minimum switch time for each traffic light (in seconds).
       Earlier RL commands are ignored.
     * num_observed: number of vehicles nearest each intersection that is
