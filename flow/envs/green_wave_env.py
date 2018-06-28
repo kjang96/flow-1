@@ -54,7 +54,7 @@ class TrafficLightGridEnv(Env):
         super().__init__(env_params, sumo_params, scenario)
 
         # Saving env variables for plotting
-        self.steps = env_params.additional_params.get('num_steps', 0)
+        self.steps = env_params.horizon
         self.obs_var_labels = {
             'edges': np.zeros((self.steps, self.vehicles.num_vehicles)),
             'velocities': np.zeros((self.steps, self.vehicles.num_vehicles)),
