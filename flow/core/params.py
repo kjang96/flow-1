@@ -98,30 +98,30 @@ class EnvParams:
 
         Attributes
             vehicle_arrangement_shuffle: bool, optional
-                determines if initial conditions of vehicles are shuffled at reset;
-                False by default
+                determines if initial conditions of vehicles are shuffled at
+                reset; False by default
             starting_position_shuffle: bool, optional
                 determines if starting position of vehicles should be updated
                 between rollouts; False by default
             additional_params: dict, optional
-                Specify additional environment params for a specific environment
-                configuration
+                Specify additional environment params for a specific
+                environment configuration
             horizon: int, optional
                 number of steps per rollouts
             sort_vehicles: bool, optional
-                specifies whether vehicles are to be sorted by position during a
-                simulation step. If set to True, the environment parameter
-                self.sorted_ids will return a list of all vehicles ideas sorted by
-                their absolute position.
+                specifies whether vehicles are to be sorted by position during
+                a simulation step. If set to True, the environment parameter
+                self.sorted_ids will return a list of all vehicles ideas sorted
+                by their absolute position.
             warmup_steps: int, optional
                 number of steps performed before the initialization of training
-                during a rollout. These warmup steps are not added as steps into
-                training, and the actions of rl agents during these steps are
-                dictated by sumo. Defaults to zero
+                during a rollout. These warmup steps are not added as steps
+                into training, and the actions of rl agents during these steps
+                are dictated by sumo. Defaults to zero
             sims_per_step: int, optional
                 number of sumo simulation steps performed in any given rollout
-                step. RL agents perform the same action for the duration of these
-                simulation steps.
+                step. RL agents perform the same action for the duration of
+                these simulation steps.
             evaluate: bool, optional
                 flag indicating that the evaluation reward should be used
                 so the evaluation reward should be used rather than the

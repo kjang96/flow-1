@@ -40,11 +40,11 @@ class SumoExperiment:
             num_steps: int
                 number of steps to be performs in each run of the experiment
             rl_actions: list or numpy ndarray, optional
-                actions to be performed by rl vehicles in the network (if there are
-                any)
+                actions to be performed by rl vehicles in the network (if there
+                are any)
             convert_to_csv: bool
-                Specifies whether to convert the emission file created by sumo into
-                a csv file
+                Specifies whether to convert the emission file created by sumo
+                into a csv file
         Returns
             info_dict: dict
                 contains returns, average speed per step
@@ -89,7 +89,7 @@ class SumoExperiment:
         print("Average, std return: {}, {}".format(np.mean(rets),
                                                    np.std(rets)))
         print("Average, std speed: {}, {}".format(np.mean(mean_vels),
-                                                        np.std(std_vels)))
+                                                  np.std(std_vels)))
         self.env.terminate()
 
         if convert_to_csv:
