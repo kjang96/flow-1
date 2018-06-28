@@ -72,7 +72,6 @@ class SumoExperiment:
                 ret += reward
                 ret_list.append(reward)
                 if done:
-                    import ipdb; ipdb.set_trace()
                     break
             rets.append(ret)
             vels.append(vel)
