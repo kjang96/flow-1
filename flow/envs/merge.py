@@ -139,28 +139,31 @@ class WaveAttenuationMergePOEnv(Env):
         return observation
 
     def compute_reward(self, state, rl_actions, **kwargs):
-        # return a reward of 0 if a collision occurred
-        if kwargs["fail"]:
-            return 0
+        if self.env_params.evaluate:
+            return np.mean(self.vehicles.get_speed(self.vehicles.get_ids()))
+        else:
+            # return a reward of 0 if a collision occurred
+            if kwargs["fail"]:
+                return 0
 
-        # reward high system-level velocities
-        cost1 = rewards.desired_velocity(self, fail=kwargs["fail"])
+            # reward high system-level velocities
+            cost1 = rewards.desired_velocity(self, fail=kwargs["fail"])
 
-        # penalize small time headways
-        cost2 = 0
-        t_min = 1  # smallest acceptable time headway
-        for rl_id in self.rl_veh:
-            lead_id = self.vehicles.get_leader(rl_id)
-            if lead_id not in ["", None] \
-                    and self.vehicles.get_speed(rl_id) > 0:
-                t_headway = max(self.vehicles.get_headway(rl_id)
-                                / self.vehicles.get_speed(rl_id), 0)
-                cost2 += min((t_headway - t_min) / t_min, 0)
+            # penalize small time headways
+            cost2 = 0
+            t_min = 1  # smallest acceptable time headway
+            for rl_id in self.rl_veh:
+                lead_id = self.vehicles.get_leader(rl_id)
+                if lead_id not in ["", None] \
+                        and self.vehicles.get_speed(rl_id) > 0:
+                    t_headway = max(self.vehicles.get_headway(rl_id)
+                                    / self.vehicles.get_speed(rl_id), 0)
+                    cost2 += min((t_headway - t_min) / t_min, 0)
 
-        # weights for cost1, cost2, and cost3, respectively
-        eta1, eta2 = 1.00, 0.10
+            # weights for cost1, cost2, and cost3, respectively
+            eta1, eta2 = 1.00, 0.10
 
-        return max(eta1*cost1 + eta2*cost2, 0)
+            return max(eta1*cost1 + eta2*cost2, 0)
 
     def sort_by_position(self):
         # vehicles are sorted by their get_x_by_id value

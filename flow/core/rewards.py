@@ -126,6 +126,25 @@ def min_delay(env):
     cost = time_step * sum((v_top - vel) / v_top)
     return max((max_cost - cost)/max_cost, 0)
 
+def min_delay_unscaled(env):
+    """The average delay for all vehicles in the system
+
+    Parameters
+    ----------
+    env: flow.envs.Env type
+        the environment variable, which contains information on the current
+        state of the system.
+    """
+
+    vel = np.array(env.vehicles.get_speed(env.vehicles.get_ids()))
+
+    vel = vel[vel >= -1e-6]
+    v_top = max(env.scenario.speed_limit(edge)
+                for edge in env.scenario.get_edge_list())
+    time_step = env.sim_step
+
+    cost = time_step * sum((v_top - vel) / v_top)
+    return cost/len(env.vehicles.get_ids())
 
 def penalize_tl_changes(actions, gain=1):
     """

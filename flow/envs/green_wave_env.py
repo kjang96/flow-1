@@ -51,11 +51,7 @@ class TrafficLightGridEnv(Env):
         self.cols = self.grid_array["col_num"]
         # self.num_observed = self.grid_array.get("num_observed", 3)
         self.num_traffic_lights = self.rows * self.cols
-        tl_logic = scenario.net_params.additional_params.get('tl_logic')
-        if tl_logic and tl_logic.baseline:
-            self.tl_type = "actuated"
-        else:
-            self.tl_type = "static"
+        self.tl_type = scenario.net_params.additional_params.get('tl_logic')
 
         super().__init__(env_params, sumo_params, scenario)
 
@@ -129,7 +125,7 @@ class TrafficLightGridEnv(Env):
         return np.array(state)
 
     def _apply_rl_actions(self, rl_actions):
-        if self.tl_type == "actuated":
+        if self.env_params.evaluate:
             return
 
         # convert values less than 0.5 to zero and above to 1. 0's indicate
@@ -469,7 +465,10 @@ class PO_TrafficLightGridEnv(TrafficLightGridEnv):
                                         self.last_change.flatten().tolist()]))
 
     def compute_reward(self, state, rl_actions, **kwargs):
-        return rewards.desired_velocity(self, fail=kwargs["fail"])
+        if self.env_params.evaluate:
+            return rewards.min_delay_unscaled(self)
+        else:
+            return rewards.desired_velocity(self, fail=kwargs["fail"])
 
     def additional_command(self):
         # specify observed vehicles

@@ -126,7 +126,6 @@ class SimpleGridScenario(Scenario):
         per_edge = int(num_vehicles/(2 * (row_num+col_num)))
         start_positions = []
         d_inc = 10
-        # import ipdb; ipdb.set_trace()
         for i in range(self.col_num):
             x = 6
             for k in range(per_edge):
