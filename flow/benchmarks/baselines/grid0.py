@@ -100,7 +100,6 @@ net_params = NetParams(
             },
             "horizontal_lanes": 1,
             "vertical_lanes": 1,
-            "tl_logic": "actuated",
         },
     )
 
@@ -116,6 +115,7 @@ env_params = EnvParams(
         additional_params={
             "switch_time": 2.0,
             "num_observed": 2,
+            "tl_type": "actuated",
         },
     )
 

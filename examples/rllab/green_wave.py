@@ -96,7 +96,7 @@ def run_task(*_):
     tl_logic = TrafficLights(baseline=False)
 
     additional_env_params = {"target_velocity": 50, "num_steps": 500,
-                             "control-length": 150, "switch_time": 3.0}
+                             "switch_time": 3.0}
     env_params = EnvParams(additional_params=additional_env_params)
 
     additional_net_params = {"speed_limit": 35, "grid_array": grid_array,
