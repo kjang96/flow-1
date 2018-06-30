@@ -126,6 +126,7 @@ def min_delay(env):
     cost = time_step * sum((v_top - vel) / v_top)
     return max((max_cost - cost)/max_cost, 0)
 
+
 def min_delay_unscaled(env):
     """The average delay for all vehicles in the system
 
@@ -145,6 +146,7 @@ def min_delay_unscaled(env):
 
     cost = time_step * sum((v_top - vel) / v_top)
     return cost/len(env.vehicles.get_ids())
+
 
 def penalize_tl_changes(actions, gain=1):
     """

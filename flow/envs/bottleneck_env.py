@@ -818,7 +818,7 @@ class DesiredVelocityEnv(BottleneckEnv):
             reward = self.vehicles.get_outflow_rate(500)
         else:
             reward = self.vehicles.get_outflow_rate(10 * self.sim_step) / \
-            (2000.0 * self.scaling)
+                     (2000.0 * self.scaling)
         return reward
 
     def reset(self):
