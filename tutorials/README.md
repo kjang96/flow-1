@@ -11,7 +11,7 @@
 
 ## Tutorials
 
-Each file ``tutorials/tutorials*.ipynb`` is a separate tutorial. They can be
+Each file ``tutorials/tutorial*.ipynb`` is a separate tutorial. They can be
 opened in a Jupyter notebook by running the following commands.
 
 ```shell
