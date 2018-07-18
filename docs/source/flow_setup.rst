@@ -36,9 +36,9 @@ human-driven agents during the simulation process.
 ::
 
     cd ~
-    git clone --recursive https://github.com/eclipse/sumo
-    cd sumo
-    git fetch origin refs/replace/*:refs/replace/*
+    git clone https://github.com/DLR-TS/sumo.git
+    cd sumo 
+    git checkout 1d4338ab80
     make -f Makefile.cvs
     export CPPFLAGS=-I/opt/X11/include
     export LDFLAGS=-L/opt/X11/lib
