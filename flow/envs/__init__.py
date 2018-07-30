@@ -11,9 +11,10 @@ from flow.envs.loop.wave_attenuation import WaveAttenuationEnv, \
     WaveAttenuationPOEnv
 from flow.envs.merge import WaveAttenuationMergePOEnv
 from flow.envs.straight_env import StraightEnv
+from flow.envs.UDSSC_merge_env import UDSSCMergeEnv
 
 __all__ = ["Env", "AccelEnv", "LaneChangeAccelEnv", "LaneChangeAccelPOEnv",
            "GreenWaveTestEnv", "GreenWaveTestEnv", "WaveAttenuationMergePOEnv",
            "TwoLoopsMergeEnv", "BottleneckEnv", "BottleNeckAccelEnv",
            "WaveAttenuationEnv", "WaveAttenuationPOEnv", "TrafficLightGridEnv",
-           "PO_TrafficLightGridEnv", "DesiredVelocityEnv", "StraightEnv"]
+           "PO_TrafficLightGridEnv", "DesiredVelocityEnv", "StraightEnv", "UDSSCMergeEnv"]
