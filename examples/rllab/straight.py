@@ -23,6 +23,7 @@ def run_task(*_):
     num_rl = 1
     num_idm = 1
     target_velocity = 10
+    target_headway = 10
     max_accel = 3
     max_decel = 3
     speed_limit = 15 # as requested by UD 
@@ -38,12 +39,18 @@ def run_task(*_):
                  routing_controller=(ContinuousRouter, {}),
                  num_vehicles=num_rl)
     vehicles.add(veh_id="idm",
-                 acceleration_controller=(IDMController, {"noise": 0.1}),
+                 acceleration_controller=(IDMController, 
+                                          {"noise": 0.1,
+                                           "v0": target_velocity,
+                                           "b": max_decel}),
                  routing_controller=(ContinuousRouter, {}),
                  num_vehicles=num_idm)
 
     additional_env_params = {"target_velocity": target_velocity,
-                             "max_accel": max_accel, "max_decel": max_decel}
+                             "max_accel": max_accel,
+                             "max_decel": max_decel,
+                             "target_headway": target_headway,
+                            }
 
     env_params = EnvParams(horizon=HORIZON,
                            additional_params=additional_env_params)
@@ -95,7 +102,7 @@ def run_task(*_):
     algo.train(),
 
 
-exp_tag = "delaware_3"
+exp_tag = "delaware_4"
 
 for seed in [5, 20, 68]:
     run_experiment_lite(

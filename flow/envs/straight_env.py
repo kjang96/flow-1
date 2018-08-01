@@ -13,6 +13,8 @@ ADDITIONAL_ENV_PARAMS = {
     "max_decel": 3,
     # desired velocity for all vehicles in the network, in m/s
     "target_velocity": 10,
+    # desired velocity for all vehicles in the network, in m/s
+    "target_headway": 10,
 }
 
 
@@ -88,23 +90,17 @@ class StraightEnv(Env):
     def compute_reward(self, state, rl_actions, **kwargs):
         # TODO adjust to account for spacing 
         if self.env_params.evaluate:
-            return np.mean(self.vehicles.get_speed(self.vehicles.get_ids()))
-        else:
-            return rewards.desired_velocity(self, fail=kwargs["fail"])
+            print("This env does not currently support evaluate mode")
+        # return rewards.desired_velocity(self, fail=kwargs["fail"])    
+        return rewards.desired_headway(self, fail=kwargs["fail"])
 
     def get_state(self, **kwargs):
         # speed normalizer
         max_speed = self.scenario.max_speed
 
-        # state =  np.array([[self.vehicles.get_speed(veh_id) / max_speed,
-        #                   self.get_x_by_id(veh_id) / self.scenario.length]
-        #                  for veh_id in self.sorted_ids])
         rl = "rl_0"
         idm = "idm_0"
 
-        # state =  np.array([[self.vehicles.get_speed(veh_id) / max_speed,
-        #                   self.vehicles.get_headway(veh_id) / self.scenario.length]
-        #                  for veh_id in self.sorted_ids])
         state = np.array([self.vehicles.get_headway(rl) / self.scenario.length,
                           self.vehicles.get_speed(rl) / max_speed,
                           self.vehicles.get_speed(idm) / max_speed])
