@@ -12,6 +12,8 @@ ADDITIONAL_NET_PARAMS = {
     "ring_radius": 50,
     # length of the straight edges connected the outer loop to the inner loop
     "lane_length": 75,
+    # length of the merge next to the roundabout
+    "merge_length": 15,
     # number of lanes in the inner loop
     "inner_lanes": 3,
     # number of lanes in the outer loop
@@ -74,26 +76,28 @@ class UDSSCMergingScenario(Scenario):
         """
         r = self.net_params.additional_params["ring_radius"]
         x = self.net_params.additional_params["lane_length"]
+        m = self.net_params.additional_params["merge_length"]
         circumference = 2 * pi * r
 
         ring_edgelen = pi * r
+        twelfth = circumference / 12
 
         edgestarts = [
-            ("circus_right", 0),
-            ("circus_left",circumference / 4),
-            ("left", circumference),
-            ("right", circumference + x),
-
-            # ("left", self.intersection_length),
-            # ("center", ring_edgelen + 2 * self.intersection_length),
-            # ("bottom", 2 * ring_edgelen + 2 * self.intersection_length),
-            # # ("right", 2 * ring_edgelen + lane_length
-            # #  + 2 * self.intersection_length + self.junction_length),
-            # ("top", 3 * ring_edgelen + lane_length
-            #  + 2 * self.intersection_length + 2 * self.junction_length)
+            ("right", 0),
+            ("top", 5 * twelfth),
+            ("left", 7 * twelfth),
+            ("bottom", 9 * twelfth),
+            ("inflow_1", 12 * twelfth),
+            ("merge_in_1", circumference + x),
+            ("merge_out_0", circumference + x + m),
+            ("outflow_0", circumference + x + 2*m),
+            ("inflow_0", circumference + 2*x + 2*m),
+            ("merge_in_0", circumference + 3*x + 2*m),
+            ("merge_out_1", circumference + 3*x + 3*m),
+            ("outflow_1", circumference + 3*x + 4*m),
         ]
-
         return edgestarts
+
         
     # TODO
     def specify_internal_edge_starts(self):
@@ -267,6 +271,11 @@ class UDSSCMergingScenario(Scenario):
                         self.net_params.additional_params["outer_lanes"]:
                     lane_count = 0
 
+        # CHANGES START
+        # startpositions = [('right', 2.87), ('inflow_1', 10.0)]
+        # CHANGES END
         except ZeroDivisionError:
             pass
+        startpositions = [('right', 10), ('right',0)]
+        # import ipdb; ipdb.set_trace()
         return startpositions, startlanes

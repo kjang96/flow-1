@@ -18,20 +18,23 @@ from flow.core.params import SumoParams, EnvParams, NetParams, InitialConfig, \
 from flow.core.vehicles import Vehicles
 from flow.scenarios.UDSSC_merge.gen import UDSSCMergingGenerator
 from flow.scenarios.UDSSC_merge.scenario import UDSSCMergingScenario
-# from flow.scenarios.loop_merge.gen import TwoLoopOneMergingGenerator
-# from flow.scenarios.loop_merge.scenario import TwoLoopsOneMergingScenario
+from flow.core.params import InFlows
 
-HORIZON = 300
-
+HORIZON = 1000
+FLOW_RATE = 300
 
 def run_task(*_):
-    sumo_params = SumoParams(sim_step=0.2, sumo_binary="sumo-gui")
+    sumo_params = SumoParams(sim_step=0.1, sumo_binary="sumo-gui")
+
+    inflow = InFlows()
+    inflow.add(veh_type="idm", edge="inflow_1", vehs_per_hour=FLOW_RATE)
+    inflow.add(veh_type="idm", edge="inflow_0", vehs_per_hour=FLOW_RATE)
 
     # note that the vehicles are added sequentially by the generator,
     # so place the merging vehicles after the vehicles in the ring
     vehicles = Vehicles()
     # Inner ring vehicles
-    vehicles.add(veh_id="human",
+    vehicles.add(veh_id="idm",
                  acceleration_controller=(IDMController, {"noise": 0.2}),
                  lane_change_controller=(SumoLaneChangeController, {}),
                  routing_controller=(ContinuousRouter, {}),
@@ -43,17 +46,18 @@ def run_task(*_):
                  sumo_lc_params=SumoLaneChangeParams())
 
     # A single learning agent in the inner ring
-    # vehicles.add(veh_id="rl",
-    #              acceleration_controller=(RLController, {}),
-    #              lane_change_controller=(SumoLaneChangeController, {}),
-    #              routing_controller=(ContinuousRouter, {}),
-    #              speed_mode="no_collide",
-    #              num_vehicles=1,
-    #              sumo_car_following_params=SumoCarFollowingParams(
-    #                  minGap=0.01,
-    #                  tau=0.5
-    #              ),
-    #              sumo_lc_params=SumoLaneChangeParams())
+    vehicles.add(veh_id="rl",
+                 acceleration_controller=(RLController, {}),
+                # acceleration_controller=(IDMController, {}),
+                 lane_change_controller=(SumoLaneChangeController, {}),
+                 routing_controller=(ContinuousRouter, {}),
+                 speed_mode="no_collide",
+                 num_vehicles=1,
+                 sumo_car_following_params=SumoCarFollowingParams(
+                     minGap=0.01,
+                     tau=0.5
+                 ),
+                 sumo_lc_params=SumoLaneChangeParams())
 
     # Outer ring vehicles
     # vehicles.add(veh_id="merge-human",
@@ -87,26 +91,29 @@ def run_task(*_):
 
     additional_net_params = {
         # radius of the loops
-        "ring_radius": 50,
+        "ring_radius": 30,
         # length of the straight edges connected the outer loop to the inner loop
-        "lane_length": 125,
+        "lane_length": 30,
+        # length of the merge next to the roundabout
+        "merge_length": 15,
         # number of lanes in the inner loop
-        "inner_lanes": 2,
+        "inner_lanes": 1,
         # number of lanes in the outer loop
-        "outer_lanes": 2,
+        "outer_lanes": 1,
         # max speed limit in the network
-        "speed_limit": 30,
+        "speed_limit": 15,
         # resolution of the curved portions
-        "resolution": 40,
+        "resolution": 100,
     }
     net_params = NetParams(
-        no_internal_links=True,
+        in_flows=inflow,
+        no_internal_links=False,
         additional_params=additional_net_params
     )
 
     initial_config = InitialConfig(
         x0=50,
-        spacing="uniform", # TODO make this custom? 
+        spacing="custom", # TODO make this custom? 
         additional_params={"merge_bunching": 0}
     )
 
