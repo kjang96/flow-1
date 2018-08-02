@@ -330,11 +330,11 @@ def desired_headway(env, fail=False):
     if any(headways < -100) or fail:
         return 0.
 
-    max_cost = np.array([target_headway] *
-                        len(headways))
+    max_cost = np.array([target_headway] * len(headways))
     max_cost = np.linalg.norm(max_cost)
+
     cost = headways - target_headway
     cost = np.linalg.norm(cost)
-    
+
     reward = max(max_cost - cost, 0) / max_cost
     return reward

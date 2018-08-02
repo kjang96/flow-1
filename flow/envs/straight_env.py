@@ -91,8 +91,8 @@ class StraightEnv(Env):
         # TODO adjust to account for spacing 
         if self.env_params.evaluate:
             print("This env does not currently support evaluate mode")
-        # return rewards.desired_velocity(self, fail=kwargs["fail"])    
-        return rewards.desired_headway(self, fail=kwargs["fail"])
+        reward = rewards.desired_headway(self, fail=kwargs["fail"])
+        return reward
 
     def get_state(self, **kwargs):
         # speed normalizer
