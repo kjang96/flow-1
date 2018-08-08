@@ -2,7 +2,10 @@ Setup Instructions
 ******************
 
 To get Flow running, you need three things: Flow,
-SUMO, and (optionally) a reinforcement learning library (RLlib/rllab). Once
+SUMO, and (optionally) a reinforcement learning library (RLlib/rllab). 
+If you choose not to install a reinforcement learning library, you will 
+still be able to build and run SUMO-only traffic tasks, but will not be 
+able to run experiments which require learning agents. Once
 each component is installed successfully, you might get some missing
 module bugs from Python. Just install the missing module using 
 your OS-specific package manager / installation tool. Follow the 
