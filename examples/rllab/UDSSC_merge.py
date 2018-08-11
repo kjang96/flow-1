@@ -20,11 +20,11 @@ from flow.scenarios.UDSSC_merge.gen import UDSSCMergingGenerator
 from flow.scenarios.UDSSC_merge.scenario import UDSSCMergingScenario
 from flow.core.params import InFlows
 
-HORIZON = 1000
+HORIZON = 500
 FLOW_RATE = 300
 
 def run_task(*_):
-    sumo_params = SumoParams(sim_step=0.1, sumo_binary="sumo-gui")
+    sumo_params = SumoParams(sim_step=0.1, sumo_binary="sumo")
 
     inflow = InFlows()
     inflow.add(veh_type="idm", edge="inflow_1", vehs_per_hour=FLOW_RATE)
@@ -38,11 +38,13 @@ def run_task(*_):
                  acceleration_controller=(IDMController, {"noise": 0.2}),
                  lane_change_controller=(SumoLaneChangeController, {}),
                  routing_controller=(ContinuousRouter, {}),
+                 speed_mode="all_checks",
                  num_vehicles=1,
-                 sumo_car_following_params=SumoCarFollowingParams(
-                     minGap=0.0,
-                     tau=0.5
-                 ),
+                #  sumo_car_following_params=SumoCarFollowingParams(
+                #      minGap=0.0,
+                #      tau=0.5
+                #  ),
+                 lane_change_mode=1621,
                  sumo_lc_params=SumoLaneChangeParams())
 
     # A single learning agent in the inner ring
@@ -53,10 +55,11 @@ def run_task(*_):
                  routing_controller=(ContinuousRouter, {}),
                  speed_mode="no_collide",
                  num_vehicles=1,
-                 sumo_car_following_params=SumoCarFollowingParams(
-                     minGap=0.01,
-                     tau=0.5
-                 ),
+                #  sumo_car_following_params=SumoCarFollowingParams(
+                #      minGap=0.01,
+                #      tau=0.5
+                #  ),
+                 lane_change_mode="aggressive",
                  sumo_lc_params=SumoLaneChangeParams())
 
     # Outer ring vehicles
