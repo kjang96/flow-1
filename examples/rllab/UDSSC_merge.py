@@ -20,11 +20,11 @@ from flow.scenarios.UDSSC_merge.gen import UDSSCMergingGenerator
 from flow.scenarios.UDSSC_merge.scenario import UDSSCMergingScenario
 from flow.core.params import InFlows
 
-HORIZON = 500
+HORIZON = 200
 FLOW_RATE = 300
 
 def run_task(*_):
-    sumo_params = SumoParams(sim_step=0.1, sumo_binary="sumo")
+    sumo_params = SumoParams(sim_step=1, sumo_binary="sumo-gui", restart_instance=False)
 
     inflow = InFlows()
     inflow.add(veh_type="idm", edge="inflow_1", vehs_per_hour=FLOW_RATE)
@@ -33,6 +33,12 @@ def run_task(*_):
     # note that the vehicles are added sequentially by the generator,
     # so place the merging vehicles after the vehicles in the ring
     vehicles = Vehicles()
+
+    # sumo_car_following_params=SumoCarFollowingParams(
+    #                accel=max_accel,
+    #                decel=max_decel,
+    #                tau=1.1,
+    #                max_speed=speed_limit),
     # Inner ring vehicles
     vehicles.add(veh_id="idm",
                  acceleration_controller=(IDMController, {"noise": 0.2}),
@@ -40,10 +46,9 @@ def run_task(*_):
                  routing_controller=(ContinuousRouter, {}),
                  speed_mode="all_checks",
                  num_vehicles=1,
-                #  sumo_car_following_params=SumoCarFollowingParams(
-                #      minGap=0.0,
-                #      tau=0.5
-                #  ),
+                 sumo_car_following_params=SumoCarFollowingParams(
+                     tau=1.1,
+                 ),
                  lane_change_mode=1621,
                  sumo_lc_params=SumoLaneChangeParams())
 
@@ -55,10 +60,10 @@ def run_task(*_):
                  routing_controller=(ContinuousRouter, {}),
                  speed_mode="no_collide",
                  num_vehicles=1,
-                #  sumo_car_following_params=SumoCarFollowingParams(
-                #      minGap=0.01,
-                #      tau=0.5
-                #  ),
+                 sumo_car_following_params=SumoCarFollowingParams(
+                     tau=1.1,
+                 ),
+                #  lane_change_mode="no_lat_collide",
                  lane_change_mode="aggressive",
                  sumo_lc_params=SumoLaneChangeParams())
 
@@ -80,7 +85,7 @@ def run_task(*_):
         # maximum deceleration for autonomous vehicles, in m/s^2
         "max_decel": 3,
         # desired velocity for all vehicles in the network, in m/s
-        "target_velocity": 10,
+        "target_velocity": 15,
         # number of observable vehicles preceding the rl vehicle
         "n_preceding": 2,
         # number of observable vehicles following the rl vehicle
@@ -94,7 +99,7 @@ def run_task(*_):
 
     additional_net_params = {
         # radius of the loops
-        "ring_radius": 30,
+        "ring_radius": 15,
         # length of the straight edges connected the outer loop to the inner loop
         "lane_length": 30,
         # length of the merge next to the roundabout
@@ -147,10 +152,10 @@ def run_task(*_):
         env=env,
         policy=policy,
         baseline=baseline,
-        batch_size=64 * 3 * horizon,
+        batch_size=5000,#64 * 3 * horizon,
         max_path_length=horizon,
         # whole_paths=True,
-        n_itr=1000,
+        n_itr=300,
         discount=0.999,
         # step_size=0.01,
     )

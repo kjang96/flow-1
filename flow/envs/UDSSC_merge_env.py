@@ -81,14 +81,19 @@ class UDSSCMergeEnv(Env):
 
     @property
     def observation_space(self):
+        # speed = Box(low=0, high=np.inf, shape=(self.n_obs_vehicles,),
+        #             dtype=np.float32)
+        # absolute_pos = Box(low=0., high=np.inf, shape=(self.n_obs_vehicles,),
+        #                    dtype=np.float32)
+        # queue_length = Box(low=0, high=np.inf, shape=(1,), dtype=np.float32)
+        # vel_stats = Box(low=-np.inf, high=np.inf, shape=(2,), dtype=np.float32)
+
+        # return Tuple((speed, absolute_pos, queue_length, vel_stats))
         speed = Box(low=0, high=np.inf, shape=(self.n_obs_vehicles,),
                     dtype=np.float32)
-        absolute_pos = Box(low=0., high=np.inf, shape=(self.n_obs_vehicles,),
-                           dtype=np.float32)
-        queue_length = Box(low=0, high=np.inf, shape=(1,), dtype=np.float32)
-        vel_stats = Box(low=-np.inf, high=np.inf, shape=(2,), dtype=np.float32)
-
-        return Tuple((speed, absolute_pos, queue_length, vel_stats))
+        relative_pos = Box(low=0., high=np.inf, shape=(self.n_obs_vehicles,),
+                           dtype=np.float32) # Normalized by ring circumference 
+        return Tuple((speed, relative_pos))
 
     @property
     def action_space(self):
@@ -107,92 +112,125 @@ class UDSSCMergeEnv(Env):
 
         # Use a similar weighting of of the headway reward as the velocity
         # reward
-        max_cost = np.array([self.env_params.additional_params[
-                                 "target_velocity"]] *
-                            self.vehicles.num_vehicles)
-        max_cost = np.linalg.norm(max_cost)
-        normalization = self.scenario.length / self.vehicles.num_vehicles
-        headway_reward = 0.2 * max_cost * rewards.penalize_headway_variance(
-            self.vehicles, self.sorted_extra_data, normalization)
-        return vel_reward + headway_reward
+        # max_cost = np.array([self.env_params.additional_params[
+        #                          "target_velocity"]] *
+        #                     self.vehicles.num_vehicles)
+        # max_cost = np.linalg.norm(max_cost)
+        # normalization = self.scenario.length / self.vehicles.num_vehicles
+        # headway_reward = 0.2 * max_cost * rewards.penalize_headway_variance(
+        #     self.vehicles, self.sorted_extra_data, normalization)
+        # return vel_reward + headway_reward
+        return vel_reward
 
     def get_state(self, **kwargs):
-        vel = np.zeros(self.n_obs_vehicles)
-        pos = np.zeros(self.n_obs_vehicles)
+        """
+        Want to include: 
+        * dist, vel of vehicles closest to roundabout
+        * dist, 2 vehicles ahead, 2 vehicles behind
 
-        sorted = self.sorted_extra_data
-        merge_len = self.scenario.intersection_length
 
-        # Merge stretch is pos 0.0-25.5 (ish), so actively merging vehicles
-        # are sorted at the front of the list. Otherwise, vehicles closest to
-        # the merge are at the end of the list (effectively reverse sorted).
-        if self.get_x_by_id(sorted[0]) < merge_len and self.get_x_by_id(
-                sorted[1]) < merge_len:
-            if not sorted[0].startswith("merge") and \
-                    not sorted[1].startswith("merge"):
-                vid1 = sorted[-1]
-                vid2 = sorted[-2]
-            elif not sorted[0].startswith("merge"):
-                vid1 = sorted[1]
-                vid2 = sorted[-1]
-            elif not sorted[1].startswith("merge"):
-                vid1 = sorted[0]
-                vid2 = sorted[-1]
-            else:
-                vid1 = sorted[1]
-                vid2 = sorted[0]
-        elif self.get_x_by_id(sorted[0]) < merge_len:
-            vid1 = sorted[0]
-            vid2 = sorted[-1]
-        else:
-            vid1 = sorted[-1]
-            vid2 = sorted[-2]
-        pos[-2] = self.get_x_by_id(vid1)
-        pos[-1] = self.get_x_by_id(vid2)
-        vel[-2] = self.vehicles.get_speed(vid1)
-        vel[-1] = self.vehicles.get_speed(vid2)
+        """
+        ## changes start
+        # import ipdb; ipdb.set_trace()
 
-        # find and eliminate all the vehicles on the outer ring
-        num_inner = len(sorted)
+        # TODO: NORMALIZE EVERYTHING
+        rl_pos = self.get_x_by_id('rl_0')
+        rl_vel = self.vehicles.get_speed('rl_0')
+        close_0 = np.zeros(self.n_merging_in)
+        close_1 = np.zeros(self.n_merging_in)
 
-        rl_vehID = self.vehicles.get_rl_ids()[0]
-        rl_srtID, = np.where(sorted == rl_vehID)
-        rl_srtID = rl_srtID[0]
+        merge_0, merge_1 = self.k_closest_to_merge(k)
+        tailway, headway = self.k_closest_to_rl('rl_0', k)
+        
+        velocities = self.vehicles.get_speed([merge_ids] + [close_ids])
+        rl_distances = [item[1] for item in [tailway] + [headway]]
+        merge_distances = self._dist_to_merge_0(merge_0) + 
+                          self._dist_to_merge_1(merge_1)
+        state = np.array([rl_pos, rl_vel, velocities,
+                          rl_distances, merge_distances])
+        return state
+        
+        # Calculate distances. 
+        
 
-        # FIXME(cathywu) hardcoded for self.num_preceding = 2
-        lead_id1 = sorted[(rl_srtID + 1) % num_inner]
-        lead_id2 = sorted[(rl_srtID + 2) % num_inner]
-        # FIXME(cathywu) hardcoded for self.num_following = 2
-        follow_id1 = sorted[(rl_srtID - 1) % num_inner]
-        follow_id2 = sorted[(rl_srtID - 2) % num_inner]
-        vehicles = [rl_vehID[0], lead_id1, lead_id2, follow_id1, follow_id2]
 
-        vel[:self.n_obs_vehicles - self.n_merging_in] = np.array(
-            self.vehicles.get_speed(vehicles))
-        pos[:self.n_obs_vehicles - self.n_merging_in] = np.array(
-            [self.get_x_by_id(veh_id) for veh_id in vehicles])
+        ## changes end
 
-        # normalize the speed
-        # FIXME(cathywu) can divide by self.max_speed
-        normalized_vel = np.array(vel) / self.scenario.max_speed
+        ### OLD STUFF STARTS
+        # sorted_data = self.sorted_extra_data
+        # merge_len = self.scenario.intersection_length
 
-        # normalize the position
-        normalized_pos = np.array(pos) / self.scenario.length
+        # # Merge stretch is pos 0.0-25.5 (ish), so actively merging vehicles
+        # # are sorted at the front of the list. Otherwise, vehicles closest to
+        # # the merge are at the end of the list (effectively reverse sorted).
+        # if self.get_x_by_id(sorted_data[0]) < merge_len and self.get_x_by_id(
+        #         sorted_data[1]) < merge_len:
+        #     if not sorted_data[0].startswith("merge") and \
+        #             not sorted_data[1].startswith("merge"):
+        #         vid1 = sorted_data[-1]
+        #         vid2 = sorted_data[-2]
+        #     elif not sorted_data[0].startswith("merge"):
+        #         vid1 = sorted_data[1]
+        #         vid2 = sorted_data[-1]
+        #     elif not sorted_data[1].startswith("merge"):
+        #         vid1 = sorted_data[0]
+        #         vid2 = sorted_data[-1]
+        #     else:
+        #         vid1 = sorted_data[1]
+        #         vid2 = sorted_data[0]
+        # elif self.get_x_by_id(sorted_data[0]) < merge_len:
+        #     vid1 = sorted_data[0]
+        #     vid2 = sorted_data[-1]
+        # else:
+        #     vid1 = sorted_data[-1]
+        #     vid2 = sorted_data[-2]
+        # pos[-2] = self.get_x_by_id(vid1)
+        # pos[-1] = self.get_x_by_id(vid2)
+        # vel[-2] = self.vehicles.get_speed(vid1)
+        # vel[-1] = self.vehicles.get_speed(vid2)
 
-        # Compute number of vehicles in the outer ring
-        queue_length = np.zeros(1)
-        queue_length[0] = len(sorted) - num_inner
+        # # find and eliminate all the vehicles on the outer ring
+        # num_inner = len(sorted_data)
 
-        # Compute mean velocity on inner and outer rings
-        # Note: merging vehicles count towards the inner ring stats
-        vel_stats = np.zeros(2)
-        vel_all = self.vehicles.get_speed(sorted)
-        vel_stats[0] = np.mean(vel_all[:num_inner])
-        vel_stats[1] = np.mean(vel_all[num_inner:])
-        vel_stats = np.nan_to_num(vel_stats)
+        # rl_vehID = self.vehicles.get_rl_ids()[0]
+        # rl_srtID, = np.where(sorted_data == rl_vehID)
+        # rl_srtID = rl_srtID[0]
 
-        return np.array([normalized_vel, normalized_pos, queue_length,
-                         vel_stats]).T
+        # # FIXME(cathywu) hardcoded for self.num_preceding = 2
+        # lead_id1 = sorted_data[(rl_srtID + 1) % num_inner]
+        # lead_id2 = sorted_data[(rl_srtID + 2) % num_inner]
+        # # FIXME(cathywu) hardcoded for self.num_following = 2
+        # follow_id1 = sorted_data[(rl_srtID - 1) % num_inner]
+        # follow_id2 = sorted_data[(rl_srtID - 2) % num_inner]
+        # vehicles = [rl_vehID[0], lead_id1, lead_id2, follow_id1, follow_id2]
+
+        # vel[:self.n_obs_vehicles - self.n_merging_in] = np.array(
+        #     self.vehicles.get_speed(vehicles))
+        # pos[:self.n_obs_vehicles - self.n_merging_in] = np.array(
+        #     [self.get_x_by_id(veh_id) for veh_id in vehicles])
+
+        # # normalize the speed
+        # # FIXME(cathywu) can divide by self.max_speed
+        # normalized_vel = np.array(vel) / self.scenario.max_speed
+
+        # # normalize the position
+        # normalized_pos = np.array(pos) / self.scenario.length
+
+        # # Compute number of vehicles in the outer ring
+        # queue_length = np.zeros(1)
+        # queue_length[0] = len(sorted_data) - num_inner
+
+        # # Compute mean velocity on inner and outer rings
+        # # Note: merging vehicles count towards the inner ring stats
+        # vel_stats = np.zeros(2)
+        # vel_all = self.vehicles.get_speed(sorted_data)
+        # vel_stats[0] = np.mean(vel_all[:num_inner])
+        # vel_stats[1] = np.mean(vel_all[num_inner:])
+        # vel_stats = np.nan_to_num(vel_stats)
+
+        # return np.array([normalized_vel, normalized_pos, queue_length,
+        #                  vel_stats]).T
+        ### OLD STUFF ENDS 
 
     def sort_by_position(self):
         """
@@ -215,3 +253,116 @@ class UDSSCMergeEnv(Env):
         sorted_separated_ids = sorted_human_ids + sorted_rl_ids
 
         return sorted_separated_ids, sorted_ids
+
+
+    def k_closest_to_merge(self, k):
+        close_0 = np.zeros(self.n_merging_in)
+        close_1 = np.zeros(self.n_merging_in)
+
+        # both dists_0 and dists_1 increase the closer you get to the intersection
+        # dists_0 = self.vehicles.get_x_by_id(self.vehicles.get_ids_by_edge(["merge_in_0", "inflow_0"]))
+        # dists_1 = self.vehicles.get_x_by_id(self.vehicles.get_ids_by_edge(["merge_in_1", "inflow_1"]))
+
+        # total_len = self.scenario.edge_length("merge_in_0") +
+        #             self.scenario.edge_length("inflow_0")
+
+        # return self.total_edgestarts_dict[edge] + position
+
+
+        dists_0 = sorted(self.vehicles.get_ids_by_edge(["merge_in_0", "inflow_0"]), 
+                         key=lambda veh_id:
+                         -self.vehicles.get_x_by_id(veh_id))
+
+        dists_1 = sorted(self.vehicles.get_ids_by_edge(["merge_in_1", "inflow_1"]), 
+                         key=lambda veh_id:
+                         -self.vehicles.get_x_by_id(veh_id))
+
+        for i in range(min(k, len(dists_0))):
+            close_0[i] = dists_0
+
+        for i in range(min(k, len(dists_1))):
+            close_1[i] = dists_1
+        
+        return close_0, close_1
+
+    def k_closest_to_rl(self, rl_id, k):
+        """
+        Return a list of ids and  distances to said rl vehicles
+        """
+
+        # Arrays holding veh_ids of vehicles before/after the rl_id.
+        # Will always be sorted by distance to rl_id 
+        k_tailway = [] 
+        k_headway = []
+
+        # Prep.
+        route = ["top", "left", "bottom", "right"]
+        rl_edge = self.vehicles.get_edge(rl_id)
+        rl_index = route.index(rl_edge) 
+        rl_x = self.get_x_by_id(rl_id)
+        rl_pos = self.scenario.get_position(rl_id)
+
+        # Get preceding first.
+        for i in range(rl_index, rl_index-2, -1): # Curr  edge and preceding edge
+            if i == rl_index: # Same edge as rl_id
+                veh_ids = [(v, rl_pos - self.scenario.get_position(v)) 
+                           for v in self.vehicles.get_ids_by_edge(route[i]) 
+                           if self.scenario.get_position(v) < rl_pos]
+            else: # Preceding edge 
+                edge_len = self.scenario.edge_length(route[i])
+                veh_ids = [(v, rl_pos + (edge_len - self.vehicles.get_position(v))) 
+                           for v in self.vehicles.get_ids_by_edge(route[i])]
+            sorted_vehs = sorted(veh_ids, lambda v: self.get_x_by_id(v))
+            # k_tailway holds veh_ids in decreasing order of closeness 
+            k_tailway = sorted_vehs + k_tailway
+
+        # Get headways second.
+        for i in range(rl_index, rl_index+2):
+            # If statement is to cover the case of overflow in get_x 
+            if i == rl_index: # Same edge as rl_id
+                veh_ids = [(v, self.scenario.get_position(v) - rl_pos) 
+                           for v in self.vehicles.get_ids_by_edge(route[i]) 
+                           if self.scenario.get_position(v) > rl_pos]
+            else:
+                rl_dist = self.scenario.edge_length(rl_edge) 
+                          - self.scenario.get_position(rl_id)
+                veh_ids = [(v, self.vehicles.get_position(v) + rl_dist)
+                           for self.vehicles.get_ids_by_edge(route[i])]
+            # The following statement is safe because it's being done
+            # by one edge at a time
+            sorted_vehs = sorted(veh_ids, lambda v: self.get_x_by_id(v))
+            k_headway += sorted_vehs
+
+        # After this step, truncate if necessary, or pad with zeros.
+        if len(k_tailway) > k:
+            k_tailway = k[-k:]
+        else:
+            k_tailway = [0] * (k - len(k_tailway))
+                
+        if len(k_headway) > k:
+            k_headway = k[:k]
+        else: 
+            k_headway += [0] * (k - len(k_headway))
+
+        return k_tailway, k_headway
+
+    def _dist_to_merge_1(self, veh_id):
+        # distances = []
+        reference = self.scenario.total_edgestarts_dict["merge_in_1"] +
+                    self.scenario.edge_length("merge_in_1")
+        distances = [reference - self.vehicles.get_x_by_id(v)
+                     for v in veh_id]
+        return distances
+
+    def _dist_to_merge_0(self, veh_id):
+        reference = self.scenario.total_edgestarts_dict["merge_in_0"] +
+                    self.scenario.edge_length("merge_in_0")
+        distances = [reference - self.vehicles.get_x_by_id(v)
+                     for v in veh_id]
+        return distances
+
+    def _dist_to_rl(self, rl_id, veh_id):
+        rl_edge = self.vehicles.get_edge(rl_id)
+        route = 
+        distances = 
+        for veh_
