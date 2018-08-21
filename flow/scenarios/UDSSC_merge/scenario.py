@@ -18,8 +18,10 @@ ADDITIONAL_NET_PARAMS = {
     "inner_lanes": 3,
     # number of lanes in the outer loop
     "outer_lanes": 2,
-    # max speed limit in the network
-    "speed_limit": 30,
+    # max speed limit in the roundabout
+    "roundabout_speed_limit": 8,
+    # max speed limit in the roundabout
+    "outside_speed_limit": 15,
     # resolution of the curved portions
     "resolution": 40,
 }
@@ -66,6 +68,8 @@ class UDSSCMergingScenario(Scenario):
         radius = net_params.additional_params["ring_radius"]
         length_loop = 2 * pi * radius
         self.length_loop = length_loop
+        self.roundabout_speed_limit = net_params.additional_params["roundabout_speed_limit"]
+        self.outside_speed_limit = net_params.additional_params["outside_speed_limit"]
 
         super().__init__(name, generator_class, vehicles, net_params,
                          initial_config, traffic_lights)

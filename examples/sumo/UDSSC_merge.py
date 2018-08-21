@@ -18,7 +18,7 @@ HORIZON = 200
 FLOW_RATE = 300
 
 def merge_example(sumo_binary=None):
-    sumo_params = SumoParams(sim_step=1, sumo_binary="sumo-gui", restart_instance=False)
+    sumo_params = SumoParams(sim_step=1, sumo_binary="sumo", restart_instance=False)
 
     inflow = InFlows()
     inflow.add(veh_type="idm", edge="inflow_1", vehs_per_hour=FLOW_RATE)
@@ -76,8 +76,10 @@ def merge_example(sumo_binary=None):
         "inner_lanes": 1,
         # number of lanes in the outer loop
         "outer_lanes": 1,
-        # max speed limit in the network
-        "speed_limit": 15,
+        # max speed limit in the roundabout
+        "roundabout_speed_limit": 8,
+        # max speed limit in the rest of the roundabout
+        "outside_speed_limit": 15,
         # resolution of the curved portions
         "resolution": 100,
     }
@@ -110,6 +112,6 @@ def merge_example(sumo_binary=None):
 if __name__ == "__main__":
     # import the experiment variable
     exp = merge_example()
-
+    
     # run for a set number of rollouts / time steps
-    exp.run(1, 1500)
+    exp.run(100, 1500)

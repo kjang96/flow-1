@@ -24,7 +24,7 @@ HORIZON = 200
 FLOW_RATE = 300
 
 def run_task(*_):
-    sumo_params = SumoParams(sim_step=1, sumo_binary="sumo-gui", restart_instance=False)
+    sumo_params = SumoParams(sim_step=1, sumo_binary="sumo", restart_instance=True)
 
     inflow = InFlows()
     inflow.add(veh_type="idm", edge="inflow_1", vehs_per_hour=FLOW_RATE)
@@ -67,18 +67,6 @@ def run_task(*_):
                  lane_change_mode="aggressive",
                  sumo_lc_params=SumoLaneChangeParams())
 
-    # Outer ring vehicles
-    # vehicles.add(veh_id="merge-human",
-    #              acceleration_controller=(IDMController, {"noise": 0.2}),
-    #              lane_change_controller=(SumoLaneChangeController, {}),
-    #              routing_controller=(ContinuousRouter, {}),
-    #              num_vehicles=1,
-    #              sumo_car_following_params=SumoCarFollowingParams(
-    #                  minGap=0.0,
-    #                  tau=0.5
-    #              ),
-    #              sumo_lc_params=SumoLaneChangeParams())
-
     additional_env_params = {
         # maximum acceleration for autonomous vehicles, in m/s^2
         "max_accel": 3,
@@ -108,8 +96,10 @@ def run_task(*_):
         "inner_lanes": 1,
         # number of lanes in the outer loop
         "outer_lanes": 1,
-        # max speed limit in the network
-        "speed_limit": 15,
+        # max speed limit in the roundabout
+        "roundabout_speed_limit": 8,
+        # max speed limit in the rest of the roundabout
+        "outside_speed_limit": 15,
         # resolution of the curved portions
         "resolution": 100,
     }
@@ -155,15 +145,16 @@ def run_task(*_):
         batch_size=5000,#64 * 3 * horizon,
         max_path_length=horizon,
         # whole_paths=True,
-        n_itr=300,
+        n_itr=200,
         discount=0.999,
         # step_size=0.01,
     )
     algo.train()
 
 
-exp_tag = "UDSSCMerge_0"  # experiment prefix
+exp_tag = "UDSSCMerge_2"  # experiment prefix
 
+# for seed in [1, 2]:#, 5, 10, 56]:  # , 1, 5, 10, 73]:
 for seed in [1]:#, 5, 10, 56]:  # , 1, 5, 10, 73]:
     run_experiment_lite(
         run_task,

@@ -155,10 +155,12 @@ class UDSSCMergingGenerator(Generator):
         """
         See parent class
         """
-        speed_limit = net_params.additional_params["speed_limit"]
-
-        types = [{"id": "edgeType_hi", "speed": repr(speed_limit), "priority": repr(2)},
-                 {"id": "edgeType_lo", "speed": repr(speed_limit), "priority": repr(1)}]
+        types = [{"id": "edgeType_hi",
+                  "speed": repr(net_params.additional_params.get("roundabout_speed_limit")),
+                  "priority": repr(2)},
+                 {"id": "edgeType_lo",
+                  "speed": repr(net_params.additional_params.get("outside_speed_limit")),
+                  "priority": repr(1)}]
         return types
 
     def specify_routes(self, net_params):
