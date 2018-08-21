@@ -14,7 +14,7 @@ from flow.scenarios.UDSSC_merge.scenario import UDSSCMergingScenario
 from flow.envs.UDSSC_merge_env import UDSSCMergeEnv
 from flow.core.params import InFlows
 
-HORIZON = 200
+HORIZON = 500
 FLOW_RATE = 300
 
 def merge_example(sumo_binary=None):
@@ -28,15 +28,9 @@ def merge_example(sumo_binary=None):
     # so place the merging vehicles after the vehicles in the ring
     vehicles = Vehicles()
 
-    # sumo_car_following_params=SumoCarFollowingParams(
-    #                accel=max_accel,
-    #                decel=max_decel,
-    #                tau=1.1,
-    #                max_speed=speed_limit),
-    # Inner ring vehicles
-
     vehicles.add(veh_id="idm",
-                 acceleration_controller=(IDMController, {"noise": 0.2}),
+                 acceleration_controller=(IDMController, {"noise": 0.1}),
+                #  acceleration_controller=(IDMController, {"noise": 0.2}),
                  lane_change_controller=(SumoLaneChangeController, {}),
                  routing_controller=(ContinuousRouter, {}),
                  speed_mode="all_checks",
@@ -59,7 +53,7 @@ def merge_example(sumo_binary=None):
         # number of observable vehicles following the rl vehicle
         "n_following": 2,
         # number of observable merging-in vehicle from the larger loop
-        "n_merging_in": 2,
+        "n_merging_in": 1,
     }
 
     env_params = EnvParams(horizon=HORIZON,
@@ -114,4 +108,10 @@ if __name__ == "__main__":
     exp = merge_example()
     
     # run for a set number of rollouts / time steps
-    exp.run(100, 1500)
+    exp.run(1, HORIZON)
+    
+    # added by kj
+    # import numpy as np
+    # std = np.std(exp.env.accels)
+    # print("Standard deviation of accelerations is: ", std)
+    # import ipdb; ipdb.set_trace() 
