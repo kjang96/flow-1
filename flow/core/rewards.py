@@ -28,7 +28,7 @@ def desired_velocity(env, fail=False):
         state of the system.
     fail: bool
         specifies if any crash or other failure occurred in the system
-    """
+    """ 
     vel = np.array(env.vehicles.get_speed(env.vehicles.get_ids()))
     num_vehicles = env.vehicles.num_vehicles
 
@@ -43,6 +43,14 @@ def desired_velocity(env, fail=False):
     cost = np.linalg.norm(cost)
 
     return max(max_cost - cost, 0) / max_cost
+
+def average_velocity(env, fail=False):
+    vel = np.array(env.vehicles.get_speed(env.vehicles.get_ids()))
+    
+    if any(vel < -100) or fail:
+        return 0.
+
+    return np.mean(vel)
 
 
 def reward_density(env):
@@ -157,6 +165,9 @@ def penalize_tl_changes(actions, gain=1):
     """
     action_penalty = gain * np.sum(np.round(actions))
     return -action_penalty
+
+def penalize_tl_standstill(last_change):
+    re
 
 
 def penalize_headway_variance(vehicles, vids, normalization=1, penalty_gain=1,
@@ -299,42 +310,3 @@ def reward_rl_opening_headways(env, reward_gain=0.1, reward_exponent=1):
     if total_reward < 0:
         print('negative total reward of:', total_reward)
     return total_reward * reward_gain
-
-
-
-def desired_headway(env, fail=False):
-    """A reward function used to encourage high system-level velocity.
-
-    This function measures the deviation of a system of vehicles from a
-    user-specified desired velocity peaking when all vehicles in the ring
-    are set to this desired velocity. Moreover, in order to ensure that the
-    reward function naturally punishing the early termination of rollouts due
-    to collisions or other failures, the function is formulated as a mapping
-    :math:`r: \\mathcal{S} \\times \\mathcal{A} \\rightarrow \\mathbb{R}_{\\geq 0}`.
-    This is done by subtracting the deviation of the system from the
-    desired velocity from the peak allowable deviation from the desired
-    velocity. Additionally, since the velocity of vehicles are
-    unbounded above, the reward is bounded below by zero,
-    to ensure nonnegativity.
-
-    Parameters
-    ----------
-    env: flow.envs.Env type
-        the environment variable, which contains information on the current
-        state of the system.
-    fail: bool
-        specifies if any crash or other failure occurred in the system
-    """
-    target_headway = env.env_params.additional_params["target_headway"]
-    headways = np.array([x for x in env.vehicles.get_headway(env.vehicles.get_ids()) if x != 1e+3])
-    if any(headways < -100) or fail:
-        return 0.
-
-    max_cost = np.array([target_headway] * len(headways))
-    max_cost = np.linalg.norm(max_cost)
-
-    cost = headways - target_headway
-    cost = np.linalg.norm(cost)
-
-    reward = max(max_cost - cost, 0) / max_cost
-    return reward
