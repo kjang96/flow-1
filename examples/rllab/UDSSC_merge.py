@@ -152,20 +152,20 @@ def run_task(*_):
     algo.train()
 
 
-exp_tag = "UDSSCMerge_7"  # experiment prefix
-
-for seed in [1, 2]:#, 5, 10, 56]:  # , 1, 5, 10, 73]:
-# for seed in [1]:#, 5, 10, 56]:  # , 1, 5, 10, 73]:
+exp_tag = "UDSSCMerge_8"  # experiment prefix
+# 
+# for seed in [1, 2, 5]:# 10, 56]:  # , 1, 5, 10, 73]:
+for seed in [1]:#, 5, 10, 56]:  # , 1, 5, 10, 73]:
     run_experiment_lite(
         run_task,
         # Number of parallel workers for sampling
-        n_parallel=8,
+        n_parallel=1,
         # Only keep the snapshot parameters for the last iteration
         snapshot_mode="last",
         # Specifies the seed for the experiment. If this is not provided, a
         # random seed will be used
         seed=seed,
-        mode="ec2",
+        mode="local",
         exp_prefix=exp_tag,
         # plot=True,
     )
