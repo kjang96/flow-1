@@ -152,7 +152,7 @@ def run_task(*_):
     algo.train()
 
 
-exp_tag = "UDSSCMerge_6"  # experiment prefix
+exp_tag = "UDSSCMerge_7"  # experiment prefix
 
 for seed in [1, 2]:#, 5, 10, 56]:  # , 1, 5, 10, 73]:
 # for seed in [1]:#, 5, 10, 56]:  # , 1, 5, 10, 73]:
