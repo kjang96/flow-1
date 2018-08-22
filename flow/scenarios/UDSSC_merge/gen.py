@@ -18,8 +18,8 @@ class UDSSCMergingGenerator(Generator):
 
         super().__init__(net_params, base)
 
-        self.name = "%s-%dr%dl" % (base, radius,
-                                   self.inner_lanes + self.outer_lanes)
+        # self.name = "%s-%dr%dl" % (base, radius,
+        #                            self.inner_lanes + self.outer_lanes)
 
     def specify_nodes(self, net_params):
         """
