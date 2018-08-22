@@ -46,10 +46,11 @@ def desired_velocity(env, fail=False):
 
 def average_velocity(env, fail=False):
     vel = np.array(env.vehicles.get_speed(env.vehicles.get_ids()))
-    
+
     if any(vel < -100) or fail:
         return 0.
-
+    if len(vel) == 0:
+        return 0.
     return np.mean(vel)
 
 
