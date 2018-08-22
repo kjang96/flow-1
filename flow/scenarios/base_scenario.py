@@ -55,7 +55,7 @@ class Scenario(Serializable):
             Serializable.quick_init(self, locals())
 
         self.orig_name = name  # To avoid repeated concatenation upon reset
-        self.name = name + str(time.time())
+        self.name = name #+ str(time.time())
 
         self.generator_class = generator_class
         self.vehicles = vehicles
@@ -65,6 +65,10 @@ class Scenario(Serializable):
 
         # create a generator instance
         self.generator = self.generator_class(self.net_params, self.name)
+        
+        #<--
+        self.edge_info = self.read_edges_from_xml(omit=["shape", "priority", "type", "id"])
+        #-->
 
         # create the network configuration file from the generator
         self._edges, self._connections = self.generator.generate_net(

@@ -1,3 +1,5 @@
+import xml.etree.ElementTree as ET
+
 from flow.scenarios.base_scenario import Scenario
 from flow.core.params import InitialConfig
 from flow.core.traffic_lights import TrafficLights
@@ -73,55 +75,71 @@ class UDSSCMergingScenario(Scenario):
 
         super().__init__(name, generator_class, vehicles, net_params,
                          initial_config, traffic_lights)
+        
 
     def specify_edge_starts(self):
         """
         See parent class
         """
-        r = self.net_params.additional_params["ring_radius"]
-        x = self.net_params.additional_params["lane_length"]
-        m = self.net_params.additional_params["merge_length"]
-        circumference = 2 * pi * r
+        edge_dict = {}
+        absolute = 0
+        prev_edge = 0
+        for edge in self.specify_absolute_order():
+            
+            if edge.startswith(":"):
+                absolute += float(self.edge_info[edge]["length"])
+                continue
+            new_x = absolute + prev_edge #+ prev_internal
+            edge_dict[edge] = new_x
+            prev_edge = float(self.edge_info[edge]["length"])
+            absolute = new_x
 
-        ring_edgelen = pi * r
-        twelfth = circumference / 12
-
-        edgestarts = [
-            ("right", 0),
-            ("top", 5 * twelfth),
-            ("left", 7 * twelfth),
-            ("bottom", 9 * twelfth),
-            ("inflow_1", 12 * twelfth),
-            ("merge_in_1", circumference + x),
-            ("merge_out_0", circumference + x + m),
-            ("outflow_0", circumference + x + 2*m),
-            ("inflow_0", circumference + 2*x + 2*m),
-            ("merge_in_0", circumference + 3*x + 2*m),
-            ("merge_out_1", circumference + 3*x + 3*m),
-            ("outflow_1", circumference + 3*x + 4*m),
+        edgestarts = [ #len of prev edge + total prev (including internal edge len)
+            ("right", edge_dict["right"]),
+            ("top", edge_dict["top"]), 
+            ("left", edge_dict["left"]),
+            ("bottom", edge_dict["bottom"]),
+            ("inflow_1", edge_dict["inflow_1"]),
+            ("merge_in_1", edge_dict["merge_in_1"]),
+            ("merge_out_0", edge_dict["merge_out_0"]),
+            ("outflow_0", edge_dict["outflow_0"]),
+            ("inflow_0", edge_dict["inflow_0"]),
+            ("merge_in_0", edge_dict["merge_in_0"]),
+            ("merge_out_1", edge_dict["merge_out_1"]),
+            ("outflow_1", edge_dict["outflow_1"]),
         ]
+
         return edgestarts
 
-        
-    # TODO
     def specify_internal_edge_starts(self):
         """
         See parent class
         """
-        r = self.net_params.additional_params["ring_radius"]
-        lane_length = self.net_params.additional_params["lane_length"]
-
-        ring_edgelen = pi * r
-
-        internal_edgestarts = [
-            (":top_left", 0),
-            (":bottom_left", ring_edgelen + self.intersection_length),
-            (":bottom_right", 2 * ring_edgelen + lane_length
-             + 2 * self.intersection_length),
-            (":top_right", 3 * ring_edgelen + lane_length
-             + 2 * self.intersection_length + self.junction_length)
+        edge_dict = {}
+        absolute = 0
+        prev_edge = 0
+        for edge in self.specify_absolute_order(): # each edge = absolute + len(prev edge) + len(prev internal edge)
+            
+            if not edge.startswith(":"):
+                absolute += float(self.edge_info[edge]["length"])
+                continue
+            new_x = absolute + prev_edge
+            edge_dict[edge] = new_x
+            prev_edge = float(self.edge_info[edge]["length"])
+            absolute = new_x
+             
+        internal_edgestarts = [ # in increasing order
+            (":a_2", edge_dict[":a_2"]),
+            (":b_2", edge_dict[":b_2"]),
+            (":c_2", edge_dict[":c_2"]),
+            (":d_2", edge_dict[":d_2"]),
+            (":g_3", edge_dict[":g_3"]),
+            (":b_0", edge_dict[":b_0"]),
+            (":e_2", edge_dict[":e_2"]),
+            (":e_0", edge_dict[":e_0"]),
+            (":d_0", edge_dict[":d_0"]),
+            (":g_0", edge_dict[":g_0"]),
         ]
-
         return internal_edgestarts
 
     def gen_custom_start_pos(self, initial_config, num_vehicles, **kwargs):
@@ -281,5 +299,34 @@ class UDSSCMergingScenario(Scenario):
         except ZeroDivisionError:
             pass
         startpositions = [('right', 10), ('right',0)]
-        # import ipdb; ipdb.set_trace()
         return startpositions, startlanes
+    
+    def read_edges_from_xml(self, omit=[]):
+        # xml = "/Users/kathyjang/research/rllab-multiagent/learning-traffic/flow/core/debug/cfg/UDSSC_Merge_3-15r2l.net.xml"
+        netfn = "%s.net.xml" % self.generator.name
+        xml = self.generator.cfg_path + netfn
+        tree = ET.parse(xml)
+        root = tree.getroot()
+        edges = {}
+        for edge in root.findall("edge"):
+            e_id = edge.attrib['id']
+            edges[e_id] = edge.attrib
+
+            # Search for a length if internal edges
+            for child in edge.getchildren():
+                if "length" not in edges[e_id] and "length" in child.attrib:
+                    edges[e_id]["length"] = child.attrib["length"]
+            try:
+                for unwanted in omit:
+                    edges[e_id].pop(unwanted)
+            except KeyError:
+                pass
+        return edges
+
+    def specify_absolute_order(self):
+        return [":a_2", "right", ":b_2", "top", ":c_2",
+                "left", ":d_2", "bottom", "inflow_1",
+                ":g_3", "merge_in_1", ":a_0", ":b_0",
+                "merge_out_0", ":e_2", "outflow_0", "inflow_0",
+                ":e_0", "merge_in_0", ":c_0", ":d_0",
+                "merge_out_1", ":g_0", "outflow_1" ]
