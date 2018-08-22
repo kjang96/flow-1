@@ -76,6 +76,7 @@ class UDSSCMergeEnv(Env):
         self.ring_radius = scenario.net_params.additional_params["ring_radius"]
         self.obs_var_labels = \
             ["speed", "pos", "queue_length", "velocity_stats"]
+        self.accels = []
 
         super().__init__(env_params, sumo_params, scenario)
 
@@ -123,10 +124,8 @@ class UDSSCMergeEnv(Env):
 
         """
         try:
-            # import ipdb; ipdb.set_trace()
             # Get normalization factors 
             circ = float(2 * np.pi * self.ring_radius)
-            # max_speed = self.scenario.net_params.additional_params.get("speed_limit")
             max_speed = self.scenario.max_speed 
             merge_0_norm = self.scenario.edge_length('merge_in_0') + \
                         self.scenario.edge_length('inflow_0')
@@ -140,11 +139,10 @@ class UDSSCMergeEnv(Env):
             merge_id_0, merge_id_1 = self.k_closest_to_merge(self.n_merging_in) # TODO check this is sorted
             merge_dists_0 = self.process(self._dist_to_merge_0(merge_id_0),
                                         length=self.n_merging_in,
-                                        normalizer=merge_0_norm) # pad and normalize
+                                        normalizer=merge_0_norm)
             merge_dists_1 = self.process(self._dist_to_merge_1(merge_id_1),
                                         length=self.n_merging_in,
                                         normalizer=merge_1_norm)
-            # import ipdb; ipdb.set_trace()
 
             # Get (ID, dist_from_RL) for the k vehicles closest to 
             # the RL vehicle. 0 if there is no k_closest.
@@ -175,21 +173,16 @@ class UDSSCMergeEnv(Env):
             headway_vel = self.process(self.vehicles.get_speed(headway_ids),
                                     length=self.n_following,
                                     normalizer=max_speed)
-            # return np.array(np.concatenate([speeds, dist_to_intersec, edge_number,
-            #                                 density, velocity_avg,
-            #                                 self.last_change.flatten().tolist()]))
-            # return np.array([normalized_vel, normalized_pos, queue_length,
-            #                  vel_stats]).T
-            # state = np.array([rl_pos, ])
+
             state = np.array(np.concatenate([rl_pos, rl_vel,
                                             merge_dists_0, merge_0_vel,
                                             merge_dists_1, merge_1_vel,
                                             tailway_dists, tailway_vel,
                                             headway_dists, headway_vel]))
                                             
-            # import ipdb; ipdb.set_trace()
         except:
-            import ipdb; ipdb.set_trace()
+            return np.zeros(self.n_obs_vehicles*2)
+
         return state
 
     def sort_by_position(self):
@@ -221,8 +214,8 @@ class UDSSCMergeEnv(Env):
 
         [veh_id, veh_id, veh_id] 
         """
-
-        # close_0 = []
+        edges_0 = ["merge_in_0", "inflow_0", ":e_0",":e_5", ":c_0"]
+        edges_1 = ["merge_in_1", "inflow_1", ":g_3", ":g_5", ":a_0"]
 
         close_0 = sorted(self.vehicles.get_ids_by_edge(["merge_in_0", "inflow_0"]), 
                          key=lambda veh_id:
@@ -237,17 +230,11 @@ class UDSSCMergeEnv(Env):
 
         if len(close_1) > k:
             close_1 = close_1[:k]
-
-        # for i in range(min(k, len(dists_0))):
-        #     close_0[i] = dists_0
-
-        # for i in range(min(k, len(dists_1))):
-        #     close_1[i] = dists_1
         
         return close_0, close_1
 
     def k_closest_to_rl(self, rl_id, k):
-        """
+        """ 
         Return a list of ids and  distances to said rl vehicles
 
         In the form:
@@ -265,7 +252,6 @@ class UDSSCMergeEnv(Env):
         k_headway = []
 
         # Prep.
-        # try:
         route = ["top", "left", "bottom", "right"]
         route = ["top", ":c_2", "left", ":d_2", "bottom", ":a_2", "right", ":b_2"]
         rl_edge = self.vehicles.get_edge(rl_id)
@@ -274,8 +260,6 @@ class UDSSCMergeEnv(Env):
         rl_index = route.index(rl_edge) 
         rl_x = self.get_x_by_id(rl_id)
         rl_pos = self.vehicles.get_position(rl_id)
-        # except:
-        #     import ipdb; ipdb.set_trace()
 
         # Get preceding first.
         for i in range(rl_index, rl_index-2, -1): # Curr  edge and preceding edge
@@ -309,17 +293,9 @@ class UDSSCMergeEnv(Env):
             sorted_vehs = sorted(veh_ids, key=lambda v: self.get_x_by_id(v[0]))
             k_headway += sorted_vehs
 
-        # After this step, truncate if necessary, or pad with zeros.
-        # if len(k_tailway) > k:
-        #     k_tailway = k[-k:]
-                
-        # if len(k_headway) > k:
-        #     k_headway = k[:k]
-
         return k_tailway[::-1], k_headway
 
     def _dist_to_merge_1(self, veh_id):
-        # distances = []
         reference = self.scenario.total_edgestarts_dict["merge_in_1"] + \
                     self.scenario.edge_length("merge_in_1")
         distances = [reference - self.get_x_by_id(v)
@@ -345,4 +321,13 @@ class UDSSCMergeEnv(Env):
                 state = state[:length]
         state = [x / normalizer for x in state]
         return state
+        
+    def additional_command(self):
+        try: 
+            # self.velocities.append(np.mean(self.vehicles.get_speed(self.vehicles.get_controlled_ids())))
+            self.velocities.append(np.mean(self.vehicles.get_speed(self.vehicles.get_ids())))
+        except AttributeError:
+            self.velocities = []
+            # self.velocities.append(np.mean(self.vehicles.get_speed(self.vehicles.get_controlled_ids())))
+            self.velocities.append(np.mean(self.vehicles.get_speed(self.vehicles.get_ids())))
         
