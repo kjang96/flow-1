@@ -5,8 +5,8 @@ generation, serialization, and visualization.
 import json
 from copy import deepcopy
 
-from flow.core.params import SumoLaneChangeParams, SumoCarFollowingParams, \
-    SumoParams, InitialConfig, EnvParams, NetParams, InFlows
+from flow.core.params import SumoParams, InitialConfig, EnvParams, NetParams, \
+    InFlows
 from flow.core.traffic_lights import TrafficLights
 from flow.core.vehicles import Vehicles
 
