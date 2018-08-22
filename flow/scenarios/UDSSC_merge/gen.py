@@ -29,14 +29,17 @@ class UDSSCMergingGenerator(Generator):
         x = net_params.additional_params["lane_length"]
         m = self.net_params.additional_params["merge_length"]
 
-        nodes = [{"id": "a",   "x": repr(0),  "y": repr(-r), "type": "priority"},
-                 {"id": "b",   "x": repr(0.5 * r),  "y": repr(sqrt(3)/2 * r), "type": "priority"},
-                 {"id": "c",   "x": repr(-0.5 * r),  "y": repr(sqrt(3)/2 * r), "type": "priority"},
-                 {"id": "d",   "x": repr(-r), "y": repr(0), "type": "priority"},
-                 {"id": "e",   "x": repr(0), "y": repr(r + m)},
-                 {"id": "f",   "x": repr(0), "y": repr(r + m + x)},
-                 {"id": "g",   "x": repr(-r - m), "y": repr(-r - 0.1*r)},
-                 {"id": "h",   "x": repr(-r - m - x), "y": repr(-r - 0.2*r)},
+        roundabout_type = "priority"
+        default = "priority"
+
+        nodes = [{"id": "a",   "x": repr(0),  "y": repr(-r), "type": roundabout_type},
+                 {"id": "b",   "x": repr(0.5 * r),  "y": repr(sqrt(3)/2 * r), "type": roundabout_type},
+                 {"id": "c",   "x": repr(-0.5 * r),  "y": repr(sqrt(3)/2 * r), "type": roundabout_type},
+                 {"id": "d",   "x": repr(-r), "y": repr(0), "type": roundabout_type},
+                 {"id": "e",   "x": repr(0), "y": repr(r + m), "type": default},
+                 {"id": "f",   "x": repr(0), "y": repr(r + m + x), "type": default},
+                 {"id": "g",   "x": repr(-r - m), "y": repr(-r - 0.1*r), "type": default},
+                 {"id": "h",   "x": repr(-r - m - x), "y": repr(-r - 0.2*r), "type": default},
                 ]
 
         return nodes
@@ -48,6 +51,7 @@ class UDSSCMergingGenerator(Generator):
         r = net_params.additional_params["ring_radius"]
         x = net_params.additional_params["lane_length"]
         circumference = 2 * pi * r
+        lanes = repr(2)
         
         resolution = net_params.additional_params["resolution"]
 
@@ -60,7 +64,7 @@ class UDSSCMergingGenerator(Generator):
              "type": "edgeType_hi",
              "from": "d",
              "to": "a",
-             "numLanes": repr(2),
+             "numLanes": lanes,
              "length": repr(twelfth * 3),
              "shape": " ".join(["%.2f,%.2f" % (r * cos(t), r * sin(t))
                                 for t in linspace(-pi, -pi/2 , resolution)])},
@@ -69,7 +73,7 @@ class UDSSCMergingGenerator(Generator):
              "type": "edgeType_hi",
              "from": "a",
              "to": "b",
-             "numLanes": repr(2),
+             "numLanes": lanes,
              "length": repr(twelfth * 5),
              "shape": " ".join(["%.2f,%.2f" % (r * cos(t), r * sin(t))
                                 for t in linspace(-pi / 2,pi/3, resolution)])},
@@ -78,7 +82,7 @@ class UDSSCMergingGenerator(Generator):
              "type": "edgeType_hi",
              "from": "b",
              "to": "c",
-             "numLanes": repr(2),
+             "numLanes": lanes,
              "length": repr(twelfth * 2),
              "shape": " ".join(["%.2f,%.2f" % (r * cos(t), r * sin(t))
                                 for t in linspace(pi/3, 2*pi/3, resolution)])},
@@ -87,7 +91,7 @@ class UDSSCMergingGenerator(Generator):
              "type": "edgeType_hi",
              "from": "c",
              "to": "d", 
-             "numLanes": repr(2),
+             "numLanes": lanes,
              "length": repr(twelfth * 2),
              "shape": " ".join(["%.2f,%.2f" % (r * cos(t), r * sin(t))
                                 for t in linspace(2*pi/3, pi, resolution)])},
@@ -96,56 +100,56 @@ class UDSSCMergingGenerator(Generator):
              "type": "edgeType_lo",
              "from": "b",
              "to": "e",
-             "numLanes": repr(2),
+             "numLanes": lanes,
             },
 
             {"id": "merge_in_0",
              "type": "edgeType_lo",
              "from": "e",
              "to": "c",
-             "numLanes": repr(2),
+             "numLanes": lanes,
             },
 
             {"id": "outflow_0",
              "type": "edgeType_lo",
              "from": "e",
              "to": "f",
-             "numLanes": repr(2),
+             "numLanes": lanes,
             },
 
             {"id": "inflow_0",
              "type": "edgeType_lo",
              "from": "f",
              "to": "e",
-             "numLanes": repr(2),
+             "numLanes": lanes,
             },
 
             {"id": "merge_out_1",
              "type": "edgeType_lo",
              "from": "d",
              "to": "g",
-             "numLanes": repr(2),
+             "numLanes": lanes,
             },
             
             {"id": "merge_in_1",
              "type": "edgeType_lo",
              "from": "g",
              "to": "a",
-             "numLanes": repr(2),
+             "numLanes": lanes,
             },
 
             {"id": "outflow_1",
              "type": "edgeType_lo",
              "from": "g",
              "to": "h",
-             "numLanes": repr(2),
+             "numLanes": lanes,
             },
 
             {"id": "inflow_1",
              "type": "edgeType_lo",
              "from": "h",
              "to": "g",
-             "numLanes": repr(2),
+             "numLanes": lanes,
             },
         ]
 
