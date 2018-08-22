@@ -30,8 +30,10 @@ def merge_example(sumo_binary=None):
 
     vehicles = Vehicles()
     vehicles.add(veh_id="human",
-                 acceleration_controller=(IDMController, {"noise": 0.2}),
-                 speed_mode="no_collide",
+                 acceleration_controller=(IDMController, {
+                     "noise": 0.2,
+                     "speed_mode": "no_collide",
+                 }),
                  num_vehicles=5)
 
     env_params = EnvParams(additional_params=ADDITIONAL_ENV_PARAMS,

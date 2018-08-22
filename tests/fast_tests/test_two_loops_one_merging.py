@@ -20,19 +20,22 @@ def two_loops_one_merging_exp_setup(vehicles=None):
     if vehicles is None:
         vehicles = Vehicles()
         vehicles.add(veh_id="rl",
-                     acceleration_controller=(RLController, {}),
+                     acceleration_controller=(RLController, dict(
+                         speed_mode="no_collide",
+                     )),
                      lane_change_controller=(StaticLaneChanger, {}),
-                     speed_mode="no_collide",
                      num_vehicles=1)
         vehicles.add(veh_id="idm",
-                     acceleration_controller=(IDMController, {}),
+                     acceleration_controller=(IDMController, dict(
+                         speed_mode="no_collide",
+                     )),
                      lane_change_controller=(StaticLaneChanger, {}),
-                     speed_mode="no_collide",
                      num_vehicles=5)
         vehicles.add(veh_id="merge-idm",
-                     acceleration_controller=(IDMController, {}),
+                     acceleration_controller=(IDMController, dict(
+                         speed_mode="no_collide",
+                     )),
                      lane_change_controller=(StaticLaneChanger, {}),
-                     speed_mode="no_collide",
                      num_vehicles=5)
 
     env_params = EnvParams(additional_params=ADDITIONAL_ENV_PARAMS)

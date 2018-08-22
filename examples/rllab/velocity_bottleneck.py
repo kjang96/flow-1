@@ -9,6 +9,7 @@ from flow.core.traffic_lights import TrafficLights
 
 from flow.scenarios.bottleneck.gen import BottleneckGenerator
 from flow.scenarios.bottleneck.scenario import BottleneckScenario
+from flow.controllers.car_following_models import SumoCarFollowingController
 from flow.controllers.lane_change_controllers import SumoLaneChangeController
 from flow.controllers.routing_controllers import ContinuousRouter
 from flow.controllers.rlcontroller import RLController
@@ -34,18 +35,22 @@ sumo_params = SumoParams(sim_step=0.5, sumo_binary="sumo",
 vehicles = Vehicles()
 
 vehicles.add(veh_id="human",
-             speed_mode=9,
-             lane_change_controller=(SumoLaneChangeController, {}),
+             acceleration_controller=(SumoCarFollowingController, dict(
+                 speed_mode=9,
+             )),
+             lane_change_controller=(SumoLaneChangeController, dict(
+                 lane_change_mode=0,  # 1621,#0b100000101,
+             )),
              routing_controller=(ContinuousRouter, {}),
-             lane_change_mode=0,  # 1621,#0b100000101,
              num_vehicles=1 * SCALING)
 vehicles.add(veh_id="followerstopper",
-             acceleration_controller=(RLController,
-                                      {"fail_safe": "instantaneous"}),
-             lane_change_controller=(SumoLaneChangeController, {}),
+             acceleration_controller=(RLController, dict(
+                 speed_mode=9,
+             )),
+             lane_change_controller=(SumoLaneChangeController, dict(
+                 lane_change_mode=0,
+             )),
              routing_controller=(ContinuousRouter, {}),
-             speed_mode=9,
-             lane_change_mode=0,
              num_vehicles=1 * SCALING)
 
 horizon = 1000

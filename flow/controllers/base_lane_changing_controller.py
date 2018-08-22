@@ -1,6 +1,22 @@
+from flow.core.params import SumoLaneChangeParams
+import logging
+
+LC_MODES = {
+    # execute all TraCI commands
+    "aggressive": 0,
+    # collision avoidance and safety-gap enforcement
+    "no_lat_collide": 512,
+    # the laneChangeModel may execute all changes unless in conflict with TraCI
+    "strategic": 1621
+}
+
+
 class BaseLaneChangeController:
 
-    def __init__(self, veh_id, lane_change_params={}):
+    def __init__(self,
+                 veh_id,
+                 lane_change_mode="no_lat_collide",
+                 sumo_lc_params=None):
         """Base class for lane-changing controllers.
 
         Instantiates a controller and forces the user to pass a
@@ -12,17 +28,43 @@ class BaseLaneChangeController:
         ----------
         veh_id: string
             ID of the vehicle this controller is used for
-        lane_change_params: dict
-            Dictionary of lane changes params that may optional contain
-            "min_gap", which denotes the minimize safe gap (in meters) a car
-            is willing to lane-change into.
+        lane_change_mode: str or int, optional
+            may be one of the following:
+
+            * "no_lat_collide" (default): Human cars will not make lane
+              changes, RL cars can lane change into any space, no matter how
+              likely it is to crash
+            * "strategic": Human cars make lane changes in accordance with SUMO
+              to provide speed boosts
+            * "aggressive": RL cars are not limited by sumo with regard to
+              their lane-change actions, and can crash longitudinally
+            * int values may be used to define custom lane change modes for the
+              given vehicles, specified at:
+              http://sumo.dlr.de/wiki/TraCI/Change_Vehicle_State#lane_change_mode_.280xb6.29
+
+        sumo_lc_params: flow.core.params.SumoLaneChangeParams type
+            Params object specifying attributes for Sumo lane changing model.
         """
+        if sumo_lc_params is None:
+            sumo_lc_params = SumoLaneChangeParams()
+
         self.veh_id = veh_id
-        self.lane_change_params = lane_change_params
+        self.sumo_lc_params = sumo_lc_params
+
+        # adjust the lane change mode value
+        if isinstance(lane_change_mode, str) and lane_change_mode in LC_MODES:
+            lane_change_mode = LC_MODES[lane_change_mode]
+        elif not (isinstance(lane_change_mode, int)
+                  or isinstance(lane_change_mode, float)):
+            logging.error("Setting lane change mode of {0} to "
+                          "default.".format(veh_id))
+            lane_change_mode = LC_MODES["no_lat_collide"]
+
+        self.lane_change_mode = lane_change_mode
 
         # min_gap defines the minimum gap (in meters) that a car is willing
         # to accept in front and behind it to enter a gap
-        self.min_gap = lane_change_params.get("min_gap", 0.1)
+        self.min_gap = sumo_lc_params.controller_params.get("min_gap", 0.1)
 
     def get_lane_change_action(self, env):
         """Specifies the lane change action to be performed.

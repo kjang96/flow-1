@@ -23,14 +23,17 @@ def run_task(*_):
 
     vehicles = Vehicles()
     vehicles.add(veh_id="rl",
-                 acceleration_controller=(RLController, {}),
+                 acceleration_controller=(RLController, dict(
+                     speed_mode="no_collide",
+                 )),
                  routing_controller=(ContinuousRouter, {}),
-                 speed_mode="no_collide",
                  num_vehicles=1)
     vehicles.add(veh_id="idm",
-                 acceleration_controller=(IDMController, {"noise": 0.2}),
+                 acceleration_controller=(IDMController, dict(
+                     noise=0.2,
+                     speed_mode="no_collide",
+                 )),
                  routing_controller=(ContinuousRouter, {}),
-                 speed_mode="no_collide",
                  num_vehicles=13)
 
     additional_env_params = {"target_velocity": 20,

@@ -22,10 +22,11 @@ def figure_eight_example(sumo_binary=None):
 
     vehicles = Vehicles()
     vehicles.add(veh_id="idm",
-                 acceleration_controller=(IDMController, {}),
+                 acceleration_controller=(IDMController, dict(
+                     speed_mode="no_collide"
+                 )),
                  lane_change_controller=(StaticLaneChanger, {}),
                  routing_controller=(ContinuousRouter, {}),
-                 speed_mode="no_collide",
                  initial_speed=0,
                  num_vehicles=14)
 

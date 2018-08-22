@@ -6,7 +6,8 @@ from flow.core.vehicles import Vehicles
 from flow.core.params import SumoCarFollowingParams, NetParams, InitialConfig
 from flow.controllers.car_following_models import IDMController, \
     SumoCarFollowingController
-from flow.controllers.lane_change_controllers import StaticLaneChanger
+from flow.controllers.lane_change_controllers import StaticLaneChanger, \
+    SumoLaneChangeController
 from flow.controllers.rlcontroller import RLController
 
 from tests.setup_scripts import ring_road_exp_setup
@@ -26,25 +27,34 @@ class TestVehiclesClass(unittest.TestCase):
         """
         vehicles = Vehicles()
         vehicles.add("typeA",
-                     acceleration_controller=(IDMController, {}),
-                     speed_mode='no_collide',
-                     lane_change_mode="no_lat_collide")
+                     acceleration_controller=(IDMController, dict(
+                         speed_mode='no_collide',
+                     )),
+                     lane_change_controller=(SumoLaneChangeController, dict(
+                         lane_change_mode="no_lat_collide"
+                     )))
 
         self.assertEqual(vehicles.get_speed_mode("typeA_0"), 1)
         self.assertEqual(vehicles.get_lane_change_mode("typeA_0"), 256)
 
         vehicles.add("typeB",
-                     acceleration_controller=(IDMController, {}),
-                     speed_mode='aggressive',
-                     lane_change_mode="strategic")
+                     acceleration_controller=(IDMController, dict(
+                         speed_mode='aggressive',
+                     )),
+                     lane_change_controller=(SumoLaneChangeController, dict(
+                         lane_change_mode="strategic"
+                     )))
 
         self.assertEqual(vehicles.get_speed_mode("typeB_0"), 0)
         self.assertEqual(vehicles.get_lane_change_mode("typeB_0"), 853)
 
         vehicles.add("typeC",
-                     acceleration_controller=(IDMController, {}),
-                     speed_mode=31,
-                     lane_change_mode=277)
+                     acceleration_controller=(IDMController, dict(
+                         speed_mode=31,
+                     )),
+                     lane_change_controller=(SumoLaneChangeController, dict(
+                         lane_change_mode=277
+                     )))
         self.assertEqual(vehicles.get_speed_mode("typeC_0"), 31)
         self.assertEqual(vehicles.get_lane_change_mode("typeC_0"), 277)
 
@@ -57,18 +67,24 @@ class TestVehiclesClass(unittest.TestCase):
         # vehicle, then its minGap is equal to 0
         vehicles = Vehicles()
         vehicles.add("typeA",
-                     acceleration_controller=(IDMController, {}),
-                     speed_mode='no_collide',
-                     lane_change_mode="no_lat_collide")
+                     acceleration_controller=(IDMController, dict(
+                         speed_mode='no_collide',
+                     )),
+                     lane_change_controller=(SumoLaneChangeController, dict(
+                         lane_change_mode="no_lat_collide"
+                     )))
         self.assertEqual(vehicles.types[0]["type_params"]["minGap"], 0)
 
         # check that, if the vehicle is a SumoCarFollowingController vehicle,
         # then its minGap, accel, and decel are set to default
         vehicles = Vehicles()
         vehicles.add("typeA",
-                     acceleration_controller=(SumoCarFollowingController, {}),
-                     speed_mode='no_collide',
-                     lane_change_mode="no_lat_collide")
+                     acceleration_controller=(SumoCarFollowingController, dict(
+                         speed_mode='no_collide',
+                     )),
+                     lane_change_controller=(SumoLaneChangeController, dict(
+                         lane_change_mode="no_lat_collide"
+                     )))
         default_mingap = SumoCarFollowingParams().controller_params["minGap"]
         self.assertEqual(vehicles.types[0]["type_params"]["minGap"],
                          default_mingap)

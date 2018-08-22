@@ -24,15 +24,15 @@ class TestCFMController(unittest.TestCase):
         # also make sure that the input params are what is expected
 
         contr_params = {"time_delay": 0, "k_d": 1, "k_v": 1, "k_c": 1,
-                        "d_des": 1, "v_des": 8, "noise": 0}
+                        "d_des": 1, "v_des": 8, "noise": 0,
+                        "sumo_car_following_params": SumoCarFollowingParams(
+                            accel=20, decel=5)}
 
         vehicles = Vehicles()
         vehicles.add(
             veh_id="test_0",
             acceleration_controller=(CFMController, contr_params),
             routing_controller=(ContinuousRouter, {}),
-            sumo_car_following_params=SumoCarFollowingParams(
-                accel=20, decel=5),
             num_vehicles=5
         )
 
@@ -71,15 +71,14 @@ class TestBCMController(unittest.TestCase):
         # also make sure that the input params are what is expected
         contr_params = \
             {"time_delay": 0, "k_d": 1, "k_v": 1, "k_c": 1, "d_des": 1,
-             "v_des": 8, "noise": 0}
+             "v_des": 8, "noise": 0, "sumo_car_following_params":
+                 SumoCarFollowingParams(accel=15, decel=5)}
 
         vehicles = Vehicles()
         vehicles.add(
             veh_id="test",
             acceleration_controller=(BCMController, contr_params),
             routing_controller=(ContinuousRouter, {}),
-            sumo_car_following_params=SumoCarFollowingParams(
-                accel=15, decel=5),
             num_vehicles=5
         )
 
@@ -117,15 +116,15 @@ class TestOVMController(unittest.TestCase):
         # add a few vehicles to the network using the requested model
         # also make sure that the input params are what is expected
         contr_params = {"time_delay": 0, "alpha": 1, "beta": 1, "h_st": 2,
-                        "h_go": 15, "v_max": 30, "noise": 0}
+                        "h_go": 15, "v_max": 30, "noise": 0,
+                        "sumo_car_following_params": SumoCarFollowingParams(
+                            accel=15, decel=5)}
 
         vehicles = Vehicles()
         vehicles.add(
             veh_id="test",
             acceleration_controller=(OVMController, contr_params),
             routing_controller=(ContinuousRouter, {}),
-            sumo_car_following_params=SumoCarFollowingParams(
-                accel=15, decel=5),
             num_vehicles=5
         )
 
@@ -165,15 +164,14 @@ class TestLinearOVM(unittest.TestCase):
         # also make sure that the input params are what is expected
         contr_params = \
             {"time_delay": 0, "v_max": 30, "adaptation": 0.65,
-             "h_st": 5, "noise": 0}
+             "h_st": 5, "noise": 0, "sumo_car_following_params":
+                 SumoCarFollowingParams(accel=15, decel=5)}
 
         vehicles = Vehicles()
         vehicles.add(
             veh_id="test",
             acceleration_controller=(LinearOVM, contr_params),
             routing_controller=(ContinuousRouter, {}),
-            sumo_car_following_params=SumoCarFollowingParams(
-                accel=15, decel=5),
             num_vehicles=5
         )
 
@@ -211,15 +209,14 @@ class TestIDMController(unittest.TestCase):
         # add a few vehicles to the network using the requested model
         # also make sure that the input params are what is expected
         contr_params = {"v0": 30, "b": 1.5, "delta": 4,
-                        "s0": 2, "noise": 0}
+                        "s0": 2, "noise": 0, "sumo_car_following_params":
+                            SumoCarFollowingParams(tau=1, accel=1, decel=5)}
 
         vehicles = Vehicles()
         vehicles.add(
             veh_id="test",
             acceleration_controller=(IDMController, contr_params),
             routing_controller=(ContinuousRouter, {}),
-            sumo_car_following_params=SumoCarFollowingParams(
-                tau=1, accel=1, decel=5),
             num_vehicles=5
         )
 

@@ -47,12 +47,15 @@ additional_net_params["pre_merge_length"] = 500
 # RL vehicles constitute 5% of the total number of vehicles
 vehicles = Vehicles()
 vehicles.add(veh_id="human",
-             acceleration_controller=(IDMController, {"noise": 0.2}),
-             speed_mode="no_collide",
+             acceleration_controller=(IDMController, dict(
+                 noise=0.2,
+                 speed_mode="no_collide",
+             )),
              num_vehicles=5)
 vehicles.add(veh_id="rl",
-             acceleration_controller=(RLController, {}),
-             speed_mode="no_collide",
+             acceleration_controller=(RLController, dict(
+                 speed_mode="no_collide",
+             )),
              num_vehicles=0)
 
 # Vehicles are introduced from both sides of merge, with RL vehicles entering

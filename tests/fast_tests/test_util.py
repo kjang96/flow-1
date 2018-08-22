@@ -87,14 +87,17 @@ class TestRegistry(unittest.TestCase):
         # use a flow_params dict derived from flow/benchmarks/figureeight0.py
         vehicles = Vehicles()
         vehicles.add(veh_id="human",
-                     acceleration_controller=(IDMController, {"noise": 0.2}),
+                     acceleration_controller=(IDMController, dict(
+                         noise=0.2,
+                         speed_mode="no_collide",
+                     )),
                      routing_controller=(ContinuousRouter, {}),
-                     speed_mode="no_collide",
                      num_vehicles=13)
         vehicles.add(veh_id="rl",
-                     acceleration_controller=(RLController, {}),
+                     acceleration_controller=(RLController, dict(
+                         speed_mode="no_collide",
+                     )),
                      routing_controller=(ContinuousRouter, {}),
-                     speed_mode="no_collide",
                      num_vehicles=1)
 
         flow_params = dict(
@@ -185,12 +188,14 @@ class TestRllib(unittest.TestCase):
         # use a flow_params dict derived from flow/benchmarks/merge0.py
         vehicles = Vehicles()
         vehicles.add(veh_id="human",
-                     acceleration_controller=(IDMController, {}),
-                     speed_mode="no_collide",
+                     acceleration_controller=(IDMController, dict(
+                         speed_mode="no_collide",
+                     )),
                      num_vehicles=5)
         vehicles.add(veh_id="rl",
-                     acceleration_controller=(RLController, {}),
-                     speed_mode="no_collide",
+                     acceleration_controller=(RLController, dict(
+                         speed_mode="no_collide",
+                     )),
                      num_vehicles=0)
 
         inflow = InFlows()

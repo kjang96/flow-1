@@ -1,10 +1,27 @@
 import numpy as np
+import logging
+from flow.core.params import SumoCarFollowingParams
+
+SPEED_MODES = {
+    # execute all TraCI commands
+    "aggressive": 0,
+    # TraCI commands are clipped to conform with safe speeds
+    "no_collide": 1,
+    #
+    "right_of_way": 25,
+    # all checks on regarding safe speed, maximum acceleration, maximum
+    # deceleration, right of way at intersections, and brake hard to avoid
+    # passing a red light
+    "all_checks": 31
+}
 
 
 class BaseController:
+
     def __init__(self,
                  veh_id,
-                 sumo_cf_params,
+                 speed_mode='right_of_way',
+                 sumo_car_following_params=None,
                  delay=0,
                  fail_safe=None,
                  noise=0):
@@ -19,12 +36,24 @@ class BaseController:
         ----------
         veh_id: string
             ID of the vehicle this controller is used for
-        sumo_cf_params: SumoCarFollowingParams
-            The underlying sumo model for car that will be overwritten. A Flow
-            controller will override the behavior this sumo car following
-            model; however, if control is ceded back to sumo, the vehicle will
-            use these params. Ensure that accel / decel parameters that are
-            specified to in this model are as desired.
+        speed_mode: str or int, optional
+            may be one of the following:
+
+             * "right_of_way" (default): respect safe speed, right of way and
+               brake hard at red lights if needed. DOES NOT respect
+               max accel and decel which enables emergency stopping.
+               Necessary to prevent custom models from crashing
+             * "no_collide": Human and RL cars are preventing from reaching
+               speeds that may cause crashes (also serves as a failsafe).
+             * "aggressive": Human and RL cars are not limited by sumo with
+               regard to their accelerations, and can crash longitudinally
+             * "all_checks": all sumo safety checks are activated
+             * int values may be used to define custom speed mode for the given
+               vehicles, specified at:
+               http://sumo.dlr.de/wiki/TraCI/Change_Vehicle_State#speed_mode_.280xb3.29
+
+        sumo_car_following_params: flow.core.params.SumoCarFollowingParams type
+            Params object specifying attributes for Sumo car following model.
         delay: int
             delay in applying the action (time)
         fail_safe: string
@@ -33,6 +62,9 @@ class BaseController:
             variance of the gaussian from which to sample a noisy acceleration
 
         """
+        if sumo_car_following_params is None:
+            sumo_car_following_params = SumoCarFollowingParams()
+
         self.veh_id = veh_id
         self.sumo_controller = False
 
@@ -45,11 +77,22 @@ class BaseController:
         # longitudinal failsafe used by the vehicle
         self.fail_safe = fail_safe
 
-        self.max_accel = sumo_cf_params.controller_params['accel']
+        self.max_accel = sumo_car_following_params.controller_params['accel']
         # max deaccel should always be a positive
-        self.max_deaccel = abs(sumo_cf_params.controller_params['decel'])
+        self.max_deaccel = abs(
+            sumo_car_following_params.controller_params['decel'])
 
-        self.sumo_cf_params = sumo_cf_params
+        # adjust the speed mode value
+        if isinstance(speed_mode, str) and speed_mode in SPEED_MODES:
+            speed_mode = SPEED_MODES[speed_mode]
+        elif not (isinstance(speed_mode, int)
+                  or isinstance(speed_mode, float)):
+            logging.error("Setting speed mode of {0} to "
+                          "default.".format(veh_id))
+            speed_mode = SPEED_MODES["no_collide"]
+
+        self.speed_mode = speed_mode
+        self.sumo_cf_params = sumo_car_following_params
 
     def uses_sumo(self):
         return self.sumo_controller

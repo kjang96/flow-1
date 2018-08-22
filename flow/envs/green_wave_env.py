@@ -345,12 +345,12 @@ class TrafficLightGridEnv(Env):
             self.traci_connection.vehicle.remove(veh_id)
             # reintroduce it at the start of the network
             type_id = self.vehicles.get_state(veh_id, "type")
+            speed_mode = self.vehicles.get_acc_controller(veh_id).speed_mode
             lane_index = self.vehicles.get_lane(veh_id)
             self.traci_connection.vehicle.addFull(
                 veh_id, route_id, typeID=str(type_id),
                 departLane=str(lane_index),
                 departPos="0", departSpeed="max")
-            speed_mode = self.vehicles.type_parameters[type_id]["speed_mode"]
             self.traci_connection.vehicle.setSpeedMode(veh_id, speed_mode)
 
     def k_closest_to_intersection(self, edges, k):

@@ -14,7 +14,8 @@ from flow.core.params import SumoParams, EnvParams, InitialConfig, NetParams, \
     InFlows
 from flow.core.traffic_lights import TrafficLights
 from flow.core.vehicles import Vehicles
-from flow.controllers import RLController, ContinuousRouter
+from flow.controllers import RLController, ContinuousRouter, \
+    SumoLaneChangeController, SumoCarFollowingController
 
 # time horizon of a single rollout
 HORIZON = 1000
@@ -27,15 +28,22 @@ AV_FRAC = 0.25
 
 vehicles = Vehicles()
 vehicles.add(veh_id="human",
-             speed_mode=9,
+             acceleration_controller=(SumoCarFollowingController, dict(
+                 speed_mode=9,
+             )),
+             lane_change_controller=(SumoLaneChangeController, dict(
+                 lane_change_mode=1621,
+             )),
              routing_controller=(ContinuousRouter, {}),
-             lane_change_mode=1621,
              num_vehicles=1 * SCALING)
 vehicles.add(veh_id="rl",
-             acceleration_controller=(RLController, {}),
+             acceleration_controller=(RLController, dict(
+                 speed_mode=9,
+             )),
+             lane_change_controller=(SumoLaneChangeController, dict(
+                 lane_change_mode=0,
+             )),
              routing_controller=(ContinuousRouter, {}),
-             speed_mode=9,
-             lane_change_mode=0,
              num_vehicles=1 * SCALING)
 
 controlled_segments = [("1", 1, False), ("2", 2, True), ("3", 2, True),

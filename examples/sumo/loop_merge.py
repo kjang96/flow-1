@@ -26,23 +26,27 @@ def loop_merge_example(sumo_binary=None):
     # so place the merging vehicles after the vehicles in the ring
     vehicles = Vehicles()
     vehicles.add(veh_id="idm",
-                 acceleration_controller=(IDMController, {}),
-                 lane_change_controller=(SumoLaneChangeController, {}),
+                 acceleration_controller=(IDMController, dict(
+                     speed_mode="no_collide",
+                     sumo_car_following_params=SumoCarFollowingParams(
+                         minGap=0.0, tau=0.5),
+                 )),
+                 lane_change_controller=(SumoLaneChangeController, dict(
+                     sumo_lc_params=SumoLaneChangeParams()
+                 )),
                  routing_controller=(ContinuousRouter, {}),
-                 num_vehicles=7,
-                 speed_mode="no_collide",
-                 sumo_car_following_params=SumoCarFollowingParams(
-                     minGap=0.0, tau=0.5),
-                 sumo_lc_params=SumoLaneChangeParams())
+                 num_vehicles=7)
     vehicles.add(veh_id="merge-idm",
-                 acceleration_controller=(IDMController, {}),
-                 lane_change_controller=(SumoLaneChangeController, {}),
+                 acceleration_controller=(IDMController, dict(
+                     speed_mode="no_collide",
+                     sumo_car_following_params=SumoCarFollowingParams(
+                         minGap=0.01, tau=0.5),
+                 )),
+                 lane_change_controller=(SumoLaneChangeController, dict(
+                     sumo_lc_params=SumoLaneChangeParams()
+                 )),
                  routing_controller=(ContinuousRouter, {}),
-                 num_vehicles=10,
-                 speed_mode="no_collide",
-                 sumo_car_following_params=SumoCarFollowingParams(
-                     minGap=0.01, tau=0.5),
-                 sumo_lc_params=SumoLaneChangeParams())
+                 num_vehicles=10)
 
     env_params = EnvParams(additional_params=ADDITIONAL_ENV_PARAMS)
 

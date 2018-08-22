@@ -135,10 +135,11 @@ class TestPOEnv(unittest.TestCase):
     def setUp(self):
         vehicles = Vehicles()
         vehicles.add(veh_id="idm",
-                     acceleration_controller=(IDMController, {}),
+                     acceleration_controller=(IDMController, dict(
+                         sumo_car_following_params=SumoCarFollowingParams(
+                             min_gap=2.5, tau=1.1),
+                     )),
                      routing_controller=(GridRouter, {}),
-                     sumo_car_following_params=SumoCarFollowingParams(
-                         min_gap=2.5, tau=1.1),
                      num_vehicles=16)
 
         self.env, scenario = grid_mxn_exp_setup(row_num=1, col_num=3,
@@ -202,10 +203,11 @@ class TestItRuns(unittest.TestCase):
     def setUp(self):
         vehicles = Vehicles()
         vehicles.add(veh_id="idm",
-                     acceleration_controller=(IDMController, {}),
+                     acceleration_controller=(IDMController, dict(
+                         sumo_car_following_params=SumoCarFollowingParams(
+                             min_gap=2.5, tau=1.1),
+                     )),
                      routing_controller=(GridRouter, {}),
-                     sumo_car_following_params=SumoCarFollowingParams(
-                         min_gap=2.5, tau=1.1),
                      num_vehicles=16)
 
         env, scenario = grid_mxn_exp_setup(row_num=1, col_num=3,

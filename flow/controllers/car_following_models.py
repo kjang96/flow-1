@@ -18,12 +18,13 @@ class CFMController(BaseController):
 
     def __init__(self,
                  veh_id,
-                 sumo_cf_params,
                  k_d=1,
                  k_v=1,
                  k_c=1,
                  d_des=1,
                  v_des=8,
+                 speed_mode='right_of_way',
+                 sumo_car_following_params=None,
                  time_delay=0.0,
                  noise=0,
                  fail_safe=None):
@@ -33,8 +34,6 @@ class CFMController(BaseController):
         ----------
         veh_id : str
             Vehicle ID for SUMO identification
-        sumo_cf_params : SumoCarFollowingParams
-            see parent class
         k_d : float
             headway gain (default: 1)
         k_v : float, optional
@@ -45,6 +44,10 @@ class CFMController(BaseController):
             desired headway (default: 1)
         v_des : float, optional
             desired velocity (default: 8)
+        speed_mode : str
+            see parent class
+        sumo_car_following_params : SumoCarFollowingParams
+            see parent class
         time_delay : float, optional
             time delay (default: 0.0)
         noise : float, optional
@@ -53,9 +56,10 @@ class CFMController(BaseController):
             type of flow-imposed failsafe the vehicle should posses, defaults
             to no failsafe (None)
         """
-        BaseController.__init__(self, veh_id, sumo_cf_params,
-                                delay=time_delay, fail_safe=fail_safe,
-                                noise=noise)
+        BaseController.__init__(
+            self, veh_id, speed_mode=speed_mode,
+            sumo_car_following_params=sumo_car_following_params,
+            delay=time_delay, fail_safe=fail_safe, noise=noise)
 
         self.veh_id = veh_id
         self.k_d = k_d
@@ -82,12 +86,13 @@ class BCMController(BaseController):
 
     def __init__(self,
                  veh_id,
-                 sumo_cf_params,
                  k_d=1,
                  k_v=1,
                  k_c=1,
                  d_des=1,
                  v_des=8,
+                 speed_mode='right_of_way',
+                 sumo_car_following_params=None,
                  time_delay=0.0,
                  noise=0,
                  fail_safe=None):
@@ -98,8 +103,6 @@ class BCMController(BaseController):
         ----------
         veh_id: str
             Vehicle ID for SUMO identification
-        sumo_cf_params: SumoCarFollowingParams
-            see parent class
         k_d: float, optional
             gain on distances to lead/following cars (default: 1)
         k_v: float, optional
@@ -110,6 +113,10 @@ class BCMController(BaseController):
             desired headway (default: 1)
         v_des: float, optional
             desired velocity (default: 8)
+        speed_mode : str
+            see parent class
+        sumo_car_following_params : SumoCarFollowingParams
+            see parent class
         time_delay: float, optional
             time delay (default: 0.5)
         noise: float, optional
@@ -118,9 +125,10 @@ class BCMController(BaseController):
             type of flow-imposed failsafe the vehicle should posses, defaults
             to no failsafe (None)
         """
-        BaseController.__init__(self, veh_id, sumo_cf_params,
-                                delay=time_delay, fail_safe=fail_safe,
-                                noise=noise)
+        BaseController.__init__(
+            self, veh_id, speed_mode=speed_mode,
+            sumo_car_following_params=sumo_car_following_params,
+            delay=time_delay, fail_safe=fail_safe, noise=noise)
 
         self.veh_id = veh_id
         self.k_d = k_d
@@ -159,12 +167,13 @@ class OVMController(BaseController):
 
     def __init__(self,
                  veh_id,
-                 sumo_cf_params,
                  alpha=1,
                  beta=1,
                  h_st=2,
                  h_go=15,
                  v_max=30,
+                 speed_mode='right_of_way',
+                 sumo_car_following_params=None,
                  time_delay=0,
                  noise=0,
                  fail_safe=None):
@@ -174,8 +183,6 @@ class OVMController(BaseController):
         ----------
         veh_id: str
             Vehicle ID for SUMO identification
-        sumo_cf_params: SumoCarFollowingParams
-            see parent class
         alpha: float, optional
             gain on desired velocity to current velocity difference
             (default: 0.6)
@@ -188,6 +195,10 @@ class OVMController(BaseController):
             headway for full speed (default: 35)
         v_max: float, optional
             max velocity (default: 30)
+        speed_mode : str
+            see parent class
+        sumo_car_following_params : SumoCarFollowingParams
+            see parent class
         time_delay: float, optional
             time delay (default: 0.5)
         noise: float, optional
@@ -196,9 +207,10 @@ class OVMController(BaseController):
             type of flow-imposed failsafe the vehicle should posses, defaults
             to no failsafe (None)
         """
-        BaseController.__init__(self, veh_id, sumo_cf_params,
-                                delay=time_delay, fail_safe=fail_safe,
-                                noise=noise)
+        BaseController.__init__(
+            self, veh_id, speed_mode=speed_mode,
+            sumo_car_following_params=sumo_car_following_params,
+            delay=time_delay, fail_safe=fail_safe, noise=noise)
         self.veh_id = veh_id
         self.v_max = v_max
         self.alpha = alpha
@@ -232,7 +244,8 @@ class LinearOVM(BaseController):
 
     def __init__(self,
                  veh_id,
-                 sumo_cf_params,
+                 speed_mode='right_of_way',
+                 sumo_car_following_params=None,
                  v_max=30,
                  adaptation=0.65,
                  h_st=5,
@@ -245,14 +258,16 @@ class LinearOVM(BaseController):
         ----------
         veh_id: str
             Vehicle ID for SUMO identification
-        sumo_cf_params: SumoCarFollowingParams
-            see parent class
         v_max: float, optional
             max velocity (default: 30)
         adaptation: float
             adaptation constant (default: 0.65)
         h_st: float, optional
             headway for stopping (default: 5)
+        speed_mode : str
+            see parent class
+        sumo_car_following_params : SumoCarFollowingParams
+            see parent class
         time_delay: float, optional
             time delay (default: 0.5)
         noise: float, optional
@@ -261,9 +276,10 @@ class LinearOVM(BaseController):
             type of flow-imposed failsafe the vehicle should posses, defaults
             to no failsafe (None)
         """
-        BaseController.__init__(self, veh_id, sumo_cf_params,
-                                delay=time_delay, fail_safe=fail_safe,
-                                noise=noise)
+        BaseController.__init__(
+            self, veh_id, speed_mode=speed_mode,
+            sumo_car_following_params=sumo_car_following_params,
+            delay=time_delay, fail_safe=fail_safe, noise=noise)
         self.veh_id = veh_id
         # 4.8*1.85 for case I, 3.8*1.85 for case II, per Nakayama
         self.v_max = v_max
@@ -297,18 +313,20 @@ class IDMController(BaseController):
                  b=1.5,
                  delta=4,
                  s0=2,
+                 speed_mode='right_of_way',
+                 sumo_car_following_params=None,
                  time_delay=0.0,
-                 dt=0.1,
                  noise=0,
-                 fail_safe=None,
-                 sumo_cf_params=None):
+                 fail_safe=None):
         """Instantiates an Intelligent Driver Model (IDM) controller
 
         Attributes
         ----------
         veh_id: str
             Vehicle ID for SUMO identification
-        sumo_cf_params: SumoCarFollowingParams
+        speed_mode : str
+            see parent class
+        sumo_car_following_params : SumoCarFollowingParams
             see parent class
         v0: float, optional
             desirable velocity, in m/s (default: 30)
@@ -320,24 +338,22 @@ class IDMController(BaseController):
             acceleration exponent (default: 4)
         s0: float, optional
             linear jam distance, in m (default: 2)
-        dt: float, optional
-            timestep, in s (default: 0.1)
         noise: float, optional
             std dev of normal perturbation to the acceleration (default: 0)
         fail_safe: str, optional
             type of flow-imposed failsafe the vehicle should posses, defaults
             to no failsafe (None)
         """
-        BaseController.__init__(self, veh_id, sumo_cf_params,
-                                delay=time_delay, fail_safe=fail_safe,
-                                noise=noise)
+        BaseController.__init__(
+            self, veh_id, speed_mode=speed_mode,
+            sumo_car_following_params=sumo_car_following_params,
+            delay=time_delay, fail_safe=fail_safe, noise=noise)
         self.v0 = v0
         self.T = T
         self.a = a
         self.b = b
         self.delta = delta
         self.s0 = s0
-        self.dt = dt
 
     def get_accel(self, env):
         v = env.vehicles.get_speed(self.veh_id)
@@ -364,7 +380,10 @@ class IDMController(BaseController):
 
 class SumoCarFollowingController(BaseController):
 
-    def __init__(self, veh_id, sumo_cf_params):
+    def __init__(self,
+                 veh_id,
+                 speed_mode='right_of_way',
+                 sumo_car_following_params=None):
         """Instantiates a car-following controller whose actions are purely
         defined by sumo.
 
@@ -376,10 +395,14 @@ class SumoCarFollowingController(BaseController):
         ----------
         veh_id: str
             name of the vehicle
-        sumo_cf_params: SumoCarFollowingParams
+        speed_mode : str
+            see parent class
+        sumo_car_following_params : SumoCarFollowingParams
             see parent class
         """
-        super().__init__(veh_id, sumo_cf_params)
+        super().__init__(veh_id,
+                         speed_mode=speed_mode,
+                         sumo_car_following_params=sumo_car_following_params)
         self.sumo_controller = True
 
     def get_accel(self, env):

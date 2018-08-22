@@ -5,8 +5,13 @@ from flow.controllers.base_lane_changing_controller import \
 class SumoLaneChangeController(BaseLaneChangeController):
     """A controller used to enforce sumo lane-change dynamics on a vehicle."""
 
-    def __init__(self, veh_id):
-        super().__init__(veh_id, lane_change_params={})
+    def __init__(self,
+                 veh_id,
+                 lane_change_mode="no_lat_collide",
+                 sumo_lc_params=None):
+        super().__init__(veh_id,
+                         lane_change_mode=lane_change_mode,
+                         sumo_lc_params=sumo_lc_params)
         self.SumoController = True
 
     def get_lane_change_action(self, env):

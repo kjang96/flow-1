@@ -10,7 +10,8 @@ from flow.core.experiment import SumoExperiment
 from flow.envs.bay_bridge import BayBridgeEnv
 from flow.scenarios.bay_bridge.gen import BayBridgeGenerator
 from flow.scenarios.bay_bridge.scenario import BayBridgeScenario
-from flow.controllers import SumoCarFollowingController, BayBridgeRouter
+from flow.controllers import SumoCarFollowingController, \
+    SumoLaneChangeController, BayBridgeRouter
 
 NETFILE = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                        "bay_bridge.net.xml")
@@ -55,12 +56,15 @@ def bay_bridge_example(sumo_binary=None,
 
     vehicles = Vehicles()
     vehicles.add(veh_id="human",
-                 acceleration_controller=(SumoCarFollowingController, {}),
+                 acceleration_controller=(SumoCarFollowingController, dict(
+                     speed_mode="all_checks",
+                     sumo_car_following_params=sumo_car_following_params,
+                 )),
+                 lane_change_controller=(SumoLaneChangeController, dict(
+                     lane_change_mode="no_lat_collide",
+                     sumo_lc_params=sumo_lc_params,
+                 )),
                  routing_controller=(BayBridgeRouter, {}),
-                 speed_mode="all_checks",
-                 lane_change_mode="no_lat_collide",
-                 sumo_car_following_params=sumo_car_following_params,
-                 sumo_lc_params=sumo_lc_params,
                  num_vehicles=1400)
 
     additional_env_params = {}

@@ -84,14 +84,16 @@ def run_task(*_):
 
     vehicles = Vehicles()
     vehicles.add(veh_id="idm",
-                 acceleration_controller=(SumoCarFollowingController, {}),
-                 sumo_car_following_params=SumoCarFollowingParams(
-                   min_gap=2.5,
-                   tau=1.1,
-                   max_speed=v_enter),
+                 acceleration_controller=(SumoCarFollowingController, dict(
+                     sumo_car_following_params=SumoCarFollowingParams(
+                         min_gap=2.5,
+                         tau=1.1,
+                         max_speed=v_enter
+                     ),
+                     speed_mode="all_checks"
+                 )),
                  routing_controller=(GridRouter, {}),
-                 num_vehicles=tot_cars,
-                 speed_mode="all_checks")
+                 num_vehicles=tot_cars)
 
     tl_logic = TrafficLights(baseline=False)
 

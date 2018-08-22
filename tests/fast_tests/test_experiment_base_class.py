@@ -73,9 +73,10 @@ class TestRLActions(unittest.TestCase):
         # create an environment using AccelEnv with 1 RL vehicle
         vehicles = Vehicles()
         vehicles.add(veh_id="rl",
-                     acceleration_controller=(RLController, {}),
+                     acceleration_controller=(RLController, dict(
+                         speed_mode="aggressive",
+                     )),
                      routing_controller=(ContinuousRouter, {}),
-                     speed_mode="aggressive",
                      num_vehicles=1)
 
         env, scenario = ring_road_exp_setup(vehicles=vehicles)

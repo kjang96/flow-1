@@ -93,14 +93,15 @@ additional_net_params = {"speed_limit": 35, "grid_array": grid_array,
 
 vehicles = Vehicles()
 vehicles.add(veh_id="idm",
-             acceleration_controller=(SumoCarFollowingController, {}),
-             sumo_car_following_params=SumoCarFollowingParams(
-                 minGap=2.5,
-                 max_speed=v_enter,
-             ),
+             acceleration_controller=(SumoCarFollowingController, dict(
+                 sumo_car_following_params=SumoCarFollowingParams(
+                     minGap=2.5,
+                     max_speed=v_enter,
+                 ),
+                 speed_mode="all_checks",
+             )),
              routing_controller=(GridRouter, {}),
-             num_vehicles=tot_cars,
-             speed_mode="all_checks")
+             num_vehicles=tot_cars)
 
 initial_config, net_params = \
     get_non_flow_params(v_enter, additional_net_params)

@@ -21,12 +21,13 @@ class TestCollisions(unittest.TestCase):
         total_vehicles = 20
         vehicles = Vehicles()
         vehicles.add(veh_id="idm",
-                     acceleration_controller=(SumoCarFollowingController, {}),
+                     acceleration_controller=(SumoCarFollowingController, dict(
+                         sumo_car_following_params=SumoCarFollowingParams(
+                             tau=0.1, carFollowModel="Krauss", minGap=2.5),
+                         speed_mode=0b00000,
+                     )),
                      routing_controller=(GridRouter, {}),
-                     sumo_car_following_params=SumoCarFollowingParams(
-                         tau=0.1, carFollowModel="Krauss", minGap=2.5),
-                     num_vehicles=total_vehicles,
-                     speed_mode=0b00000)
+                     num_vehicles=total_vehicles)
         grid_array = {"short_length": 100, "inner_length": 100,
                       "long_length": 100, "row_num": 1,
                       "col_num": 1,
@@ -63,12 +64,13 @@ class TestCollisions(unittest.TestCase):
         total_vehicles = 12
         vehicles = Vehicles()
         vehicles.add(veh_id="idm",
-                     acceleration_controller=(SumoCarFollowingController, {}),
+                     acceleration_controller=(SumoCarFollowingController, dict(
+                         sumo_car_following_params=SumoCarFollowingParams(
+                             tau=0.1, carFollowModel="Krauss", minGap=2.5),
+                         speed_mode=0b00000
+                     )),
                      routing_controller=(GridRouter, {}),
-                     sumo_car_following_params=SumoCarFollowingParams(
-                         tau=0.1, carFollowModel="Krauss", minGap=2.5),
-                     num_vehicles=total_vehicles,
-                     speed_mode=0b00000)
+                     num_vehicles=total_vehicles)
         grid_array = {"short_length": 100, "inner_length": 100,
                       "long_length": 100, "row_num": 1,
                       "col_num": 1,

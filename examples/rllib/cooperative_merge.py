@@ -35,38 +35,42 @@ NUM_MERGE_RL = 1
 vehicles = Vehicles()
 # Inner ring vehicles
 vehicles.add(veh_id="human",
-             acceleration_controller=(IDMController, {"noise": 0.2}),
-             lane_change_controller=(SumoLaneChangeController, {}),
+             acceleration_controller=(IDMController, dict(
+                 noise=0.2,
+                 sumo_car_following_params=SumoCarFollowingParams(
+                     minGap=0.0, tau=0.5),
+             )),
+             lane_change_controller=(SumoLaneChangeController, dict(
+                 sumo_lc_params=SumoLaneChangeParams()
+             )),
              routing_controller=(ContinuousRouter, {}),
-             num_vehicles=6,
-             sumo_car_following_params=SumoCarFollowingParams(
-                 minGap=0.0,
-                 tau=0.5
-             ),
-             sumo_lc_params=SumoLaneChangeParams())
+             num_vehicles=6)
 # A single learning agent in the inner ring
 vehicles.add(veh_id="rl",
-             acceleration_controller=(RLController, {}),
-             lane_change_controller=(SumoLaneChangeController, {}),
+             acceleration_controller=(RLController, dict(
+                 sumo_car_following_params=SumoCarFollowingParams(
+                     minGap=0.01,
+                     tau=0.5
+                 ),
+                 speed_mode="no_collide",
+             )),
+             lane_change_controller=(SumoLaneChangeController, dict(
+                 sumo_lc_params=SumoLaneChangeParams()
+             )),
              routing_controller=(ContinuousRouter, {}),
-             speed_mode="no_collide",
-             num_vehicles=1,
-             sumo_car_following_params=SumoCarFollowingParams(
-                 minGap=0.01,
-                 tau=0.5
-             ),
-             sumo_lc_params=SumoLaneChangeParams())
+             num_vehicles=1)
 # Outer ring vehicles
 vehicles.add(veh_id="merge-human",
-             acceleration_controller=(IDMController, {"noise": 0.2}),
-             lane_change_controller=(SumoLaneChangeController, {}),
+             acceleration_controller=(IDMController, dict(
+                 sumo_car_following_params=SumoCarFollowingParams(
+                     minGap=0.0, tau=0.5),
+                 noise=0.2,
+             )),
+             lane_change_controller=(SumoLaneChangeController, dict(
+                 sumo_lc_params=SumoLaneChangeParams()
+             )),
              routing_controller=(ContinuousRouter, {}),
-             num_vehicles=10,
-             sumo_car_following_params=SumoCarFollowingParams(
-                 minGap=0.0,
-                 tau=0.5
-             ),
-             sumo_lc_params=SumoLaneChangeParams())
+             num_vehicles=10)
 
 flow_params = dict(
     # name of the experiment

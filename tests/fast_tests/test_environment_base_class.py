@@ -158,10 +158,11 @@ class TestApplyingActionsWithSumo(unittest.TestCase):
         # place 5 vehicles in the network (we need at least more than 1)
         vehicles = Vehicles()
         vehicles.add(veh_id="test",
-                     acceleration_controller=(IDMController, {}),
+                     acceleration_controller=(IDMController, dict(
+                         sumo_car_following_params=SumoCarFollowingParams(
+                             accel=1000, decel=1000),
+                     )),
                      routing_controller=(ContinuousRouter, {}),
-                     sumo_car_following_params=SumoCarFollowingParams(
-                         accel=1000, decel=1000),
                      num_vehicles=5)
 
         # create the environment and scenario classes for a ring road

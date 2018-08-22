@@ -2,7 +2,8 @@ import logging
 
 from numpy import pi, sin, cos, linspace
 
-from flow.controllers.car_following_models import IDMController
+from flow.controllers.car_following_models import IDMController, \
+    SumoCarFollowingController
 from flow.controllers.lane_change_controllers import SumoLaneChangeController
 from flow.controllers.routing_controllers import ContinuousRouter, GridRouter
 from flow.core.params import SumoParams, EnvParams, InitialConfig, NetParams, \
@@ -63,9 +64,10 @@ def ring_road_exp_setup(sumo_params=None,
         # set default vehicles configuration
         vehicles = Vehicles()
         vehicles.add(veh_id="idm",
-                     acceleration_controller=(IDMController, {}),
+                     acceleration_controller=(IDMController, dict(
+                         speed_mode="aggressive",
+                     )),
                      routing_controller=(ContinuousRouter, {}),
-                     speed_mode="aggressive",
                      num_vehicles=1)
 
     if env_params is None:
@@ -146,8 +148,9 @@ def figure_eight_exp_setup(sumo_params=None,
         # set default vehicles configuration
         vehicles = Vehicles()
         vehicles.add(veh_id="idm",
-                     acceleration_controller=(IDMController, {}),
-                     speed_mode="aggressive",
+                     acceleration_controller=(IDMController, dict(
+                         speed_mode="aggressive",
+                     )),
                      routing_controller=(ContinuousRouter, {}),
                      num_vehicles=1)
 
@@ -230,8 +233,9 @@ def highway_exp_setup(sumo_params=None,
         # set default vehicles configuration
         vehicles = Vehicles()
         vehicles.add(veh_id="idm",
-                     acceleration_controller=(IDMController, {}),
-                     speed_mode="aggressive",
+                     acceleration_controller=(IDMController, dict(
+                         speed_mode="aggressive",
+                     )),
                      routing_controller=(ContinuousRouter, {}),
                      num_vehicles=1)
 
@@ -323,12 +327,13 @@ def grid_mxn_exp_setup(row_num=1,
         total_vehicles = 20
         vehicles = Vehicles()
         vehicles.add(veh_id="idm",
-                     acceleration_controller=(IDMController, {}),
-                     sumo_car_following_params=SumoCarFollowingParams(
-                        min_gap=2.5,
-                        tau=1.1,
-                        max_speed=30
-                        ),
+                     acceleration_controller=(IDMController, dict(
+                         sumo_car_following_params=SumoCarFollowingParams(
+                             min_gap=2.5,
+                             tau=1.1,
+                             max_speed=30
+                         ),
+                     )),
                      routing_controller=(GridRouter, {}),
                      num_vehicles=total_vehicles)
 
@@ -420,8 +425,9 @@ def variable_lanes_exp_setup(sumo_params=None,
         # set default vehicles configuration
         vehicles = Vehicles()
         vehicles.add(veh_id="idm",
-                     acceleration_controller=(IDMController, {}),
-                     speed_mode="aggressive",
+                     acceleration_controller=(IDMController, dict(
+                         speed_mode="aggressive",
+                     )),
                      routing_controller=(ContinuousRouter, {}),
                      num_vehicles=1)
 
@@ -481,10 +487,13 @@ def setup_bottlenecks(sumo_params=None,
         vehicles = Vehicles()
 
         vehicles.add(veh_id="human",
-                     speed_mode=25,
-                     lane_change_controller=(SumoLaneChangeController, {}),
+                     acceleration_controller=(SumoCarFollowingController, dict(
+                         speed_mode=25,
+                     )),
+                     lane_change_controller=(SumoLaneChangeController, dict(
+                         lane_change_mode=1621,
+                     )),
                      routing_controller=(ContinuousRouter, {}),
-                     lane_change_mode=1621,
                      num_vehicles=1 * scaling)
 
     if env_params is None:
