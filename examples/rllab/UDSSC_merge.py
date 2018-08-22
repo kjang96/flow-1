@@ -20,7 +20,7 @@ from flow.scenarios.UDSSC_merge.gen import UDSSCMergingGenerator
 from flow.scenarios.UDSSC_merge.scenario import UDSSCMergingScenario
 from flow.core.params import InFlows
 
-HORIZON = 200
+HORIZON = 500
 FLOW_RATE = 300
 
 def run_task(*_):
@@ -41,7 +41,7 @@ def run_task(*_):
     #                max_speed=speed_limit),
     # Inner ring vehicles
     vehicles.add(veh_id="idm",
-                 acceleration_controller=(IDMController, {"noise": 0.2}),
+                 acceleration_controller=(IDMController, {"noise": 0.1}),
                  lane_change_controller=(SumoLaneChangeController, {}),
                  routing_controller=(ContinuousRouter, {}),
                  speed_mode="all_checks",
@@ -142,7 +142,7 @@ def run_task(*_):
         env=env,
         policy=policy,
         baseline=baseline,
-        batch_size=5000,#64 * 3 * horizon,
+        batch_size=15000,#64 * 3 * horizon,
         max_path_length=horizon,
         # whole_paths=True,
         n_itr=200,
@@ -152,20 +152,20 @@ def run_task(*_):
     algo.train()
 
 
-exp_tag = "UDSSCMerge_2"  # experiment prefix
+exp_tag = "UDSSCMerge_6"  # experiment prefix
 
-# for seed in [1, 2]:#, 5, 10, 56]:  # , 1, 5, 10, 73]:
-for seed in [1]:#, 5, 10, 56]:  # , 1, 5, 10, 73]:
+for seed in [1, 2]:#, 5, 10, 56]:  # , 1, 5, 10, 73]:
+# for seed in [1]:#, 5, 10, 56]:  # , 1, 5, 10, 73]:
     run_experiment_lite(
         run_task,
         # Number of parallel workers for sampling
-        n_parallel=1,
+        n_parallel=8,
         # Only keep the snapshot parameters for the last iteration
         snapshot_mode="last",
         # Specifies the seed for the experiment. If this is not provided, a
         # random seed will be used
         seed=seed,
-        mode="local",
+        mode="ec2",
         exp_prefix=exp_tag,
         # plot=True,
     )
