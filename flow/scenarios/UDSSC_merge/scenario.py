@@ -127,12 +127,26 @@ class UDSSCMergingScenario(Scenario):
             edge_dict[edge] = new_x
             prev_edge = float(self.edge_info[edge]["length"])
             absolute = new_x
-             
+        # two lane 
+        # internal_edgestarts = [ # in increasing order
+        #     (":a_2", edge_dict[":a_2"]),
+        #     (":b_2", edge_dict[":b_2"]),
+        #     (":c_2", edge_dict[":c_2"]),
+        #     (":d_2", edge_dict[":d_2"]),
+        #     (":g_3", edge_dict[":g_3"]),
+        #     (":b_0", edge_dict[":b_0"]),
+        #     (":e_2", edge_dict[":e_2"]),
+        #     (":e_0", edge_dict[":e_0"]),
+        #     (":d_0", edge_dict[":d_0"]),
+        #     (":g_0", edge_dict[":g_0"]),
+        # ]
+
+        # one lane
         internal_edgestarts = [ # in increasing order
-            (":a_2", edge_dict[":a_2"]),
-            (":b_2", edge_dict[":b_2"]),
-            (":c_2", edge_dict[":c_2"]),
-            (":d_2", edge_dict[":d_2"]),
+            (":a_1", edge_dict[":a_1"]),
+            (":b_1", edge_dict[":b_1"]),
+            (":c_1", edge_dict[":c_1"]),
+            (":d_1", edge_dict[":d_1"]),
             (":g_3", edge_dict[":g_3"]),
             (":b_0", edge_dict[":b_0"]),
             (":e_2", edge_dict[":e_2"]),
@@ -140,6 +154,7 @@ class UDSSCMergingScenario(Scenario):
             (":d_0", edge_dict[":d_0"]),
             (":g_0", edge_dict[":g_0"]),
         ]
+
         return internal_edgestarts
 
     def gen_custom_start_pos(self, initial_config, num_vehicles, **kwargs):
@@ -302,7 +317,6 @@ class UDSSCMergingScenario(Scenario):
         return startpositions, startlanes
     
     def read_edges_from_xml(self, omit=[]):
-        # xml = "/Users/kathyjang/research/rllab-multiagent/learning-traffic/flow/core/debug/cfg/UDSSC_Merge_3-15r2l.net.xml"
         netfn = "%s.net.xml" % self.generator.name
         xml = self.generator.cfg_path + netfn
         tree = ET.parse(xml)
@@ -324,8 +338,17 @@ class UDSSCMergingScenario(Scenario):
         return edges
 
     def specify_absolute_order(self):
-        return [":a_2", "right", ":b_2", "top", ":c_2",
-                "left", ":d_2", "bottom", "inflow_1",
+        # two lane
+        # return [":a_2", "right", ":b_2", "top", ":c_2",
+        #         "left", ":d_2", "bottom", "inflow_1",
+        #         ":g_3", "merge_in_1", ":a_0", ":b_0",
+        #         "merge_out_0", ":e_2", "outflow_0", "inflow_0",
+        #         ":e_0", "merge_in_0", ":c_0", ":d_0",
+        #         "merge_out_1", ":g_0", "outflow_1" ]
+
+        # one lane
+        return [":a_1", "right", ":b_1", "top", ":c_1",
+                "left", ":d_1", "bottom", "inflow_1",
                 ":g_3", "merge_in_1", ":a_0", ":b_0",
                 "merge_out_0", ":e_2", "outflow_0", "inflow_0",
                 ":e_0", "merge_in_0", ":c_0", ":d_0",

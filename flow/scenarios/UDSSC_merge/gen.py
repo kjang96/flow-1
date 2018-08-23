@@ -51,7 +51,7 @@ class UDSSCMergingGenerator(Generator):
         r = net_params.additional_params["ring_radius"]
         x = net_params.additional_params["lane_length"]
         circumference = 2 * pi * r
-        lanes = repr(2)
+        lanes = repr(1)
         
         resolution = net_params.additional_params["resolution"]
 

@@ -65,14 +65,14 @@ class Scenario(Serializable):
 
         # create a generator instance
         self.generator = self.generator_class(self.net_params, self.name)
-        
-        #<--
-        self.edge_info = self.read_edges_from_xml(omit=["shape", "priority", "type", "id"])
-        #-->
 
         # create the network configuration file from the generator
         self._edges, self._connections = self.generator.generate_net(
             self.net_params, self.traffic_lights)
+
+        #<--
+        self.edge_info = self.read_edges_from_xml(omit=["shape", "priority", "type", "id"])
+        #-->
 
         # list of edges and internal links (junctions)
         self._edge_list = [edge_id for edge_id in self._edges.keys()
@@ -92,6 +92,7 @@ class Scenario(Serializable):
         # is set to "false" while calling sumo's netconvert function
         self.internal_edgestarts = self.specify_internal_edge_starts()
         self.intersection_edgestarts = self.specify_intersection_edge_starts()
+        # import ipdb; ipdb.set_trace()
 
         # in case the user did not write the intersection edge-starts in
         # internal edge-starts as well (because of redundancy), merge the two
