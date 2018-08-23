@@ -114,9 +114,9 @@ class UDSSCMergeEnv(Env):
         # headway_reward = 0.2 * max_cost * rewards.penalize_headway_variance(
         #     self.vehicles, self.sorted_extra_data, normalization)
         # return vel_reward + headway_reward
-        # return vel_reward
+        return vel_reward
         # print(avg_vel_reward)
-        return avg_vel_reward
+        # return avg_vel_reward
 
     def get_state(self, **kwargs):
         """

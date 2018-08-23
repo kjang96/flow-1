@@ -21,7 +21,7 @@ from flow.scenarios.UDSSC_merge.scenario import UDSSCMergingScenario
 from flow.core.params import InFlows
 
 HORIZON = 500
-FLOW_RATE = 300
+FLOW_RATE = 350
 
 def run_task(*_):
     sumo_params = SumoParams(sim_step=1, sumo_binary="sumo", restart_instance=True)
@@ -49,7 +49,8 @@ def run_task(*_):
                  sumo_car_following_params=SumoCarFollowingParams(
                      tau=1.1,
                  ),
-                 lane_change_mode=1621,
+                #  lane_change_mode=1621,
+                 lane_change_mode=0,
                  sumo_lc_params=SumoLaneChangeParams())
 
     # A single learning agent in the inner ring
@@ -145,21 +146,21 @@ def run_task(*_):
         batch_size=15000,#64 * 3 * horizon,
         max_path_length=horizon,
         # whole_paths=True,
-        n_itr=200,
+        n_itr=150,
         discount=0.999,
         # step_size=0.01,
     )
     algo.train()
 
 
-exp_tag = "UDSSCMerge_9"  # experiment prefix
+exp_tag = "UDSSCMerge_10"  # experiment prefix
 # 
 # for seed in [1, 2, 5]:# 10, 56]:  # , 1, 5, 10, 73]:
 for seed in [1]:#, 5, 10, 56]:  # , 1, 5, 10, 73]:
     run_experiment_lite(
         run_task,
         # Number of parallel workers for sampling
-        n_parallel=1,
+        n_parallel=2,
         # Only keep the snapshot parameters for the last iteration
         snapshot_mode="last",
         # Specifies the seed for the experiment. If this is not provided, a
