@@ -71,7 +71,7 @@ class Scenario(Serializable):
             self.net_params, self.traffic_lights)
 
         #<--
-        self.edge_info = self.read_edges_from_xml(omit=["shape", "priority", "type", "id"])
+        # self.edge_info = self.read_edges_from_xml(omit=["shape", "priority", "type", "id"])
         #-->
 
         # list of edges and internal links (junctions)

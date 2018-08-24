@@ -90,11 +90,13 @@ class UDSSCMergingScenario(Scenario):
         for edge in self.specify_absolute_order():
             
             if edge.startswith(":"):
-                absolute += float(self.edge_info[edge]["length"])
+                # absolute += float(self.edge_info[edge]["length"])
+                absolute += float(self.edge_length(edge))
                 continue
             new_x = absolute + prev_edge #+ prev_internal
             edge_dict[edge] = new_x
-            prev_edge = float(self.edge_info[edge]["length"])
+            # prev_edge = float(self.edge_info[edge]["length"])
+            prev_edge = float(self.edge_length(edge))
             absolute = new_x
 
         edgestarts = [ #len of prev edge + total prev (including internal edge len)
@@ -124,11 +126,13 @@ class UDSSCMergingScenario(Scenario):
         for edge in self.specify_absolute_order(): # each edge = absolute + len(prev edge) + len(prev internal edge)
             
             if not edge.startswith(":"):
-                absolute += float(self.edge_info[edge]["length"])
+                # absolute += float(self.edge_info[edge]["length"])
+                absolute += float(self.edge_length(edge))
                 continue
             new_x = absolute + prev_edge
             edge_dict[edge] = new_x
-            prev_edge = float(self.edge_info[edge]["length"])
+            # prev_edge = float(self.edge_info[edge]["length"])
+            prev_edge = float(self.edge_length(edge))
             absolute = new_x
 
         if self.lane_num == 2: 
@@ -147,12 +151,6 @@ class UDSSCMergingScenario(Scenario):
             ]
         elif self.lane_num == 1:
         # one lane
-                    # [":a_1", "right", ":b_1", "top", ":c_1",
-                    # "left", ":d_1", "bottom", "inflow_1",
-                    # ":g_2", "merge_in_1", ":a_0", ":b_0",
-                    # "merge_out_0", ":e_1", "outflow_0", "inflow_0",
-                    # ":e_0", "merge_in_0", ":c_0", ":d_0",
-                    # "merge_out_1", ":g_0", "outflow_1" ]
             internal_edgestarts = [ # in increasing order
                 (":a_1", edge_dict[":a_1"]),
                 (":b_1", edge_dict[":b_1"]),
@@ -326,11 +324,10 @@ class UDSSCMergingScenario(Scenario):
         # CHANGES END
         except ZeroDivisionError:
             pass
-        # First one corresponds to the RL vehicle,
-        # second one corresponds to the IDM 
-        
+        # First one corresponds to the IDM,
+        # second one corresponds to the RL 
         if 'rl_0' in self.vehicles.get_ids(): # HARDCODE ALERT
-            startpositions = [('right', 10), ('inflow_0', 10)]
+            startpositions = [('inflow_0', 10), ('right', 10)]
         else: 
             startpositions = [('inflow_0', 10)]
         
