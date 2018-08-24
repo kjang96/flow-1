@@ -20,15 +20,18 @@ from flow.scenarios.UDSSC_merge.gen import UDSSCMergingGenerator
 from flow.scenarios.UDSSC_merge.scenario import UDSSCMergingScenario
 from flow.core.params import InFlows
 
-HORIZON = 500
+HORIZON = 1500
 FLOW_RATE = 350
+FLOW_PROB = FLOW_RATE/3600
 
 def run_task(*_):
-    sumo_params = SumoParams(sim_step=1, sumo_binary="sumo", restart_instance=True)
+    sumo_params = SumoParams(sim_step=0.1, sumo_binary="sumo", restart_instance=True)
 
     inflow = InFlows()
-    inflow.add(veh_type="idm", edge="inflow_1", vehs_per_hour=FLOW_RATE)
-    inflow.add(veh_type="idm", edge="inflow_0", vehs_per_hour=FLOW_RATE)
+    # inflow.add(veh_type="idm", edge="inflow_1", vehs_per_hour=FLOW_RATE)
+    # inflow.add(veh_type="idm", edge="inflow_0", vehs_per_hour=FLOW_RATE)
+    inflow.add(veh_type="idm", edge="inflow_1", probability=FLOW_PROB)
+    inflow.add(veh_type="idm", edge="inflow_0", probability=FLOW_PROB)
 
     # note that the vehicles are added sequentially by the generator,
     # so place the merging vehicles after the vehicles in the ring
@@ -76,11 +79,11 @@ def run_task(*_):
         # desired velocity for all vehicles in the network, in m/s
         "target_velocity": 15,
         # number of observable vehicles preceding the rl vehicle
-        "n_preceding": 2,
+        "n_preceding": 3,
         # number of observable vehicles following the rl vehicle
-        "n_following": 2,
+        "n_following": 3,
         # number of observable merging-in vehicle from the larger loop
-        "n_merging_in": 2,
+        "n_merging_in": 4,
     }
 
     env_params = EnvParams(horizon=HORIZON,
@@ -103,7 +106,10 @@ def run_task(*_):
         "outside_speed_limit": 15,
         # resolution of the curved portions
         "resolution": 100,
+        # num lanes
+        "lane_num": 1,
     }
+
     net_params = NetParams(
         in_flows=inflow,
         no_internal_links=False,
@@ -146,27 +152,27 @@ def run_task(*_):
         batch_size=15000,#64 * 3 * horizon,
         max_path_length=horizon,
         # whole_paths=True,
-        n_itr=150,
+        n_itr=200,
         discount=0.999,
         # step_size=0.01,
     )
     algo.train()
 
 
-exp_tag = "UDSSCMerge_10"  # experiment prefix
+exp_tag = "UDSSCMerge_14"  # experiment prefix
 # 
-# for seed in [1, 2, 5]:# 10, 56]:  # , 1, 5, 10, 73]:
-for seed in [1]:#, 5, 10, 56]:  # , 1, 5, 10, 73]:
+for seed in [1, 2, 5]:# 10, 56]:  # , 1, 5, 10, 73]:
+# for seed in [1]:#, 5, 10, 56]:  # , 1, 5, 10, 73]:
     run_experiment_lite(
         run_task,
         # Number of parallel workers for sampling
-        n_parallel=2,
+        n_parallel=8,
         # Only keep the snapshot parameters for the last iteration
         snapshot_mode="last",
         # Specifies the seed for the experiment. If this is not provided, a
         # random seed will be used
         seed=seed,
-        mode="local",
+        mode="ec2",
         exp_prefix=exp_tag,
         # plot=True,
     )

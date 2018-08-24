@@ -130,6 +130,9 @@ class Generator(Serializable):
         x = makexml("edges", "http://sumo.dlr.de/xsd/edges_file.xsd")
         for edge_attributes in edges:
             x.append(E("edge", attrib=edge_attributes))
+        # <--
+        x.append(E("roundabout", nodes="a b c d", edges="top left bottom right"))
+        # -->
         printxml(x, self.net_path + edgfn)
 
         # specify the types attributes (default is None)
@@ -183,7 +186,7 @@ class Generator(Serializable):
         t.append(E("no-turnarounds", value="true"))
         x.append(t)
         printxml(x, self.net_path + cfgfn)
-
+        
         subprocess.call(
             ["netconvert -c " + self.net_path + cfgfn + " --output-file=" +
              self.cfg_path + netfn + ' --no-internal-links="%s"'

@@ -112,11 +112,11 @@ class UDSSCMergeEnv(Env):
         # max_cost = np.linalg.norm(max_cost)
         # normalization = self.scenario.length / self.vehicles.num_vehicles
         # headway_reward = 0.2 * max_cost * rewards.penalize_headway_variance(
-        #     self.vehicles, self.sorted_extra_data, normalization)
+            # self.vehicles, self.sorted_extra_data, normalization)
         # return vel_reward + headway_reward
-        return vel_reward
+        # return vel_reward
         # print(avg_vel_reward)
-        # return avg_vel_reward
+        return avg_vel_reward
 
     def get_state(self, **kwargs):
         """
@@ -216,9 +216,17 @@ class UDSSCMergeEnv(Env):
         Return a list of IDs, NO DISTANCES. NO TRUNCATION.
 
         [veh_id, veh_id, veh_id] 
+
+        one lane: 
+        [":a_1", "right", ":b_1", "top", ":c_1",
+        "left", ":d_1", "bottom", "inflow_1",
+        ":g_2", "merge_in_1", ":a_0", ":b_0",
+        "merge_out_0", ":e_1", "outflow_0", "inflow_0",
+        ":e_0", "merge_in_0", ":c_0", ":d_0",
+        "merge_out_1", ":g_0", "outflow_1" ]
         """
-        edges_0 = ["merge_in_0", "inflow_0", ":e_0",":e_5", ":c_0"]
-        edges_1 = ["merge_in_1", "inflow_1", ":g_3", ":g_5", ":a_0"]
+        edges_0 = ["merge_in_0", "inflow_0", ":e_0", ":c_0"]
+        edges_1 = ["merge_in_1", "inflow_1", ":g_2", ":a_0"]
 
         close_0 = sorted(self.vehicles.get_ids_by_edge(["merge_in_0", "inflow_0"]), 
                          key=lambda veh_id:
@@ -247,6 +255,14 @@ class UDSSCMergeEnv(Env):
 
         ASSUME NO TRUNCATION. PAD WITH ZEROS IN GET_STATE
 
+        one lane: 
+        [":a_1", "right", ":b_1", "top", ":c_1",
+        "left", ":d_1", "bottom", "inflow_1",
+        ":g_2", "merge_in_1", ":a_0", ":b_0",
+        "merge_out_0", ":e_1", "outflow_0", "inflow_0",
+        ":e_0", "merge_in_0", ":c_0", ":d_0",
+        "merge_out_1", ":g_0", "outflow_1" ]
+
         """
 
         # Arrays holding veh_ids of vehicles before/after the rl_id.
@@ -256,7 +272,8 @@ class UDSSCMergeEnv(Env):
 
         # Prep.
         route = ["top", "left", "bottom", "right"]
-        route = ["top", ":c_2", "left", ":d_2", "bottom", ":a_2", "right", ":b_2"]
+        # route = ["top", ":c_2", "left", ":d_2", "bottom", ":a_2", "right", ":b_2"] #two lane
+        route = ["top", ":c_1", "left", ":d_1", "bottom", ":a_1", "right", ":b_1"]
         rl_edge = self.vehicles.get_edge(rl_id)
         if rl_edge == "":
             return [], []

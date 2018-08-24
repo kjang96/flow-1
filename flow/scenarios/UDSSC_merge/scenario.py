@@ -16,16 +16,18 @@ ADDITIONAL_NET_PARAMS = {
     "lane_length": 75,
     # length of the merge next to the roundabout
     "merge_length": 15,
-    # number of lanes in the inner loop
+    # number of lanes in the inner loop. DEPRECATED. DO NOT USE
     "inner_lanes": 3,
-    # number of lanes in the outer loop
-    "outer_lanes": 2,
+    # number of lanes in the outer loop. DEPRECATED. DO NOT USE
+    "outer_lanes": 2, 
     # max speed limit in the roundabout
     "roundabout_speed_limit": 8,
     # max speed limit in the roundabout
     "outside_speed_limit": 15,
     # resolution of the curved portions
     "resolution": 40,
+    # num lanes
+    "lane_num": 1,
 }
 
 
@@ -72,6 +74,7 @@ class UDSSCMergingScenario(Scenario):
         self.length_loop = length_loop
         self.roundabout_speed_limit = net_params.additional_params["roundabout_speed_limit"]
         self.outside_speed_limit = net_params.additional_params["outside_speed_limit"]
+        self.lane_num = net_params.additional_params["lane_num"]
 
         super().__init__(name, generator_class, vehicles, net_params,
                          initial_config, traffic_lights)
@@ -127,33 +130,43 @@ class UDSSCMergingScenario(Scenario):
             edge_dict[edge] = new_x
             prev_edge = float(self.edge_info[edge]["length"])
             absolute = new_x
-        # two lane 
-        # internal_edgestarts = [ # in increasing order
-        #     (":a_2", edge_dict[":a_2"]),
-        #     (":b_2", edge_dict[":b_2"]),
-        #     (":c_2", edge_dict[":c_2"]),
-        #     (":d_2", edge_dict[":d_2"]),
-        #     (":g_3", edge_dict[":g_3"]),
-        #     (":b_0", edge_dict[":b_0"]),
-        #     (":e_2", edge_dict[":e_2"]),
-        #     (":e_0", edge_dict[":e_0"]),
-        #     (":d_0", edge_dict[":d_0"]),
-        #     (":g_0", edge_dict[":g_0"]),
-        # ]
 
+        if self.lane_num == 2: 
+        # two lane 
+            internal_edgestarts = [ # in increasing order
+                (":a_2", edge_dict[":a_2"]),
+                (":b_2", edge_dict[":b_2"]),
+                (":c_2", edge_dict[":c_2"]),
+                (":d_2", edge_dict[":d_2"]),
+                (":g_3", edge_dict[":g_3"]),
+                (":b_0", edge_dict[":b_0"]),
+                (":e_2", edge_dict[":e_2"]),
+                (":e_0", edge_dict[":e_0"]),
+                (":d_0", edge_dict[":d_0"]),
+                (":g_0", edge_dict[":g_0"]),
+            ]
+        elif self.lane_num == 1:
         # one lane
-        internal_edgestarts = [ # in increasing order
-            (":a_1", edge_dict[":a_1"]),
-            (":b_1", edge_dict[":b_1"]),
-            (":c_1", edge_dict[":c_1"]),
-            (":d_1", edge_dict[":d_1"]),
-            (":g_3", edge_dict[":g_3"]),
-            (":b_0", edge_dict[":b_0"]),
-            (":e_2", edge_dict[":e_2"]),
-            (":e_0", edge_dict[":e_0"]),
-            (":d_0", edge_dict[":d_0"]),
-            (":g_0", edge_dict[":g_0"]),
-        ]
+                    # [":a_1", "right", ":b_1", "top", ":c_1",
+                    # "left", ":d_1", "bottom", "inflow_1",
+                    # ":g_2", "merge_in_1", ":a_0", ":b_0",
+                    # "merge_out_0", ":e_1", "outflow_0", "inflow_0",
+                    # ":e_0", "merge_in_0", ":c_0", ":d_0",
+                    # "merge_out_1", ":g_0", "outflow_1" ]
+            internal_edgestarts = [ # in increasing order
+                (":a_1", edge_dict[":a_1"]),
+                (":b_1", edge_dict[":b_1"]),
+                (":c_1", edge_dict[":c_1"]),
+                (":d_1", edge_dict[":d_1"]),
+                (":g_2", edge_dict[":g_2"]),
+                (":a_0", edge_dict[":a_0"]),
+                (":b_0", edge_dict[":b_0"]),
+                (":e_1", edge_dict[":e_1"]),
+                (":e_0", edge_dict[":e_0"]),
+                (":c_0", edge_dict[":c_0"]),
+                (":d_0", edge_dict[":d_0"]),
+                (":g_0", edge_dict[":g_0"]),
+            ]
 
         return internal_edgestarts
 
@@ -313,7 +326,14 @@ class UDSSCMergingScenario(Scenario):
         # CHANGES END
         except ZeroDivisionError:
             pass
-        startpositions = [('right', 10), ('right',0)]
+        # First one corresponds to the RL vehicle,
+        # second one corresponds to the IDM 
+        
+        if 'rl_0' in self.vehicles.get_ids(): # HARDCODE ALERT
+            startpositions = [('right', 10), ('inflow_0', 10)]
+        else: 
+            startpositions = [('inflow_0', 10)]
+        
         return startpositions, startlanes
     
     def read_edges_from_xml(self, omit=[]):
@@ -338,18 +358,19 @@ class UDSSCMergingScenario(Scenario):
         return edges
 
     def specify_absolute_order(self):
-        # two lane
-        # return [":a_2", "right", ":b_2", "top", ":c_2",
-        #         "left", ":d_2", "bottom", "inflow_1",
-        #         ":g_3", "merge_in_1", ":a_0", ":b_0",
-        #         "merge_out_0", ":e_2", "outflow_0", "inflow_0",
-        #         ":e_0", "merge_in_0", ":c_0", ":d_0",
-        #         "merge_out_1", ":g_0", "outflow_1" ]
-
+        if self.lane_num == 2: 
+        
+            return [":a_2", "right", ":b_2", "top", ":c_2",
+                    "left", ":d_2", "bottom", "inflow_1",
+                    ":g_3", "merge_in_1", ":a_0", ":b_0",
+                    "merge_out_0", ":e_2", "outflow_0", "inflow_0",
+                    ":e_0", "merge_in_0", ":c_0", ":d_0",
+                    "merge_out_1", ":g_0", "outflow_1" ]
+        elif self.lane_num == 1: 
         # one lane
-        return [":a_1", "right", ":b_1", "top", ":c_1",
-                "left", ":d_1", "bottom", "inflow_1",
-                ":g_3", "merge_in_1", ":a_0", ":b_0",
-                "merge_out_0", ":e_2", "outflow_0", "inflow_0",
-                ":e_0", "merge_in_0", ":c_0", ":d_0",
-                "merge_out_1", ":g_0", "outflow_1" ]
+            return [":a_1", "right", ":b_1", "top", ":c_1",
+                    "left", ":d_1", "bottom", "inflow_1",
+                    ":g_2", "merge_in_1", ":a_0", ":b_0",
+                    "merge_out_0", ":e_1", "outflow_0", "inflow_0",
+                    ":e_0", "merge_in_0", ":c_0", ":d_0",
+                    "merge_out_1", ":g_0", "outflow_1" ]
