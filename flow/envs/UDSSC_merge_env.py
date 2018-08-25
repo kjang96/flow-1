@@ -4,6 +4,8 @@ from flow.core import rewards
 from gym.spaces.box import Box
 from gym.spaces.tuple_space import Tuple
 
+from math import ceil
+
 import numpy as np
 
 ADDITIONAL_ENV_PARAMS = {
@@ -82,9 +84,12 @@ class UDSSCMergeEnv(Env):
 
     @property
     def observation_space(self):
+        # Vehicle position and velocity, normalized
+        # Queue length x 2
         box = Box(low=0.,
                   high=1,
-                  shape=(self.n_obs_vehicles * 2,),
+                  shape=(self.n_obs_vehicles * 2 \
+                         + 2,),
                   dtype=np.float32)
         return box
 
@@ -128,17 +133,26 @@ class UDSSCMergeEnv(Env):
         """
         try:
             # Get normalization factors 
-            circ = float(2 * np.pi * self.ring_radius)
+            circ = self.circumference()
             max_speed = self.scenario.max_speed 
-            merge_0_norm = self.scenario.edge_length('merge_in_0') + \
-                        self.scenario.edge_length('inflow_0')
-            merge_1_norm = self.scenario.edge_length('merge_in_1') + \
-                        self.scenario.edge_length('inflow_1') 
+            merge_0_norm = self.scenario.edge_length('inflow_0') + \
+                            self.scenario.edge_length(':e_0') + \
+                            self.scenario.edge_length('merge_in_0') + \
+                            self.scenario.edge_length(':c_0')
+            merge_1_norm = self.scenario.edge_length('inflow_1') + \
+                            self.scenario.edge_length(':g_2') + \
+                            self.scenario.edge_length('merge_in_1') + \
+                            self.scenario.edge_length(':a_0')
+            queue_0_norm = ceil(merge_0_norm/5 + 1) # 5 is the car length
+            queue_1_norm = ceil(merge_1_norm/5 + 1)
+            
+
             # RL POS AND VEL
             rl_pos = [self.get_x_by_id('rl_0') / circ]
             rl_vel = [self.vehicles.get_speed('rl_0') / max_speed]
 
             # DISTANCES
+            # sorted by closest to farthest
             merge_id_0, merge_id_1 = self.k_closest_to_merge(self.n_merging_in) # TODO check this is sorted
             merge_dists_0 = self.process(self._dist_to_merge_0(merge_id_0),
                                         length=self.n_merging_in,
@@ -177,11 +191,15 @@ class UDSSCMergeEnv(Env):
                                     length=self.n_following,
                                     normalizer=max_speed)
 
+            queue_0, queue_1 = self.queue_length()
+            queue_0 = [queue_0 / queue_0_norm]
+            queue_1 = [queue_1 / queue_1_norm]
             state = np.array(np.concatenate([rl_pos, rl_vel,
                                             merge_dists_0, merge_0_vel,
                                             merge_dists_1, merge_1_vel,
                                             tailway_dists, tailway_vel,
-                                            headway_dists, headway_vel]))
+                                            headway_dists, headway_vel,
+                                            queue_0, queue_1]))
                                             
         except:
             return np.zeros(self.n_obs_vehicles*2)
@@ -272,8 +290,10 @@ class UDSSCMergeEnv(Env):
 
         # Prep.
         route = ["top", "left", "bottom", "right"]
-        # route = ["top", ":c_2", "left", ":d_2", "bottom", ":a_2", "right", ":b_2"] #two lane
-        route = ["top", ":c_1", "left", ":d_1", "bottom", ":a_1", "right", ":b_1"]
+        if self.scenario.lane_num == 2:
+            route = ["top", ":c_2", "left", ":d_2", "bottom", ":a_2", "right", ":b_2"] #two lane
+        elif self.scenario.lane_num == 1:
+            route = ["top", ":c_1", "left", ":d_1", "bottom", ":a_1", "right", ":b_1"]
         rl_edge = self.vehicles.get_edge(rl_id)
         if rl_edge == "":
             return [], []
@@ -282,7 +302,7 @@ class UDSSCMergeEnv(Env):
         rl_pos = self.vehicles.get_position(rl_id)
 
         # Get preceding first.
-        for i in range(rl_index, rl_index-2, -1): # Curr  edge and preceding edge
+        for i in range(rl_index, rl_index-3, -1): # Curr  edge and preceding edge
             if i == rl_index: # Same edge as rl_id
                 veh_ids = [(v, rl_pos - self.vehicles.get_position(v)) 
                            for v in self.vehicles.get_ids_by_edge(route[i]) 
@@ -296,7 +316,7 @@ class UDSSCMergeEnv(Env):
             k_tailway = sorted_vehs + k_tailway
 
         # Get headways second.
-        for i in range(rl_index, rl_index+2):
+        for i in range(rl_index, rl_index+3):
             i = i % len(route)
             # If statement is to cover the case of overflow in get_x 
             if i == rl_index: # Same edge as rl_id
@@ -329,6 +349,11 @@ class UDSSCMergeEnv(Env):
                      for v in veh_id]
         return distances
 
+    def queue_length(self):
+        queue_0 = len(self.vehicles.get_ids_by_edge(["inflow_0", ":e_0", "merge_in_0", ":c_0"]))
+        queue_1 = len(self.vehicles.get_ids_by_edge(["inflow_1", ":g_2", "merge_in_1", ":a_0"]))
+        return queue_0, queue_1
+
     def process(self, state, length=None, normalizer=1):
         """
         Takes in a list, returns a normalized version of the list
@@ -341,6 +366,17 @@ class UDSSCMergeEnv(Env):
                 state = state[:length]
         state = [x / normalizer for x in state]
         return state
+
+    def circumference(self):
+        """
+        Counts the circumference on the circle, because
+        annoyingly it's not 2*pi*r
+        """
+        # circ = 0
+        edges = [":a_1", "right", ":b_1", "top", ":c_1",
+                 "left", ":d_1", "bottom"]
+        circ = sum([self.scenario.edge_length(e) for e in edges])
+        return circ
         
     def additional_command(self):
         try: 
