@@ -3,7 +3,7 @@ Cooperative merging example, consisting of 1 learning agent and 6 additional
 vehicles in an inner ring, and 10 vehicles in an outer ring attempting to
 merge into the inner ring. rllab version.
 """
-
+import sys
 from rllab.algos.trpo import TRPO
 from rllab.baselines.linear_feature_baseline import LinearFeatureBaseline
 from rllab.envs.gym_env import GymEnv
@@ -23,9 +23,12 @@ from flow.core.params import InFlows
 HORIZON = 1500
 FLOW_RATE = 350
 FLOW_PROB = FLOW_RATE/3600
+SIM_STEP = 0.1
 
 def run_task(*_):
-    sumo_params = SumoParams(sim_step=0.1, sumo_binary="sumo", restart_instance=True)
+    checks()
+
+    sumo_params = SumoParams(sim_step=SIM_STEP, sumo_binary="sumo", restart_instance=False)
 
     inflow = InFlows()
     # inflow.add(veh_type="idm", edge="inflow_1", vehs_per_hour=FLOW_RATE)
@@ -91,7 +94,7 @@ def run_task(*_):
 
     additional_net_params = {
         # radius of the loops
-        "ring_radius": 15,
+        "ring_radius": 15,#15.25,
         # length of the straight edges connected the outer loop to the inner loop
         "lane_length": 30,
         # length of the merge next to the roundabout
@@ -158,8 +161,19 @@ def run_task(*_):
     )
     algo.train()
 
+def checks():
+    """
+    KJ Personal utils to remind myself not to do stupid things
+    """
+    if SIM_STEP == 1:
+        cont = input("The SIM_STEP you entered is not 0.1. Continue? [y/n]  ")
+        if cont == "y" or cont == "Y": 
+            pass
+        else:
+            sys.exit()
 
-exp_tag = "UDSSCMerge_14"  # experiment prefix
+
+exp_tag = "UDSSCMerge_15"  # experiment prefix
 # 
 for seed in [1, 2, 5]:# 10, 56]:  # , 1, 5, 10, 73]:
 # for seed in [1]:#, 5, 10, 56]:  # , 1, 5, 10, 73]:
