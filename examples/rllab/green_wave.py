@@ -8,7 +8,8 @@ from rllab.envs.gym_env import GymEnv
 from flow.core.vehicles import Vehicles
 from flow.core.traffic_lights import TrafficLights
 from flow.core.params import SumoParams, EnvParams, InitialConfig, NetParams, \
-    InFlows
+     InFlows
+    
 from flow.core.params import SumoCarFollowingParams
 
 from flow.controllers import SumoCarFollowingController, GridRouter, ContinuousRouter
@@ -18,7 +19,7 @@ from flow.scenarios.grid.grid_scenario import SimpleGridScenario
 
 # Settings
 SIM_STEP = 1
-EXP_PREFIX = "greenwave_0"
+EXP_PREFIX = "greenwave_1"
 HORIZON = 500
 
 # # Local Settings
@@ -35,7 +36,7 @@ RESTART_INSTANCE = True
 N_PARALLEL = 8
 ITR = 500
 SUMO_BINARY = "sumo"
-BATCH_SIZE = 15000
+BATCH_SIZE = 25000
 MODE = "ec2"
 SEEDS = [1, 7, 91]
 
@@ -116,7 +117,7 @@ def run_task(*_):
     num_cars_bot = 1
     tot_cars = (num_cars_left + num_cars_right) * m \
         + (num_cars_bot + num_cars_top) * n
-    num_observed = 2
+    num_observed = 4
     inflow_rate = 350
     inflow_prob = 1/11
 
@@ -189,7 +190,6 @@ def run_task(*_):
         policy=policy,
         baseline=baseline,
         batch_size=BATCH_SIZE,
-        # batch_size=1000,
         max_path_length=horizon,
         # whole_paths=True,
         n_itr=ITR,
