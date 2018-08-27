@@ -16,6 +16,42 @@ from flow.controllers import SumoCarFollowingController, GridRouter, ContinuousR
 from flow.scenarios.grid.gen import SimpleGridGenerator
 from flow.scenarios.grid.grid_scenario import SimpleGridScenario
 
+# Settings
+SIM_STEP = 1
+EXP_PREFIX = "greenwave_0"
+HORIZON = 500
+
+# # Local Settings
+# RESTART_INSTANCE = False
+# N_PARALLEL = 1
+# ITR = 500
+# SUMO_BINARY = "sumo-gui"
+# BATCH_SIZE = 15000
+# MODE = "local"
+# SEEDS = [1]
+
+# # EC2 Settings
+RESTART_INSTANCE = True
+N_PARALLEL = 8
+ITR = 500
+SUMO_BINARY = "sumo"
+BATCH_SIZE = 15000
+MODE = "ec2"
+SEEDS = [1, 7, 91]
+
+def main():
+    for seed in SEEDS:
+        run_experiment_lite(
+            run_task,
+            n_parallel=N_PARALLEL,
+            snapshot_mode="last",
+            # Specifies the seed for the experiment. If this is not provided, a
+            # random seed will be used
+            seed=seed,
+            mode=MODE,
+            exp_prefix=EXP_PREFIX,
+            # plot=True,
+        )
 
 def gen_edges(row_num, col_num):
     edges = []
@@ -41,8 +77,8 @@ def get_flow_params(v_enter, vehs_per_hour, col_num, row_num,
     outer_edges = gen_edges(col_num, row_num)
     for i in range(len(outer_edges)):
         inflow.add(veh_type="idm", edge=outer_edges[i],
-                   vehs_per_hour=vehs_per_hour,
-                #    probability=inflow_prob,
+                #    vehs_per_hour=vehs_per_hour,
+                   probability=inflow_prob,
                    departLane="free", departSpeed=v_enter)
 
     net_params = NetParams(in_flows=inflow,
@@ -66,7 +102,7 @@ def run_task(*_):
     target_velocity = 20
     speed_limit = 25
     switch_time = 3.0
-    num_steps = 500
+    
     max_accel = 2.6
     max_decel = 4.5
     inner_length = 200
@@ -84,13 +120,15 @@ def run_task(*_):
     inflow_rate = 350
     inflow_prob = 1/11
 
+
     grid_array = {"short_length": short_length, "inner_length": inner_length,
                   "long_length": long_length, "row_num": n, "col_num": m,
                   "cars_left": num_cars_left, "cars_right": num_cars_right,
                   "cars_top": num_cars_top, "cars_bot": num_cars_bot}
 
-    sumo_params = SumoParams(sim_step=1,
-                             sumo_binary="sumo")
+    sumo_params = SumoParams(sim_step=SIM_STEP,
+                             sumo_binary=SUMO_BINARY,
+                             restart_instance=RESTART_INSTANCE)
 
     vehicles = Vehicles()
     vehicles.add(veh_id="idm",
@@ -107,11 +145,11 @@ def run_task(*_):
 
     tl_logic = TrafficLights(baseline=False)
 
-    additional_env_params = {"target_velocity": target_velocity, "num_steps": num_steps,
+    additional_env_params = {"target_velocity": target_velocity,
                              "min_yellow_time": 4.0, "min_green_time": 8.0,
                              "num_observed": num_observed}
 
-    env_params = EnvParams(additional_params=additional_env_params)
+    env_params = EnvParams(horizon=HORIZON, additional_params=additional_env_params)
 
     additional_net_params = {"speed_limit": speed_limit, "grid_array": grid_array,
                              "horizontal_lanes": 1, "vertical_lanes": 1}
@@ -150,30 +188,15 @@ def run_task(*_):
         env=env,
         policy=policy,
         baseline=baseline,
-        batch_size=15000,
+        batch_size=BATCH_SIZE,
         # batch_size=1000,
         max_path_length=horizon,
         # whole_paths=True,
-        n_itr=400,
+        n_itr=ITR,
         discount=0.999,
         # step_size=0.01,
     )
     algo.train()
 
-
-# for seed in [6]:  # , 7, 8]:
-for seed in [6, 7]:#, 8]:
-    run_experiment_lite(
-        run_task,
-        # Number of parallel workers for sampling
-        n_parallel=8,
-        # n_parallel=1,
-        # Only keep the snapshot parameters for the last iteration
-        snapshot_mode="last",
-        # Specifies the seed for the experiment. If this is not provided, a
-        # random seed will be used
-        seed=seed,
-        mode="ec2",  # "local_docker", "ec2"
-        exp_prefix="103",
-        # plot=True,
-    )
+if __name__ == "__main__":
+    main()
