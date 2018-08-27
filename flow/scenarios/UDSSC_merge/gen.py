@@ -188,10 +188,14 @@ class UDSSCMergingGenerator(Generator):
                "bottom": {"bottom": ["bottom", "right", "top", "left"]},
                "right": {"right": ["right", "top", "left", "bottom"]},
 
-               "inflow_1": {"inflow_1_0": ["inflow_1", "merge_in_1", "right", "top", "left", "merge_out_1", "outflow_1"],},
-                            # "inflow_1_1": ["inflow_1", "merge_in_1", "right", "merge_out_0", "outflow_0"]}, # added
-               "inflow_0": {#"inflow_0_0": ["inflow_0", "merge_in_0", "left", "merge_out_1", "outflow_1"],},
-                            "inflow_1_1": ["inflow_0", "merge_in_0", "left", "bottom", "right", "merge_out_0", "outflow_0"]},
+               "inflow_1": {"inflow_1_0": ["inflow_1", "merge_in_1", "right", "top", "left", "merge_out_1", "outflow_1"]}, # added
+               "inflow_0": {"inflow_1_1": ["inflow_0", "merge_in_0", "left", "bottom", "right", "merge_out_0", "outflow_0"]},
+
+            #    "inflow_1": {"inflow_1_0": ["inflow_1", "merge_in_1", "right", "top", "left", "merge_out_1", "outflow_1"],
+            #                 "inflow_1_1": ["inflow_1", "merge_in_1", "right", "merge_out_0", "outflow_0"]}, # added
+            #    "inflow_0": {"inflow_0_0": ["inflow_0", "merge_in_0", "left", "merge_out_1", "outflow_1"],
+            #                 "inflow_1_1": ["inflow_0", "merge_in_0", "left", "bottom", "right", "merge_out_0", "outflow_0"]},
+
                "outflow_1": {"outflow_1": ["outflow_1"]},
                "outflow_0": {"outflow_0": ["outflow_0"]}
                }

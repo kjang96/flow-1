@@ -20,15 +20,52 @@ from flow.scenarios.UDSSC_merge.gen import UDSSCMergingGenerator
 from flow.scenarios.UDSSC_merge.scenario import UDSSCMergingScenario
 from flow.core.params import InFlows
 
-HORIZON = 1500
+# Training settings
+HORIZON = 500
+SIM_STEP = 1
+BATCH_SIZE = 15000
+ITR = 200
+exp_tag = "UDSSCMerge_14"  # experiment prefix
+
+# Sumo settings
 FLOW_RATE = 350
 FLOW_PROB = FLOW_RATE/3600
-SIM_STEP = 0.1
+
+# Local settings
+# N_PARALLEL = 1
+# SUMO_BINARY = "sumo"
+# MODE = "local"
+# RESTART_INSTANCE = False
+# SEEDS = [1]
+
+# EC2 settings
+N_PARALLEL = 8
+SUMO_BINARY = "sumo"
+MODE = "ec2"
+RESTART_INSTANCE = True
+SEEDS = [1, 2, 5]
+
+
+def main():
+    for seed in SEEDS:
+        run_experiment_lite(
+            run_task,
+            # Number of parallel workers for sampling
+            n_parallel=N_PARALLEL,
+            # Only keep the snapshot parameters for the last iteration
+            snapshot_mode="last",
+            # Specifies the seed for the experiment. If this is not provided, a
+            # random seed will be used
+            seed=seed,
+            mode=MODE,
+            exp_prefix=exp_tag,
+            # plot=True,
+        )
 
 def run_task(*_):
-    checks()
+    # checks()
 
-    sumo_params = SumoParams(sim_step=SIM_STEP, sumo_binary="sumo", restart_instance=False)
+    sumo_params = SumoParams(sim_step=SIM_STEP, sumo_binary=SUMO_BINARY, restart_instance=RESTART_INSTANCE)
 
     inflow = InFlows()
     # inflow.add(veh_type="idm", edge="inflow_1", vehs_per_hour=FLOW_RATE)
@@ -136,7 +173,6 @@ def run_task(*_):
     env_name = "UDSSCMergeEnv"
     pass_params = (env_name, sumo_params, vehicles, env_params,
                    net_params, initial_config, scenario)
-
     env = GymEnv(env_name, record_video=False, register_params=pass_params)
     horizon = env.horizon
     env = normalize(env)
@@ -147,15 +183,14 @@ def run_task(*_):
     )
 
     baseline = LinearFeatureBaseline(env_spec=env.spec)
-
     algo = TRPO(
         env=env,
         policy=policy,
         baseline=baseline,
-        batch_size=15000,#64 * 3 * horizon,
+        batch_size=BATCH_SIZE,#64 * 3 * horizon,
         max_path_length=horizon,
         # whole_paths=True,
-        n_itr=200,
+        n_itr=ITR,
         discount=0.999,
         # step_size=0.01,
     )
@@ -173,20 +208,8 @@ def checks():
             sys.exit()
 
 
-exp_tag = "UDSSCMerge_15"  # experiment prefix
-# 
-for seed in [1, 2, 5]:# 10, 56]:  # , 1, 5, 10, 73]:
-# for seed in [1]:#, 5, 10, 56]:  # , 1, 5, 10, 73]:
-    run_experiment_lite(
-        run_task,
-        # Number of parallel workers for sampling
-        n_parallel=8,
-        # Only keep the snapshot parameters for the last iteration
-        snapshot_mode="last",
-        # Specifies the seed for the experiment. If this is not provided, a
-        # random seed will be used
-        seed=seed,
-        mode="ec2",
-        exp_prefix=exp_tag,
-        # plot=True,
-    )
+# exp_tag = "UDSSCMerge_14"  # experiment prefix
+
+
+if __name__ == "__main__":
+    main()
