@@ -19,10 +19,10 @@ from flow.scenarios.grid.grid_scenario import SimpleGridScenario
 
 # Settings
 SIM_STEP = 1
-EXP_PREFIX = "greenwave_1"
+EXP_PREFIX = "greenwave_2"
 HORIZON = 500
 
-# # Local Settings
+# Local Settings
 # RESTART_INSTANCE = False
 # N_PARALLEL = 1
 # ITR = 500
@@ -31,7 +31,7 @@ HORIZON = 500
 # MODE = "local"
 # SEEDS = [1]
 
-# # EC2 Settings
+# # # EC2 Settings
 RESTART_INSTANCE = True
 N_PARALLEL = 8
 ITR = 500
@@ -109,8 +109,8 @@ def run_task(*_):
     inner_length = 200
     long_length = 200
     short_length = 200
-    n = 2
-    m = 2
+    n = 1
+    m = 1
     num_cars_left = 1
     num_cars_right = 1
     num_cars_top = 1
@@ -147,7 +147,7 @@ def run_task(*_):
     tl_logic = TrafficLights(baseline=False)
 
     additional_env_params = {"target_velocity": target_velocity,
-                             "min_yellow_time": 4.0, "min_green_time": 8.0,
+                             "min_yellow_time": 4.0, "min_green_time": 2.0,
                              "num_observed": num_observed}
 
     env_params = EnvParams(horizon=HORIZON, additional_params=additional_env_params)

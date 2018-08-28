@@ -489,9 +489,10 @@ class PO_TrafficLightGridEnv(TrafficLightGridEnv):
             return rewards.min_delay_unscaled(self)
         else:
             reward = rewards.desired_velocity(self, fail=kwargs["fail"]) \
-            + rewards.penalize_tl_changes(rl_actions >= 0.5, gain=1.0) 
-            # print("REWARD IS: ", reward)
+            + rewards.penalize_tl_changes(rl_actions >= 0.5, gain=1.0) #i think this can be taken out
             return reward
+        # reward = rewards.min_delay(self)
+        # return reward
 
     def additional_command(self):
         # specify observed vehicles
