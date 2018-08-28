@@ -22,7 +22,7 @@ SIM_STEP = 1
 EXP_PREFIX = "greenwave_2"
 HORIZON = 500
 
-# Local Settings
+# # Local Settings
 # RESTART_INSTANCE = False
 # N_PARALLEL = 1
 # ITR = 500
@@ -31,7 +31,7 @@ HORIZON = 500
 # MODE = "local"
 # SEEDS = [1]
 
-# # # EC2 Settings
+# EC2 Settings
 RESTART_INSTANCE = True
 N_PARALLEL = 8
 ITR = 500
@@ -109,8 +109,8 @@ def run_task(*_):
     inner_length = 200
     long_length = 200
     short_length = 200
-    n = 1
-    m = 1
+    n = 2
+    m = 2
     num_cars_left = 1
     num_cars_right = 1
     num_cars_top = 1

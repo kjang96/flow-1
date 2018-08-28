@@ -8,6 +8,10 @@ from gym.spaces.discrete import Discrete
 from flow.core import rewards
 from flow.envs.base_env import Env
 
+"""
+File name: green_wave_env.py
+"""
+
 ADDITIONAL_ENV_PARAMS = {
     # minimum switch time for a traffic light in the yellow phase (in seconds)
     "min_yellow_time": 2.0,
