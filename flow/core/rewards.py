@@ -102,7 +102,7 @@ def boolean_action_penalty(discrete_actions, gain=1.0):
     return gain * np.sum(discrete_actions)
 
 
-def min_delay(env):
+def min_delay(env, fail=False):
     """A reward function used to encourage minimization of total delay in the
     system. Distance travelled is used as a scaled value of delay.
 
@@ -115,16 +115,17 @@ def min_delay(env):
         the environment variable, which contains information on the current
         state of the system.
     """
-
+    # import ipdb; ipdb.set_trace()
     vel = np.array(env.vehicles.get_speed(env.vehicles.get_ids()))
-
+    if any(vel < -100) or fail:
+        return 0.
     vel = vel[vel >= -1e-6]
     v_top = max(
         env.scenario.speed_limit(edge)
         for edge in env.scenario.get_edge_list())
     time_step = env.sim_step
 
-    max_cost = time_step * sum(vel.shape)
+    max_cost = time_step * sum(vel.shape) # wait why 
     cost = time_step * sum((v_top - vel) / v_top)
     return max((max_cost - cost) / max_cost, 0)
 
