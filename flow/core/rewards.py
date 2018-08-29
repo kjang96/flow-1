@@ -162,6 +162,24 @@ def penalize_tl_changes(actions, gain=1):
     action_penalty = gain * np.sum(np.round(actions))
     return -action_penalty
 
+def penalize_standstill(env, gain=1):
+    """
+    A reward function that penalizes vehicle standstill
+
+    Is it better for this to be:
+        a) penalize standstill in general? 
+        b) multiplicative based on time that vel=0? 
+
+    Parameters
+    ----------
+    actions: {list of booleans} - indicates whether a switch is desired
+    gain: {float} - multiplicative factor on the action penalty
+    """
+    veh_ids = env.vehicles.get_ids()
+    vel = np.array(env.vehicles.get_speed(veh_ids))
+    num_standstill = len(vel[vel==0])
+    penalty = gain * num_standstill
+    return -penalty
 
 def penalize_headway_variance(vehicles,
                               vids,
