@@ -11,10 +11,12 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('file', type=str,
                         help='path to the snapshot file')
-    parser.add_argument('--num_rollouts', type=int, default=2,
+    parser.add_argument('-n', '--num_rollouts', type=int, default=100,
                         help='Number of rollouts we will average over')
     parser.add_argument('--plotname', type=str, default="traffic_plot",
                         help='Prefix for all generated plots')
+    parser.add_argument('-s', '--sumo', action='store_true',
+                        help='Specifies whether to use sumo-gui or not')                           
     parser.add_argument('--emission_to_csv', action='store_true',
                         help='Specifies whether to convert the emission file '
                              'created by sumo into a csv file')
@@ -43,8 +45,13 @@ if __name__ == "__main__":
 
     # Set sumo to make a video
     sumo_params = unwrapped_env.sumo_params
+    sumo_params.restart_instance = False
+    # sumo_params['restart_instance'] = False
     sumo_params.emission_path = "./test_time_rollout/"
-    sumo_binary = 'sumo'
+    if args.sumo:
+        sumo_binary = 'sumo'
+    else: 
+        sumo_binary = 'sumo-gui'
     unwrapped_env.restart_sumo(sumo_params=sumo_params,
                                sumo_binary=sumo_binary)
 
@@ -52,10 +59,10 @@ if __name__ == "__main__":
     all_obs = np.zeros((args.num_rollouts, max_path_length, flat_obs))
     all_rewards = np.zeros((args.num_rollouts, max_path_length))
     rew = []
+    vel = []
     for j in range(args.num_rollouts):
         # run a single rollout of the experiment
         path = rollout(env=env, agent=policy)
-        # import ipdb; ipdb.set_trace()
 
         # collect the observations and rewards from the rollout
         new_obs = path['observations']
@@ -63,11 +70,12 @@ if __name__ == "__main__":
         new_rewards = path['rewards']
         all_rewards[j, :len(new_rewards)] = new_rewards
 
+        # <--
+        vel.append(np.mean(unwrapped_env.velocities))
+        # -->
         # print the cumulative reward of the most recent rollout
         print("Round {}, return: {}".format(j, sum(new_rewards)))
         rew.append(sum(new_rewards))
-
-    avg_vel = np.mean(unwrapped_env.velocities)
     import ipdb; ipdb.set_trace()
     # print the average cumulative reward across rollouts
     print("Average, std return: {}, {}".format(np.mean(rew), np.std(rew)))
