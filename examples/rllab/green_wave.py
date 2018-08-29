@@ -19,14 +19,14 @@ from flow.scenarios.grid.grid_scenario import SimpleGridScenario
 
 # Settings
 SIM_STEP = 1
-EXP_PREFIX = "greenwave_3"
+EXP_PREFIX = "greenwave_4"
 HORIZON = 500
 
 # # Local Settings
 # RESTART_INSTANCE = False
 # N_PARALLEL = 1
 # ITR = 500
-# SUMO_BINARY = "sumo"
+# SUMO_BINARY = "sumo-gui"
 # BATCH_SIZE = 15000
 # MODE = "local"
 # SEEDS = [1]
@@ -117,7 +117,7 @@ def run_task(*_):
     num_cars_bot = 1
     tot_cars = (num_cars_left + num_cars_right) * m \
         + (num_cars_bot + num_cars_top) * n
-    num_observed = 4
+    num_observed = 6
     inflow_rate = 350
     inflow_prob = 1/11
 
