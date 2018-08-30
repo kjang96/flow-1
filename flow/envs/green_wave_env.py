@@ -492,11 +492,13 @@ class PO_TrafficLightGridEnv(TrafficLightGridEnv):
         if self.env_params.evaluate:
             return rewards.min_delay_unscaled(self)
         else:
-            # reward = rewards.desired_velocity(self, fail=kwargs["fail"]) \
-            # + rewards.penalize_tl_changes(rl_actions >= 0.5, gain=1.0) #i think this can be taken out
-            # return reward
-            reward = rewards.min_delay(self, fail=kwargs["fail"]) \
-                     + rewards.penalize_tl_changes(rl_actions >= 0.5, gain=1.0) #i think this can be taken out
+            # import ipdb; ipdb.set_trace()
+            reward = rewards.desired_velocity(self, fail=kwargs["fail"]) \
+            + rewards.penalize_tl_changes(rl_actions >= 0.5, gain=1.0) #i think this can be taken out
+            + rewards.penalize_standstill(self, gain=0.2)
+
+            # reward = rewards.min_delay(self, fail=kwargs["fail"]) \
+            #          + rewards.penalize_tl_changes(rl_actions >= 0.5, gain=1.0) #i think this can be taken out
         # print(reward)
         return reward
 

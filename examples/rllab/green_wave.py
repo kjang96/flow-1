@@ -19,7 +19,7 @@ from flow.scenarios.grid.grid_scenario import SimpleGridScenario
 
 # Settings
 SIM_STEP = 1
-EXP_PREFIX = "greenwave_4"
+EXP_PREFIX = "greenwave_5"
 HORIZON = 500
 
 # # Local Settings
