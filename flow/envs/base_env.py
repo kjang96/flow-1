@@ -121,7 +121,9 @@ class Env(gym.Env, Serializable):
         # TODO(ak): temporary fix to support old pkl files
         if not hasattr(self.env_params, "evaluate"):
             self.env_params.evaluate = False
-
+        # self.velocities = []
+        # self.rets = []
+        self.edge_set = set()
         self.start_sumo()
         self.setup_initial_state()
 
@@ -180,7 +182,7 @@ class Env(gym.Env, Serializable):
                              "-c", self.scenario.cfg,
                              "--remote-port", str(port),
                              "--step-length", str(self.sim_step)]
-
+                             
                 # add step logs (if requested)
                 if self.sumo_params.no_step_log:
                     sumo_call.append("--no-step-log")
@@ -371,13 +373,26 @@ class Env(gym.Env, Serializable):
         for _ in range(self.env_params.sims_per_step):
             self.time_counter += 1
             self.step_counter += 1
+            # # <--added 
+            # # self.velocities.append(np.mean(self.vehicles.get_speed(self.vehicles.get_controlled_ids())))
 
+            # for veh_id in self.vehicles.get_ids():
+            #     edge = self.vehicles.get_edge(veh_id)
+            #     if edge.startswith(":"):
+            #         self.edge_set.add(edge)
+
+            # #added -->
             # perform acceleration actions for controlled human-driven vehicles
             if len(self.vehicles.get_controlled_ids()) > 0:
                 accel = []
                 for veh_id in self.vehicles.get_controlled_ids():
                     accel_contr = self.vehicles.get_acc_controller(veh_id)
                     action = accel_contr.get_action(self)
+                    # print(self.traci_connection.vehicle.getMaxSpeed('idm_0'))
+                    # print(self.traci_connection.vehicle.getAllowedSpeed('idm_0'))
+                    # self.accels.append(action)
+                    # print("Accel is: ", action)
+
                     accel.append(action)
                 self.apply_acceleration(self.vehicles.get_controlled_ids(),
                                         accel)
@@ -447,6 +462,7 @@ class Env(gym.Env, Serializable):
 
         # compute the reward
         reward = self.compute_reward(self.state, rl_actions, fail=crash)
+        # self.rets.append(reward)#*(.999**self.step_counter))
 
         return next_observation, reward, crash, {}
 
@@ -472,6 +488,7 @@ class Env(gym.Env, Serializable):
             the initial observation of the space. The initial reward is assumed
             to be zero.
         """
+        # import ipdb; ipdb.set_trace()
         # reset the time counter
         self.time_counter = 0
 

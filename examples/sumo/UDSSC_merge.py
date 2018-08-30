@@ -2,6 +2,8 @@
 Cooperative merging example, consisting of 1 learning agent and 6 additional
 vehicles in an inner ring, and 10 vehicles in an outer ring attempting to
 merge into the inner ring. rllab version.
+
+File name: UDSSC_merge.py
 """
 from flow.core.experiment import SumoExperiment
 from flow.controllers import IDMController, \
@@ -15,14 +17,21 @@ from flow.envs.UDSSC_merge_env import UDSSCMergeEnv
 from flow.core.params import InFlows
 
 HORIZON = 500
-FLOW_RATE = 300
+FLOW_RATE = 350
+FLOW_PROB = FLOW_RATE/3600 # in veh/s
+# FLOW_PROB = 0.115
+SIM_STEP = 1
+ITR = 50
 
 def merge_example(sumo_binary=None):
-    sumo_params = SumoParams(sim_step=1, sumo_binary="sumo", restart_instance=False)
+    sumo_params = SumoParams(sim_step=SIM_STEP, sumo_binary="sumo", restart_instance=False)
 
     inflow = InFlows()
-    inflow.add(veh_type="idm", edge="inflow_1", vehs_per_hour=FLOW_RATE)
-    inflow.add(veh_type="idm", edge="inflow_0", vehs_per_hour=FLOW_RATE)
+    # inflow.add(veh_type="idm", edge="inflow_1", vehs_per_hour=FLOW_RATE)
+    # inflow.add(veh_type="idm", edge="inflow_0", vehs_per_hour=FLOW_RATE)
+    inflow.add(veh_type="idm", edge="inflow_1", probability=FLOW_PROB)
+    inflow.add(veh_type="idm", edge="inflow_0", probability=FLOW_PROB)
+
 
     # note that the vehicles are added sequentially by the generator,
     # so place the merging vehicles after the vehicles in the ring
@@ -39,6 +48,7 @@ def merge_example(sumo_binary=None):
                      tau=1.1,
                  ),
                  lane_change_mode=1621,
+                #  lane_change_mode=0,
                  sumo_lc_params=SumoLaneChangeParams())
 
     additional_env_params = {
@@ -49,11 +59,11 @@ def merge_example(sumo_binary=None):
         # desired velocity for all vehicles in the network, in m/s
         "target_velocity": 15,
         # number of observable vehicles preceding the rl vehicle
-        "n_preceding": 2,
+        "n_preceding": 3,
         # number of observable vehicles following the rl vehicle
-        "n_following": 2,
+        "n_following": 3,
         # number of observable merging-in vehicle from the larger loop
-        "n_merging_in": 1,
+        "n_merging_in": 4,
     }
 
     env_params = EnvParams(horizon=HORIZON,
@@ -76,7 +86,10 @@ def merge_example(sumo_binary=None):
         "outside_speed_limit": 15,
         # resolution of the curved portions
         "resolution": 100,
+        # num lanes
+        "lane_num": 1,
     }
+
     net_params = NetParams(
         in_flows=inflow,
         no_internal_links=False,
@@ -108,7 +121,7 @@ if __name__ == "__main__":
     exp = merge_example()
     
     # run for a set number of rollouts / time steps
-    exp.run(1, HORIZON)
+    exp.run(ITR, HORIZON)
     
     # added by kj
     # import numpy as np
