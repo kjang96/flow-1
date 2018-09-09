@@ -747,8 +747,11 @@ class Env(gym.Env, Serializable):
         """
         for i, veh_id in enumerate(veh_ids):
             if route_choices[i] is not None:
+                route = route_choices[i]
+                if isinstance(route, dict):
+                    route = list(route.values())[0]
                 self.traci_connection.vehicle.setRoute(
-                    vehID=veh_id, edgeList=route_choices[i])
+                    vehID=veh_id, edgeList=route)
 
     def get_x_by_id(self, veh_id):
         """Provide a 1-D representation of the position of a vehicle.
