@@ -23,6 +23,16 @@ ADDITIONAL_ENV_PARAMS = {
     "n_merging_in": 2,
 }
 
+MERGE_EDGES = [":a_1", "right", ":b_1", "top", ":c_1",
+              "left", ":d_1", "bottom", "inflow_1",
+              ":g_2", "merge_in_1", ":a_0", ":b_0",
+              "merge_out_0", ":e_1", "outflow_0", "inflow_0",
+              ":e_0", "merge_in_0", ":c_0", ":d_0",
+              "merge_out_1", ":g_0", "outflow_1" ]
+
+ROUNDABOUT_EDGES = [":a_1", "right", ":b_1", "top", ":c_1",
+                    "left", ":d_1", "bottom"]
+
 
 class UDSSCMergeEnv(Env):
     """Environment for training cooperative merging behavior in a closed loop
@@ -80,30 +90,54 @@ class UDSSCMergeEnv(Env):
             ["speed", "pos", "queue_length", "velocity_stats"]
         self.accels = []
 
+        # Maintained as a stack, only apply_rl_actions to the top 1
+        self.rl_stack = [] 
+
         super().__init__(env_params, sumo_params, scenario)
 
     @property
     def observation_space(self):
         # Vehicle position and velocity, normalized
         # Queue length x 2
+        # Roundabout state = len(MERGE_EDGES) * 3
+        self.total_obs = self.n_obs_vehicles * 2 + 2 + \
+                         len(ROUNDABOUT_EDGES) * 3
+                         
         box = Box(low=0.,
                   high=1,
-                  shape=(self.n_obs_vehicles * 2 \
-                         + 2,),
-                  dtype=np.float32)
+                  shape=(self.total_obs,),
+                  dtype=np.float32)          
         return box
 
     @property
     def action_space(self):
         return Box(low=-np.abs(self.env_params.additional_params["max_decel"]),
                    high=self.env_params.additional_params["max_accel"],
-                   shape=(self.vehicles.num_rl_vehicles,),
+                #    shape=(self.vehicles.num_rl_vehicles,),
+                   shape=(1,),
                    dtype=np.float32)
 
     def _apply_rl_actions(self, rl_actions):
-        sorted_rl_ids = [veh_id for veh_id in self.sorted_ids
-                         if veh_id in self.vehicles.get_rl_ids()]
-        self.apply_acceleration(sorted_rl_ids, rl_actions)
+        # Curating rl_stack
+        # Remove rl vehicles that are no longer in the system
+        # more efficient to keep removal list than to resize continually
+        removal = [] 
+        for rl_id in self.rl_stack:
+            if rl_id not in self.vehicles.get_rl_ids():
+                removal.append(rl_id)
+        for rl_id in removal:
+            self.rl_stack.remove(rl_id)
+        if self.rl_stack:
+            self.apply_acceleration(self.rl_stack[:1], rl_actions)
+
+        # # <-- old 
+        # sorted_rl_ids = [veh_id for veh_id in self.sorted_ids
+        #                  if veh_id in self.vehicles.get_rl_ids()]
+        # if sorted_rl_ids:
+        #     self.apply_acceleration(sorted_rl_ids[:1], rl_actions)
+        # else: # don't need this 
+        #     pass 
+        # # old -->
 
     def compute_reward(self, state, rl_actions, **kwargs):
         vel_reward = rewards.desired_velocity(self, fail=kwargs["fail"])
@@ -125,12 +159,33 @@ class UDSSCMergeEnv(Env):
 
     def get_state(self, **kwargs):
         """
-        Want to include: 
-        * dist, vel of vehicles closest to roundabout
-        * dist, 2 vehicles ahead, 2 vehicles behind
+        Want to include:
 
+        # state = np.array(np.concatenate([rl_pos, rl_vel,
+        #                                 merge_dists_0, merge_0_vel,
+        #                                 merge_dists_1, merge_1_vel,
+        #                                 tailway_dists, tailway_vel,
+        #                                 headway_dists, headway_vel,
+        #                                 queue_0, queue_1,
+        #                                 roundabout_state]))
 
+        * dist, vel of all vehicles in the roundabout.
+        Since this is variable, perhaps we can model it
+        in a different way. See [roundabout_state]
+        * vel, dist of vehicle closest to merge_0 [merge_dists_0,merge_0_vel]
+        * vel, dist of vehicle closest to merge_1 [merge_dists_1, merge_1_vel]
+        * dist, vel 1 vehicle ahead, 1 vehicle behind [tailway_dists, tailway_vel,
+                                                      [headway_dists, headway_vel]
+        * dist, vel of first RL vehicle [rl_pos, rl_vel]
+        * length of queues [queue_0, queue_1]
+
+        The following variables are dependent on the (existence of)
+        the RL vehicle and should be passed 0s if it does not exist:
+            - rl_pos, rl_vel
+            - tailway_dists, tailway_vel
+            - headway_dists, headway_vel
         """
+
         try:
             # Get normalization factors 
             circ = self.circumference()
@@ -145,11 +200,56 @@ class UDSSCMergeEnv(Env):
                             self.scenario.edge_length(':a_0')
             queue_0_norm = ceil(merge_0_norm/5 + 1) # 5 is the car length
             queue_1_norm = ceil(merge_1_norm/5 + 1)
-            
 
-            # RL POS AND VEL
-            rl_pos = [self.get_x_by_id('rl_0') / circ]
-            rl_vel = [self.vehicles.get_speed('rl_0') / max_speed]
+            # Get the RL-dependent info
+            # TODO potential error here if normalizing with self.scenario.length
+            # because I'm not sure if this includes internal edges or not
+            if self.rl_stack:
+                # Get the rl_id
+                rl_id = self.rl_stack[0]
+
+                # rl_pos, rl_vel
+                rl_pos = [self.get_x_by_id(rl_id) / circ]
+                rl_vel = [self.vehicles.get_speed(rl_id) / max_speed]
+
+
+                # tailway_dists, tailway_vel
+                # headway_dists, headway_vel
+                tail_id = self.vehicles.get_follower(rl_id)
+                head_id = self.vehicles.get_leader(rl_id)
+                # TODO BUG HERE
+
+                # This is kinda shitty coding, but I'm not that confident
+                # in get_lane_tailways atm, Idrk how it works 
+                if tail_id: 
+                    tailway_vel = [self.vehicles.get_speed(tail_id)]
+                    tailway_dists = self.vehicles.get_lane_tailways(rl_id)
+                    if not tailway_vel:
+                        tailway_vel = [0]
+                    if not tailway_dists:
+                        tailway_dists = [0]
+                else: # No 
+                    tailway_vel = [0]
+                    tailway_dists = [0]
+                if head_id:
+                    headway_vel = [self.vehicles.get_speed(head_id)]
+                    headway_dists = self.vehicles.get_lane_headways(rl_id)
+                    if not headway_vel:
+                        headway_vel = [0]
+                    if not headway_dists:
+                        headway_dists = [0]
+                else: # No leader
+                    headway_vel = [0]
+                    headway_dists = [0]
+
+
+            else: # RL vehicle's not in the system. Pass in zeros here 
+                rl_pos = [0]
+                rl_vel = [0]
+                tailway_vel = [0]
+                tailway_dists = [0]
+                headway_vel = [0]
+                headway_dists = [0]
 
             # DISTANCES
             # sorted by closest to farthest
@@ -161,20 +261,22 @@ class UDSSCMergeEnv(Env):
                                         length=self.n_merging_in,
                                         normalizer=merge_1_norm)
 
-            # Get (ID, dist_from_RL) for the k vehicles closest to 
-            # the RL vehicle. 0 if there is no k_closest.
-            tailway, headway = self.k_closest_to_rl('rl_0', self.n_preceding) #todo
-            tailway_ids = [x[0] for x in tailway]
-            tailway_dists = [x[1] for x in tailway]
-            tailway_dists = self.process(tailway_dists,
-                                        length=self.n_preceding,
-                                        normalizer=circ)
+            # OBSOLETE NOW 
+            # # Get (ID, dist_from_RL) for the k vehicles closest to 
+            # # the RL vehicle. 0 if there is no k_closest.
+            # tailway, headway = self.k_closest_to_rl('rl_0', self.n_preceding) #todo
+            # tailway_ids = [x[0] for x in tailway]
+            # tailway_dists = [x[1] for x in tailway]
+            # tailway_dists = self.process(tailway_dists,
+            #                             length=self.n_preceding,
+            #                             normalizer=circ)
 
-            headway_ids = [x[0] for x in headway]
-            headway_dists = [x[1] for x in headway]
-            headway_dists = self.process(headway_dists,
-                                        length=self.n_preceding,
-                                        normalizer=circ)
+            # headway_ids = [x[0] for x in headway]
+            # headway_dists = [x[1] for x in headway]
+            # headway_dists = self.process(headway_dists,
+            #                             length=self.n_preceding,
+            #                             normalizer=circ)
+            # tailway_dists = [self.vehicles.get_follower('rl_0')]
 
 
             # VELOCITIES
@@ -184,26 +286,29 @@ class UDSSCMergeEnv(Env):
             merge_1_vel = self.process(self.vehicles.get_speed(merge_id_1),
                                     length=self.n_merging_in,
                                     normalizer=max_speed)
-            tailway_vel = self.process(self.vehicles.get_speed(tailway_ids),
-                                    length=self.n_preceding,
-                                    normalizer=max_speed)
-            headway_vel = self.process(self.vehicles.get_speed(headway_ids),
-                                    length=self.n_following,
-                                    normalizer=max_speed)
+            # tailway_vel = self.process(self.vehicles.get_speed(tailway_ids),
+            #                         length=self.n_preceding,
+            #                         normalizer=max_speed)
+            # headway_vel = self.process(self.vehicles.get_speed(headway_ids),
+            #                         length=self.n_following,
+            #                         normalizer=max_speed)
 
             queue_0, queue_1 = self.queue_length()
             queue_0 = [queue_0 / queue_0_norm]
             queue_1 = [queue_1 / queue_1_norm]
+            
+            roundabout_state = self.roundabout_state()
+
             state = np.array(np.concatenate([rl_pos, rl_vel,
                                             merge_dists_0, merge_0_vel,
                                             merge_dists_1, merge_1_vel,
                                             tailway_dists, tailway_vel,
                                             headway_dists, headway_vel,
-                                            queue_0, queue_1]))
+                                            queue_0, queue_1,
+                                            roundabout_state]))
                                             
-        except:
-            return np.zeros(self.n_obs_vehicles*2)
-
+        except Exception as er:
+            return np.zeros(self.total_obs)
         return state
 
     def sort_by_position(self):
@@ -335,6 +440,47 @@ class UDSSCMergeEnv(Env):
 
         return k_tailway[::-1], k_headway
 
+    def roundabout_state(self): # this is variable length, is that okay? I could instead m
+        """
+        Need some way to pass a static state about this
+
+        Dynamic (bc inflows): position, vel
+        Static: edge density, cars one edge, avg velocity on edge 
+            - obviously there are a lot of problems with this but it's
+              possible that since the ring is so small, this could work
+
+        STATIC VERSION
+        """
+        # total num is 3 * 24
+        # merge_edges = [":a_1", "right", ":b_1", "top", ":c_1",
+        #                "left", ":d_1", "bottom", "inflow_1",
+        #                ":g_2", "merge_in_1", ":a_0", ":b_0",
+        #                "merge_out_0", ":e_1", "outflow_0", "inflow_0",
+        #                ":e_0", "merge_in_0", ":c_0", ":d_0",
+        #                "merge_out_1", ":g_0", "outflow_1" ] # len 24
+        # import ipdb; ipdb.set_trace()
+        states = []
+        for edge in ROUNDABOUT_EDGES:
+            density = self._edge_density(edge) # No need to normalize, already under 0
+            states.append(density)
+            avg_velocity = self._edge_velocity(edge) 
+            avg_velocity = avg_velocity / self.scenario.max_speed
+            states.append(avg_velocity)
+            num_veh = len(self.vehicles.get_ids_by_edge(edge)) / 10 # Works for now
+            states.append(num_veh)
+        # import ipdb; ipdb.set_trace()
+        return states
+
+        
+    def _edge_density(self, edge):
+        num_veh = len(self.vehicles.get_ids_by_edge(edge))
+        length = self.scenario.edge_length(edge)
+        return num_veh/length 
+
+    def _edge_velocity(self, edge):
+        vel = self.vehicles.get_speed(self.vehicles.get_ids_by_edge(edge))
+        return np.mean(vel) if vel else 0
+
     def _dist_to_merge_1(self, veh_id):
         reference = self.scenario.total_edgestarts_dict["merge_in_1"] + \
                     self.scenario.edge_length("merge_in_1")
@@ -357,7 +503,7 @@ class UDSSCMergeEnv(Env):
     def process(self, state, length=None, normalizer=1):
         """
         Takes in a list, returns a normalized version of the list
-        with padded zeros at the end 
+        with padded zeros at the end according to the length parameter
         """
         if length: # Truncation or padding
             if len(state) < length:
@@ -378,12 +524,50 @@ class UDSSCMergeEnv(Env):
         circ = sum([self.scenario.edge_length(e) for e in edges])
         return circ
         
+    def get_k_followers(self, veh_id, k):
+        """
+        Return the IDs of the k vehicles behind veh_id.
+        Will not pad zeros.
+        """
+        curr = veh_id 
+        tailways = []
+        while k > 0 and curr.get_follower():
+            tailways.append(curr.get_follower())
+            curr = curr.get_follower()
+            k -= 0
+        return tailways
+
+    def get_k_leaders(self, veh_id, k):
+        """
+        Return the IDs of the k vehicles leading veh_id.
+        Will not pad zeros.
+        """
+        curr = veh_id 
+        leaders = []
+        while k > 0 and curr.get_leader():
+            tailways.append(curr.get_leader())
+            curr = curr.get_leader()
+            k -= 0
+        return leaders
+
     def additional_command(self):
         try: 
-            # self.velocities.append(np.mean(self.vehicles.get_speed(self.vehicles.get_controlled_ids())))
             self.velocities.append(np.mean(self.vehicles.get_speed(self.vehicles.get_ids())))
         except AttributeError:
             self.velocities = []
-            # self.velocities.append(np.mean(self.vehicles.get_speed(self.vehicles.get_controlled_ids())))
             self.velocities.append(np.mean(self.vehicles.get_speed(self.vehicles.get_ids())))
         
+        # Curate rl_stack
+        for veh_id in self.vehicles.get_rl_ids():
+            if veh_id not in self.rl_stack:
+                self.rl_stack.append(veh_id) # TODO also need step for removing it from the system
+
+
+
+# # one lane: 
+#         [":a_1", "right", ":b_1", "top", ":c_1",
+#         "left", ":d_1", "bottom", "inflow_1",
+#         ":g_2", "merge_in_1", ":a_0", ":b_0",
+#         "merge_out_0", ":e_1", "outflow_0", "inflow_0",
+#         ":e_0", "merge_in_0", ":c_0", ":d_0",
+#         "merge_out_1", ":g_0", "outflow_1" ]

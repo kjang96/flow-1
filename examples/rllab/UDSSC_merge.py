@@ -2,6 +2,8 @@
 Cooperative merging example, consisting of 1 learning agent and 6 additional
 vehicles in an inner ring, and 10 vehicles in an outer ring attempting to
 merge into the inner ring. rllab version.
+
+File name: UDSSC_merge.py
 """
 import sys
 from rllab.algos.trpo import TRPO
@@ -25,15 +27,19 @@ HORIZON = 500
 SIM_STEP = 1
 BATCH_SIZE = 15000
 ITR = 200
-exp_tag = "UDSSCMerge_14"  # experiment prefix
+exp_tag = "UDSSCMerge_15"  # experiment prefix
 
 # Sumo settings
 FLOW_RATE = 350
 FLOW_PROB = FLOW_RATE/3600
+# 50 is pretty dec for striking the balance between having an RL
+# there but not too often
+RL_FLOW_RATE = 50
+RL_FLOW_PROB = RL_FLOW_RATE/3600
 
-# Local settings
+# # Local settings
 # N_PARALLEL = 1
-# SUMO_BINARY = "sumo"
+# SUMO_BINARY = "sumo-gui"
 # MODE = "local"
 # RESTART_INSTANCE = False
 # SEEDS = [1]
@@ -70,18 +76,16 @@ def run_task(*_):
     inflow = InFlows()
     # inflow.add(veh_type="idm", edge="inflow_1", vehs_per_hour=FLOW_RATE)
     # inflow.add(veh_type="idm", edge="inflow_0", vehs_per_hour=FLOW_RATE)
-    inflow.add(veh_type="idm", edge="inflow_1", probability=FLOW_PROB)
-    inflow.add(veh_type="idm", edge="inflow_0", probability=FLOW_PROB)
+    inflow.add(veh_type="idm", edge="inflow_1", name="idm", probability=FLOW_PROB)
+    inflow.add(veh_type="idm", edge="inflow_0", name="idm", probability=FLOW_PROB)
+    # Add RL vehicles on equation
+    # inflow.add(veh_type="rl", edge="inflow_0", name="rl", probability=RL_FLOW_PROB)
+    inflow.add(veh_type="rl", edge="inflow_1", name="rl", vehs_per_hour=RL_FLOW_RATE)
 
     # note that the vehicles are added sequentially by the generator,
     # so place the merging vehicles after the vehicles in the ring
     vehicles = Vehicles()
 
-    # sumo_car_following_params=SumoCarFollowingParams(
-    #                accel=max_accel,
-    #                decel=max_decel,
-    #                tau=1.1,
-    #                max_speed=speed_limit),
     # Inner ring vehicles
     vehicles.add(veh_id="idm",
                  acceleration_controller=(IDMController, {"noise": 0.1}),
@@ -119,9 +123,9 @@ def run_task(*_):
         # desired velocity for all vehicles in the network, in m/s
         "target_velocity": 15,
         # number of observable vehicles preceding the rl vehicle
-        "n_preceding": 3,
+        "n_preceding": 1, # HAS TO BE 1
         # number of observable vehicles following the rl vehicle
-        "n_following": 3,
+        "n_following": 1, # HAS TO BE 1
         # number of observable merging-in vehicle from the larger loop
         "n_merging_in": 4,
     }
