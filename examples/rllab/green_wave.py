@@ -19,7 +19,7 @@ from flow.scenarios.grid.grid_scenario import SimpleGridScenario
 
 # Settings
 SIM_STEP = 1
-EXP_PREFIX = "greenwave_6"
+EXP_PREFIX = "greenwave_7"
 HORIZON = 500
 
 # # Local Settings
@@ -102,10 +102,10 @@ def run_task(*_):
     """Implement the run_task method needed to run experiments with rllab."""
     v_enter = 20
     target_velocity = 20
-    speed_limit = 25
+    speed_limit = 20
     switch_time = 3.0
     
-    max_accel = 2.6
+    max_accel = 2.6 # doesn't even apply to anything at this point
     max_decel = 4.5
     inner_length = 200
     long_length = 200
@@ -118,9 +118,11 @@ def run_task(*_):
     num_cars_bot = 1
     tot_cars = (num_cars_left + num_cars_right) * m \
         + (num_cars_bot + num_cars_top) * n
-    num_observed = 6
+    num_observed = 8 # JACK IT UUUUP
     inflow_rate = 350
     inflow_prob = 1/11
+    min_yellow_time = 3.0
+    min_green_time = 1.0
 
 
     grid_array = {"short_length": short_length, "inner_length": inner_length,
@@ -148,7 +150,7 @@ def run_task(*_):
     tl_logic = TrafficLights(baseline=False)
 
     additional_env_params = {"target_velocity": target_velocity,
-                             "min_yellow_time": 3.0, "min_green_time": 2.0,
+                             "min_yellow_time": min_yellow_time, "min_green_time": min_green_time,
                              "num_observed": num_observed}
 
     env_params = EnvParams(horizon=HORIZON, additional_params=additional_env_params)

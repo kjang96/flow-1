@@ -21,9 +21,9 @@ HORIZON = 500
 # # Local Settings
 RESTART_INSTANCE = False
 N_PARALLEL = 1
-ITR = 2
+ITR = 10
 SUMO_BINARY = "sumo"
-BATCH_SIZE = 15000
+BATCH_SIZE = 25000
 MODE = "local"
 SEEDS = [1]
 
@@ -76,9 +76,16 @@ def grid_example(sumo_binary=None):
         A non-rl experiment demonstrating the performance of human-driven
         vehicles and balanced traffic lights on a grid.
     """
-    inner_length = 300
-    long_length = 500
-    short_length = 300
+    v_enter = 20
+    target_velocity = 20
+    speed_limit = 20 # this might actually fucking be it 
+    switch_time = 3.0
+    
+    max_accel = 2.6
+    max_decel = 4.5
+    inner_length = 200
+    long_length = 200
+    short_length = 200
     n = 2
     m = 2
     num_cars_left = 1
@@ -87,20 +94,9 @@ def grid_example(sumo_binary=None):
     num_cars_bot = 1
     tot_cars = (num_cars_left + num_cars_right) * m \
         + (num_cars_bot + num_cars_top) * n
-    num_observed = 2
+    num_observed = 6
     inflow_rate = 350
     inflow_prob = 1/11
-    # inner_length = 300
-    # long_length = 500
-    # short_length = 300
-    # n = 2
-    # m = 3
-    # num_cars_left = 20
-    # num_cars_right = 20
-    # num_cars_top = 20
-    # num_cars_bot = 20
-    # tot_cars = (num_cars_left + num_cars_right) * m \
-    #     + (num_cars_top + num_cars_bot) * n
     grid_array = {"short_length": short_length, "inner_length": inner_length,
                   "long_length": long_length, "row_num": n, "col_num": m,
                   "cars_left": num_cars_left, "cars_right": num_cars_right,
@@ -152,11 +148,14 @@ def grid_example(sumo_binary=None):
         "maxDur": "6",
         "state": "rrryyyrrryyy"
     }]
-    tl_logic.add("center0", phases=phases, programID=1)
-    tl_logic.add("center1", phases=phases, programID=1)
-    tl_logic.add("center2", phases=phases, programID=1)
-    tl_logic.add("center3", phases=phases, programID=1)
-    # tl_logic.add("center2", tls_type="actuated", phases=phases, programID=1)
+    # tl_logic.add("center0", phases=phases, programID=1)
+    # tl_logic.add("center1", phases=phases, programID=1)
+    # tl_logic.add("center2", phases=phases, programID=1)
+    # tl_logic.add("center3", phases=phases, programID=1)
+    tl_logic.add("center0", tls_type="actuated", phases=phases, programID=1)
+    tl_logic.add("center1", tls_type="actuated", phases=phases, programID=1)
+    tl_logic.add("center2", tls_type="actuated", phases=phases, programID=1)
+    tl_logic.add("center3", tls_type="actuated", phases=phases, programID=1)
 
     additional_net_params = {"speed_limit": speed_limit, "grid_array": grid_array,
                              "horizontal_lanes": 1, "vertical_lanes": 1}
