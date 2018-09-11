@@ -417,7 +417,10 @@ class Env(gym.Env, Serializable):
             self.apply_rl_actions(rl_actions)
 
             self.additional_command()
-
+            #<--
+            curr_veh_list = list(self.vehicles.get_ids())
+            #-->
+            # import ipdb; ipdb.set_trace()
             self.traci_connection.simulationStep()
 
             # collect subscription information from sumo
@@ -431,6 +434,13 @@ class Env(gym.Env, Serializable):
             # store new observations in the vehicles and traffic lights class
             self.vehicles.update(vehicle_obs, id_lists, self)
             self.traffic_lights.update(tls_obs)
+
+            # <--
+            # import ipdb; ipdb.set_trace()
+            for veh_id in curr_veh_list:
+                if veh_id not in self.vehicles.get_ids(): #that means it has left 
+                    self.num_trips += 1
+            # -->
 
             # update the colors of vehicles
             self.update_vehicle_colors()
