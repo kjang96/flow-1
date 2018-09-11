@@ -61,6 +61,11 @@ class TrafficLightGridEnv(Env):
         self.rows = self.grid_array["row_num"]
         self.cols = self.grid_array["col_num"]
         self.velocities = []
+        #<--
+        self.vel_test = []
+        self.vel_len = []
+        self.num_trips = 0
+        #-->
         # self.num_observed = self.grid_array.get("num_observed", 3)
         self.num_traffic_lights = self.rows * self.cols
         self.tl_type = env_params.additional_params.get('tl_type')
@@ -492,14 +497,29 @@ class PO_TrafficLightGridEnv(TrafficLightGridEnv):
         if self.env_params.evaluate:
             return rewards.min_delay_unscaled(self)
         else:
+            # # <--
+            # vel = np.array(self.vehicles.get_speed(self.vehicles.get_ids()))
+            # self.vel_test.append(np.mean(vel))
+            # self.vel_len.append(len(self.vehicles.get_speed(self.vehicles.get_ids())))
+            # # -->
             # import ipdb; ipdb.set_trace()
-            reward = rewards.desired_velocity(self, fail=kwargs["fail"]) \
-            + rewards.penalize_tl_changes(rl_actions >= 0.5, gain=1.0) #i think this can be taken out
-            + rewards.penalize_standstill(self, gain=0.2)
 
-            # reward = rewards.min_delay(self, fail=kwargs["fail"]) \
-            #          + rewards.penalize_tl_changes(rl_actions >= 0.5, gain=1.0) #i think this can be taken out
+            # reward = rewards.desired_velocity(self, fail=kwargs["fail"]) \
+            # + rewards.penalize_tl_changes(rl_actions >= 0.5, gain=1.0) #i think this can be taken out
+            # + rewards.penalize_standstill(self, gain=0.2)
+
+            # dv = rewards.desired_velocity(self, fail=kwargs["fail"]) 
+            # tl = rewards.penalize_tl_changes(rl_actions >= 0.5, gain=1.0)
+            # st = rewards.penalize_standstill(self, gain=0.2)
+            # print(dv, tl, st) #none of these should be neg unless fail
+            # import ipdb; ipdb.set_trace()
+
+            reward = rewards.min_delay(self, fail=kwargs["fail"]) \
+                     + rewards.penalize_tl_changes(rl_actions >= 0.5, gain=1.0) \
+                     + rewards.penalize_standstill(self, gain=0.2)
+
         # print(reward)
+        # return dv 
         return reward
 
     def additional_command(self):

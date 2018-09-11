@@ -19,14 +19,14 @@ from flow.scenarios.grid.grid_scenario import SimpleGridScenario
 
 # Settings
 SIM_STEP = 1
-EXP_PREFIX = "greenwave_7"
+EXP_PREFIX = "greenwave_8"
 HORIZON = 500
 
 # # Local Settings
 # RESTART_INSTANCE = False
 # N_PARALLEL = 1
 # ITR = 500
-# SUMO_BINARY = "sumo-gui"
+# SUMO_BINARY = "sumo"
 # BATCH_SIZE = 15000
 # MODE = "local"
 # SEEDS = [1]
