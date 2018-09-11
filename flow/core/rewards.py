@@ -49,7 +49,7 @@ def average_velocity(env, fail=False):
         return 0.
     if len(vel) == 0:
         return 0.
-    return np.mean(vel)
+    return np.sqrt(np.mean(vel))
 
 def reward_density(env):
     return env.vehicles.get_num_arrived() / env.sim_step
