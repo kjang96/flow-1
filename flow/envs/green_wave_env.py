@@ -514,9 +514,13 @@ class PO_TrafficLightGridEnv(TrafficLightGridEnv):
             # print(dv, tl, st) #none of these should be neg unless fail
             # import ipdb; ipdb.set_trace()
 
-            reward = rewards.min_delay(self, fail=kwargs["fail"]) \
-                     + rewards.penalize_tl_changes(rl_actions >= 0.5, gain=1.0) \
-                     + rewards.penalize_standstill(self, gain=0.2)
+            # reward = rewards.min_delay(self, fail=kwargs["fail"]) \
+            #          + rewards.penalize_tl_changes(rl_actions >= 0.5, gain=1.0) \
+            #          + rewards.penalize_standstill(self, gain=0.2)
+
+            reward = rewards.average_velocity(self, fail=kwargs["fail"]) \
+            + rewards.penalize_tl_changes(rl_actions >= 0.5, gain=1.0) #i think this can be taken out
+            + rewards.penalize_standstill(self, gain=0.2)
 
         # print(reward)
         # return dv 
