@@ -19,7 +19,7 @@ from flow.scenarios.grid.grid_scenario import SimpleGridScenario
 
 # Settings
 SIM_STEP = 1
-EXP_PREFIX = "greenwave_9"
+EXP_PREFIX = "greenwave_10"
 HORIZON = 500
 
 # # Local Settings
@@ -34,7 +34,7 @@ HORIZON = 500
 # EC2 Settings
 RESTART_INSTANCE = True
 N_PARALLEL = 8
-ITR = 500
+ITR = 800
 SUMO_BINARY = "sumo"
 BATCH_SIZE = 25000
 MODE = "ec2"
