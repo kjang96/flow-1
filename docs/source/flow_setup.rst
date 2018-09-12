@@ -1,7 +1,6 @@
 .. contents:: Table of contents
 
-
-1.  Local Installation 
+Local Installation 
 **********************
 
 To get Flow running, you need three things: Flow,
@@ -255,7 +254,8 @@ The installation process for this library is as follows:
 
     cd ~
     git clone https://github.com/eugenevinitsky/ray.git
-    python ray/python/setup.py develop
+    cd ray/python/
+    python setup.py develop
 
 If missing libraries cause errors, please also install additional 
 required libraries as specified at 
@@ -273,7 +273,7 @@ You may define user-specific config parameters as follows
     cp flow/core/config.template.py flow/core/config.py  # Create template for users using pycharm
 
 
-2. Remote installation using docker
+Remote installation using docker
 ***********************************
 
 a. Installation
