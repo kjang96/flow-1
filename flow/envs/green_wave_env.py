@@ -504,9 +504,10 @@ class PO_TrafficLightGridEnv(TrafficLightGridEnv):
             # # -->
             # import ipdb; ipdb.set_trace()
 
-            # reward = rewards.desired_velocity(self, fail=kwargs["fail"]) \
-            # + rewards.penalize_tl_changes(rl_actions >= 0.5, gain=1.0) #i think this can be taken out
-            # + rewards.penalize_standstill(self, gain=0.2)
+            reward = rewards.desired_velocity(self, fail=kwargs["fail"]) \
+            + rewards.penalize_tl_changes(rl_actions >= 0.5, gain=1.0) #i think this can be taken out
+            + rewards.penalize_standstill(self, gain=0.2)
+            reward = reward / self.vehicles.num_vehicles
 
             # dv = rewards.desired_velocity(self, fail=kwargs["fail"]) 
             # tl = rewards.penalize_tl_changes(rl_actions >= 0.5, gain=1.0)
@@ -518,9 +519,9 @@ class PO_TrafficLightGridEnv(TrafficLightGridEnv):
             #          + rewards.penalize_tl_changes(rl_actions >= 0.5, gain=1.0) \
             #          + rewards.penalize_standstill(self, gain=0.2)
 
-            reward = rewards.average_velocity(self, fail=kwargs["fail"]) \
-            + rewards.penalize_tl_changes(rl_actions >= 0.5, gain=1.0) #i think this can be taken out
-            + rewards.penalize_standstill(self, gain=0.4)
+            # reward = rewards.average_velocity(self, fail=kwargs["fail"]) \
+            # + rewards.penalize_tl_changes(rl_actions >= 0.5, gain=1.0) #i think this can be taken out
+            # + rewards.penalize_standstill(self, gain=0.4)
 
         # print(reward)
         # return dv 
