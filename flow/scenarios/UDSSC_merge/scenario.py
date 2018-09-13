@@ -327,8 +327,8 @@ class UDSSCMergingScenario(Scenario):
         # First one corresponds to the IDM,
         # second one corresponds to the RL 
         if 'rl_0' in self.vehicles.get_ids(): # HARDCODE ALERT
-            startpositions = [('inflow_0', 10), ('right', 10)]
-            # startpositions = [('inflow_0', 10), ('inflow_0', 20)]
+            # startpositions = [('inflow_0', 10), ('right', 10)]
+            startpositions = [('inflow_0', 10), ('inflow_0', 20)]
         else: 
             startpositions = [('inflow_0', 10)]
         

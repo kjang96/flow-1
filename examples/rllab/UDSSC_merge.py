@@ -27,7 +27,7 @@ HORIZON = 500
 SIM_STEP = 1
 BATCH_SIZE = 15000
 ITR = 200
-exp_tag = "UDSSCMerge_16"  # experiment prefix
+exp_tag = "UDSSCMerge_17"  # experiment prefix
 
 # Sumo settings
 FLOW_RATE = 350

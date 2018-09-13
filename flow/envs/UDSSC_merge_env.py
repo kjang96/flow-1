@@ -206,7 +206,7 @@ class UDSSCMergeEnv(Env):
             rl_id = self.rl_stack[0]
 
             # rl_pos, rl_vel
-            rl_pos = [self.get_x_by_id(rl_id) / circ]
+            rl_pos = [self.get_x_by_id(rl_id) / self.scenario.length]
             rl_vel = [self.vehicles.get_speed(rl_id) / max_speed]
 
 
