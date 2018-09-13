@@ -27,7 +27,7 @@ HORIZON = 500
 SIM_STEP = 1
 BATCH_SIZE = 15000
 ITR = 200
-exp_tag = "UDSSCMerge_15"  # experiment prefix
+exp_tag = "UDSSCMerge_16"  # experiment prefix
 
 # Sumo settings
 FLOW_RATE = 350
@@ -39,7 +39,7 @@ RL_FLOW_PROB = RL_FLOW_RATE/3600
 
 # # Local settings
 # N_PARALLEL = 1
-# SUMO_BINARY = "sumo-gui"
+# SUMO_BINARY = "sumo"
 # MODE = "local"
 # RESTART_INSTANCE = False
 # SEEDS = [1]
@@ -155,7 +155,7 @@ def run_task(*_):
     }
 
     net_params = NetParams(
-        in_flows=inflow,
+        inflows=inflow,
         no_internal_links=False,
         additional_params=additional_net_params
     )
