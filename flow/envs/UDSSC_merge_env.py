@@ -33,6 +33,12 @@ MERGE_EDGES = [":a_1", "right", ":b_1", "top", ":c_1",
 ROUNDABOUT_EDGES = [":a_1", "right", ":b_1", "top", ":c_1",
                     "left", ":d_1", "bottom"]
 
+ALL_EDGES = ROUNDABOUT_EDGES + \
+            ['inflow_1', ':g_3', 'merge_in_1', ':a_0'
+             , ':b_0', 'merge_out_0', ':e_2', 'outflow_0'
+             , 'inflow_0', ':e_0', 'merge_in_0', ':c_0'
+             , ':d_0', 'merge_out_1', ':g_0', 'outflow_1']
+
 
 class UDSSCMergeEnv(Env):
     """Environment for training cooperative merging behavior in a closed loop
@@ -184,6 +190,7 @@ class UDSSCMergeEnv(Env):
             - headway_dists, headway_vel
         """
         # try:
+        rl_id = None
         # Get normalization factors 
         circ = self.circumference()
         max_speed = self.scenario.max_speed 
@@ -206,38 +213,46 @@ class UDSSCMergeEnv(Env):
             rl_id = self.rl_stack[0]
 
             # rl_pos, rl_vel
-            rl_pos = [self.get_x_by_id(rl_id) / self.scenario.length]
+            rl_pos = [self.get_x_by_id(rl_id) / self.scenario_length]
             rl_vel = [self.vehicles.get_speed(rl_id) / max_speed]
-
+            # print(rl_id, rl_pos)
 
             # tailway_dists, tailway_vel
             # headway_dists, headway_vel
             tail_id = self.vehicles.get_follower(rl_id)
             head_id = self.vehicles.get_leader(rl_id)
+            # print(rl_id, head_id)
             # TODO BUG HERE
 
             # This is kinda shitty coding, but I'm not that confident
             # in get_lane_tailways atm, Idrk how it works 
             if tail_id: 
-                tailway_vel = [self.vehicles.get_speed(tail_id)]
+                tailway_vel = [self.vehicles.get_speed(tail_id) / max_speed]
                 tailway_dists = self.vehicles.get_lane_tailways(rl_id)
                 if not tailway_vel:
                     tailway_vel = [0]
-                if not tailway_dists:
+                if not tailway_dists or tailway_dists[0] == 1e+3:
                     tailway_dists = [0]
+                else:
+                    tailway_dists[0] = tailway_dists[0] / self.scenario_length
             else: # No 
                 tailway_vel = [0]
                 tailway_dists = [0]
             if head_id:
-                headway_vel = [self.vehicles.get_speed(head_id)]
+                headway_vel = [self.vehicles.get_speed(head_id) / max_speed]
                 headway_dists = self.vehicles.get_lane_headways(rl_id)
+                # print(headway_dists)
                 if not headway_vel:
                     headway_vel = [0]
-                if not headway_dists:
+                if not headway_dists or headway_dists[0] == 1e+3:
                     headway_dists = [0]
+                else:
+                    headway_dists[0] = headway_dists[0] / self.scenario_length
+                # print(headway_dists)
             else: # No leader
                 headway_vel = [0]
                 headway_dists = [0]
+            # print(rl_id, headway_dists[0] * self.scenario_length, tailway_dists[0]* self.scenario_length)
 
 
         else: # RL vehicle's not in the system. Pass in zeros here 
@@ -578,6 +593,11 @@ class UDSSCMergeEnv(Env):
     def roundabout_length(self):
         rl = sum([self.scenario.edge_length(e) for e in ROUNDABOUT_EDGES])
         return rl
+
+    @property
+    def scenario_length(self):
+        length = sum([self.scenario.edge_length(e) for e in ALL_EDGES])
+        return length
 
     def additional_command(self):
         try: 
