@@ -25,9 +25,9 @@ from flow.core.params import InFlows
 # Training settings
 HORIZON = 500
 SIM_STEP = 1
-BATCH_SIZE = 15000
-ITR = 200
-exp_tag = "UDSSCMerge_17"  # experiment prefix
+BATCH_SIZE = 20000
+ITR = 100
+exp_tag = "roundabout_a12"  # experiment prefix
 
 # Sumo settings
 FLOW_RATE = 350
@@ -39,7 +39,7 @@ RL_FLOW_PROB = RL_FLOW_RATE/3600
 
 # # Local settings
 # N_PARALLEL = 1
-# SUMO_BINARY = "sumo"
+# SUMO_BINARY = "sumo-gui"
 # MODE = "local"
 # RESTART_INSTANCE = False
 # SEEDS = [1]
@@ -49,7 +49,7 @@ N_PARALLEL = 8
 SUMO_BINARY = "sumo"
 MODE = "ec2"
 RESTART_INSTANCE = True
-SEEDS = [1, 2, 5]
+SEEDS = [1, 2, 5, 91]
 
 
 def main():
@@ -72,16 +72,27 @@ def run_task(*_):
     # checks()
 
     sumo_params = SumoParams(sim_step=SIM_STEP, sumo_binary=SUMO_BINARY, restart_instance=RESTART_INSTANCE)
+    # # <--
+    # inflow = InFlows()
+    # # inflow.add(veh_type="idm", edge="inflow_1", vehs_per_hour=FLOW_RATE)
+    # # inflow.add(veh_type="idm", edge="inflow_0", vehs_per_hour=FLOW_RATE)
+    # inflow.add(veh_type="idm", edge="inflow_1", name="idm", probability=FLOW_PROB)
+    # inflow.add(veh_type="idm", edge="inflow_0", name="idm", probability=FLOW_PROB)
+    # # Add RL vehicles on equation
+    # # inflow.add(veh_type="rl", edge="inflow_0", name="rl", probability=RL_FLOW_PROB)
+    # inflow.add(veh_type="rl", edge="inflow_1", name="rl", vehs_per_hour=RL_FLOW_RATE)
+    # # -->
 
     inflow = InFlows()
-    # inflow.add(veh_type="idm", edge="inflow_1", vehs_per_hour=FLOW_RATE)
-    # inflow.add(veh_type="idm", edge="inflow_0", vehs_per_hour=FLOW_RATE)
-    inflow.add(veh_type="idm", edge="inflow_1", name="idm", probability=FLOW_PROB)
-    inflow.add(veh_type="idm", edge="inflow_0", name="idm", probability=FLOW_PROB)
-    # Add RL vehicles on equation
-    # inflow.add(veh_type="rl", edge="inflow_0", name="rl", probability=RL_FLOW_PROB)
-    inflow.add(veh_type="rl", edge="inflow_1", name="rl", vehs_per_hour=RL_FLOW_RATE)
-
+    inflow.add(veh_type="rl", edge="inflow_0", name="rl", vehs_per_hour=50)
+    inflow.add(veh_type="idm", edge="inflow_0", name="idm", vehs_per_hour=50)
+    inflow.add(veh_type="idm", edge="inflow_0", name="idm", vehs_per_hour=50)
+    
+    inflow.add(veh_type="idm", edge="inflow_1", name="idm", vehs_per_hour=50)
+    inflow.add(veh_type="idm", edge="inflow_1", name="idm", vehs_per_hour=50)
+    inflow.add(veh_type="idm", edge="inflow_1", name="idm", vehs_per_hour=50)
+    inflow.add(veh_type="idm", edge="inflow_1", name="idm", vehs_per_hour=50)
+    inflow.add(veh_type="idm", edge="inflow_1", name="idm", vehs_per_hour=50)
     # note that the vehicles are added sequentially by the generator,
     # so place the merging vehicles after the vehicles in the ring
     vehicles = Vehicles()
@@ -127,7 +138,7 @@ def run_task(*_):
         # number of observable vehicles following the rl vehicle
         "n_following": 1, # HAS TO BE 1
         # number of observable merging-in vehicle from the larger loop
-        "n_merging_in": 4,
+        "n_merging_in": 6,
     }
 
     env_params = EnvParams(horizon=HORIZON,
