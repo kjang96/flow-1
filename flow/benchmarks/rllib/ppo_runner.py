@@ -1,14 +1,15 @@
-"""
-Runner script for environments located in flow/benchmarks.
+"""Runs the environments located in flow/benchmarks.
 
 The environment file can be modified in the imports to change the environment
-this runner script is executed on. Furthermore, the rllib specific algorithm/
-parameters can be specified here once and used on multiple environments.
+this runner script is executed on. This file runs the PPO algorithm in rllib
+and utilizes the hyper-parameters specified in:
+
+Proximal Policy Optimization Algorithms by Schulman et. al.
 """
 import json
 
 import ray
-import ray.rllib.ppo as ppo
+import ray.rllib.agents.ppo as ppo
 from ray.tune import run_experiments
 from ray.tune.registry import register_env
 
@@ -19,9 +20,9 @@ from flow.utils.rllib import FlowParamsEncoder
 from flow.benchmarks.grid1 import flow_params
 
 # number of rollouts per training iteration
-N_ROLLOUTS = 3
+N_ROLLOUTS = 20
 # number of parallel workers
-PARALLEL_ROLLOUTS = 3
+N_CPUS = 2
 
 if __name__ == "__main__":
     # get the env name and a creator for the environment
@@ -32,7 +33,7 @@ if __name__ == "__main__":
 
     horizon = flow_params["env"].horizon
     config = ppo.DEFAULT_CONFIG.copy()
-    config["num_workers"] = PARALLEL_ROLLOUTS
+    config["num_workers"] = N_CPUS
     config["timesteps_per_batch"] = horizon * N_ROLLOUTS
     config["vf_loss_coeff"] = 1.0
     config["kl_target"] = 0.02
@@ -60,11 +61,7 @@ if __name__ == "__main__":
             "stop": {
                 "training_iteration": 5
             },
-            "repeat": 1,
-            "trial_resources": {
-                "cpu": 1,
-                "gpu": 0,
-                "extra_cpu": PARALLEL_ROLLOUTS - 1,
-            },
+            "num_samples": 3,
+            # "upload_dir": "s3://bucket"
         },
     })

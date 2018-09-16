@@ -1,5 +1,4 @@
-"""
-Runner script for environments located in flow/benchmarks.
+"""Runs the environments located in flow/benchmarks.
 
 The environment file can be modified in the imports to change the environment
 this runner script is executed on. This script than handles running the rllab
@@ -22,10 +21,15 @@ from flow.benchmarks.grid1 import flow_params
 # number of rollouts per training iteration
 N_ROLLOUTS = 50
 # number of parallel workers
-PARALLEL_ROLLOUTS = 8
+N_CPUS = 8
 
 
 def run_task(*_):
+    """Implement the ``run_task`` method needed to run experiments with rllab.
+
+    Note that the flow-specific parameters are imported at the start of this
+    script and unzipped and processed here.
+    """
     env_name = flow_params["env_name"]
     exp_tag = flow_params["exp_tag"]
     sumo_params = flow_params["sumo"]
@@ -65,7 +69,7 @@ def run_task(*_):
         env=env,
         policy=policy,
         baseline=baseline,
-        batch_size=horizon * (N_ROLLOUTS - PARALLEL_ROLLOUTS + 1),
+        batch_size=horizon * (N_ROLLOUTS - N_CPUS + 1),
         max_path_length=horizon,
         n_itr=500,
         discount=0.999,
@@ -78,7 +82,7 @@ for seed in [5, 20, 68, 100, 128]:
     run_experiment_lite(
         run_task,
         # Number of parallel workers for sampling
-        n_parallel=PARALLEL_ROLLOUTS,
+        n_parallel=N_CPUS,
         # Keeps the snapshot parameters for all iterations
         snapshot_mode="all",
         # Specifies the seed for the experiment. If this is not provided, a

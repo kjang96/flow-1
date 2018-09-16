@@ -1,6 +1,4 @@
-"""
-Example of an open multi-lane network with human-driven vehicles.
-"""
+"""Example of an open multi-lane network with human-driven vehicles."""
 
 from flow.controllers import IDMController
 from flow.core.experiment import SumoExperiment
@@ -14,6 +12,20 @@ from flow.scenarios.highway.scenario import HighwayScenario, \
 
 
 def highway_example(sumo_binary=None):
+    """
+    Perform a simulation of vehicles on a highway.
+
+    Parameters
+    ----------
+    sumo_binary: bool, optional
+        specifies whether to use sumo's gui during execution
+
+    Returns
+    -------
+    exp: flow.core.SumoExperiment type
+        A non-rl experiment demonstrating the performance of human-driven
+        vehicles on a figure eight.
+    """
     sumo_params = SumoParams(sumo_binary="sumo-gui")
 
     if sumo_binary is not None:
@@ -47,7 +59,7 @@ def highway_example(sumo_binary=None):
 
     additional_net_params = ADDITIONAL_NET_PARAMS.copy()
     net_params = NetParams(
-        in_flows=inflow, additional_params=additional_net_params)
+        inflows=inflow, additional_params=additional_net_params)
 
     initial_config = InitialConfig(spacing="uniform", shuffle=True)
 

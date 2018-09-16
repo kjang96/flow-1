@@ -1,4 +1,5 @@
-"""
+"""Bottleneck decongestion example.
+
 Bottleneck in which the actions are specifying a desired velocity
 in a segment of space
 """
@@ -25,7 +26,7 @@ NUM_LANES = 4 * SCALING  # number of lanes in the widest highway
 DISABLE_TB = True
 DISABLE_RAMP_METER = True
 AV_FRAC = .1
-PARALLEL_ROLLOUTS = 32
+N_CPUS = 32
 i = 0
 
 sumo_params = SumoParams(
@@ -102,7 +103,7 @@ if not DISABLE_RAMP_METER:
 
 additional_net_params = {"scaling": SCALING}
 net_params = NetParams(
-    in_flows=inflow,
+    inflows=inflow,
     no_internal_links=False,
     additional_params=additional_net_params)
 
@@ -121,6 +122,7 @@ scenario = BottleneckScenario(
 
 
 def run_task(*_):
+    """Implement the run_task method needed to run experiments with rllab."""
     pass_params = (env_name, sumo_params, vehicles, env_params, net_params,
                    initial_config, scenario)
 

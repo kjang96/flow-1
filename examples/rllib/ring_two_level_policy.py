@@ -1,15 +1,17 @@
-"""
+"""Hierarchical ring road example.
+
 Example script for use of two-level fully connected network policy,
 using the single-lane ring road setting.
 """
 
 import ray
-import ray.rllib.ppo as ppo
+import ray.rllib.agents.ppo as ppo
 from ray.tune.registry import get_registry, register_env as register_rllib_env
 from .stabilizing_the_ring import make_create_env
 
 
 def to_subpolicy_state(inputs):
+    """Break state down for different portions of the policy."""
     return inputs
 
 

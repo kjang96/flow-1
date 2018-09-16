@@ -24,7 +24,7 @@ class TestEmissionToCSV(unittest.TestCase):
     the components are correct.
     """
 
-    def runTest(self):
+    def test_emission_to_csv(self):
         # current path
         current_path = os.path.realpath(__file__).rsplit("/", 1)[0]
 
@@ -145,11 +145,6 @@ class TestRegistry(unittest.TestCase):
         # that this feature is in fact needed to avoid race conditions
         flow_params["sumo"].port = env.env.sumo_params.port
 
-        # TODO(ak): deal with this hack
-        flow_params["initial"].positions = \
-            env.env.scenario.initial_config.positions
-        flow_params["initial"].lanes = env.env.scenario.initial_config.lanes
-
         # check that each of the parameter match
         self.assertEqual(env.env.env_params.__dict__,
                          flow_params["env"].__dict__)
@@ -236,7 +231,7 @@ class TestRllib(unittest.TestCase):
                 },
             ),
             net=NetParams(
-                in_flows=inflow,
+                inflows=inflow,
                 no_internal_links=False,
                 additional_params={
                     "merge_length": 100,
@@ -276,16 +271,12 @@ class TestRllib(unittest.TestCase):
         # delete the created file
         os.remove(os.path.expanduser('params.json'))
 
-        # TODO(ak): deal with this hack
-        imported_flow_params["initial"].positions = None
-        imported_flow_params["initial"].lanes = None
-
         # test that this inflows are correct
-        self.assertTrue(imported_flow_params["net"].in_flows.__dict__ ==
-                        flow_params["net"].in_flows.__dict__)
+        self.assertTrue(imported_flow_params["net"].inflows.__dict__ ==
+                        flow_params["net"].inflows.__dict__)
 
-        imported_flow_params["net"].in_flows = None
-        flow_params["net"].in_flows = None
+        imported_flow_params["net"].inflows = None
+        flow_params["net"].inflows = None
 
         # make sure the rest of the imported flow_params match the originals
         self.assertTrue(imported_flow_params["env"].__dict__ == flow_params[
