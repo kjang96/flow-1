@@ -106,8 +106,9 @@ class UDSSCMergeEnv(Env):
         # Queue length x 2
         # Roundabout state = len(MERGE_EDGES) * 3
         # Roundabout full = (ROUNDABOUT_LENGTH // 5)*2 # 2 cols
+        # rl_pos_2, the pos in the roundabout: 1
         self.total_obs = self.n_obs_vehicles * 2 + 2 + \
-                         int(self.roundabout_length // 5) *2
+                         int(self.roundabout_length // 5) * 2 + 1
                          
         box = Box(low=0.,
                   high=1,
@@ -148,6 +149,7 @@ class UDSSCMergeEnv(Env):
     def compute_reward(self, state, rl_actions, **kwargs):
         vel_reward = rewards.desired_velocity(self, fail=kwargs["fail"])
         avg_vel_reward = rewards.average_velocity(self, fail=kwargs["fail"])
+        penalty = rewards.penalize_standstill(self)
 
         # Use a similar weighting of of the headway reward as the velocity
         # reward
@@ -160,7 +162,6 @@ class UDSSCMergeEnv(Env):
             # self.vehicles, self.sorted_extra_data, normalization)
         # return vel_reward + headway_reward
         # return vel_reward
-        # print(avg_vel_reward)
         return avg_vel_reward
 
     def get_state(self, **kwargs):
@@ -215,6 +216,10 @@ class UDSSCMergeEnv(Env):
             # rl_pos, rl_vel
             rl_pos = [self.get_x_by_id(rl_id) / self.scenario_length]
             rl_vel = [self.vehicles.get_speed(rl_id) / max_speed]
+            if self.vehicles.get_edge(rl_id) in ROUNDABOUT_EDGES:
+                rl_pos_2 = [self.get_x_by_id(rl_id) / self.roundabout_length]
+            else: 
+                rl_pos_2 = [0]
             # print(rl_id, rl_pos)
 
             # tailway_dists, tailway_vel
@@ -257,6 +262,7 @@ class UDSSCMergeEnv(Env):
 
         else: # RL vehicle's not in the system. Pass in zeros here 
             rl_pos = [0]
+            rl_pos_2 = [0]
             rl_vel = [0]
             tailway_vel = [0]
             tailway_dists = [0]
@@ -315,16 +321,14 @@ class UDSSCMergeEnv(Env):
         roundabout_full[:,1] = roundabout_full[:,1]/max_speed
         roundabout_full = roundabout_full.flatten().tolist()
         # roundabout_state = self.roundabout_state()
-        state = np.array(np.concatenate([rl_pos, rl_vel,
+        state = np.array(np.concatenate([rl_pos, rl_pos_2, rl_vel,
                                         merge_dists_0, merge_0_vel,
                                         merge_dists_1, merge_1_vel,
                                         tailway_dists, tailway_vel,
                                         headway_dists, headway_vel,
                                         queue_0, queue_1,
                                         roundabout_full]))
-                                            
-        # except Exception as er:
-        #     return np.zeros(self.total_obs)
+    
         return state
 
     def sort_by_position(self):
