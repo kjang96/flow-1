@@ -80,15 +80,18 @@ if __name__ == "__main__":
         new_rewards = path['rewards']
         all_rewards[j, :len(new_rewards)] = new_rewards
         # <--
-        vels.append(np.mean(unwrapped_env.velocities))
+        vels.append(np.nanmean(unwrapped_env.velocities))
         # -->
         # print the cumulative reward of the most recent rollout
         print("Round {}, return: {}".format(j, sum(new_rewards)))
         rew.append(sum(new_rewards))
-
+    
     kathy = unwrapped_env
+    for v in kathy.velocities:
+        if v is np.nan:
+            import ipdb; ipdb.set_trace()
     avg_vel = np.mean(vels)
-    # import ipdb; ipdb.set_trace()
+    import ipdb; ipdb.set_trace()
 
     # print the average cumulative reward across rollouts
     print("Average, std return: {}, {}".format(np.mean(rew), np.std(rew)))
