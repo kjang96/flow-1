@@ -60,6 +60,7 @@ class Routes:
         baseline: bool
         """
         self.routes = {} # mapping of route_id -> route object
+        self.starts = []
 
     def add(self, route_id, route, prob=1):
         """Adds a route to the network.
@@ -82,9 +83,12 @@ class Routes:
         """
         if route_id in self.routes.keys():
             print("Warning: Overwriting route with id %s" % route_id)
+        start = route[0]
+        if start not in self.starts:
+            self.starts.append(start)
         route = {"route_id": route_id,
                  "route": route,
-                 "start": route[0],
+                 "start": start,
                  "prob": prob}
         self.routes[route_id] = route
 
@@ -99,29 +103,29 @@ class Routes:
     def get_routes(self):
         """
         Return dictionary of all routes in the class.
-        
-        To be used by the generator.
         """
         return self.routes
+
+    def get_starts(self):
+        return self.starts
+
+
+    def generate_routes(self):
+        """
+        To be used by the generator.
+        """
+        routes = {}
+        for start in self.starts:
+            routes[start] = self.get_distribution(start)
+        return routes
 
     def remove(self, route_id):
         """
         Remove route with name ROUTE_ID.
         """
         del self.routes[route_id]
-
+        # TODO clean up self.starts if necessary
 
     def get_ids(self):
         """Returns the names of all routes."""
         return self.routes.keys()
-
-
-# class Route:
-#     """
-#     A single route object 
-#     """
-
-#     def __init__(self, route_id, route=[], prob=1, **kwargs):
-#         self.id = route_id
-#         self.route = route
-#         self.prob = prob

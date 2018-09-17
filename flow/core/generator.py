@@ -236,12 +236,24 @@ class Generator(Serializable):
 
         add = makexml("additional",
                       "http://sumo.dlr.de/xsd/additional_file.xsd")
+        ### CHANGES START
 
+        # if any(isinstance(x, dict) for x in list_of_stuff):
+        # ORIGINAL VERSION
         # add the routes to the .add.xml file
         # for (edge, route) in self.rts.items():
         #     add.append(E("route", id="route%s" % edge, edges=" ".join(route)))
+        if isinstance(self.rts, object):
+            for (dist_id, routes) in self.rts.generate_routes().items():
+                e = E("routeDistribution", id="route%s" % dist_id)
+                for route in routes:
+                    e.append(E("route", 
+                               id=route["route_id"], 
+                               edges=" ".join(route["route"]), 
+                               probability=repr(route["prob"])))
+                add.append(e)
 
-        if any(isinstance(x, dict) for x in list(self.rts.values())):
+        elif any(isinstance(x, dict) for x in list(self.rts.values())):
         # CURRENT WORKING VERSION FOR UDSSC_MERGE
             for (dist_id, routes) in self.rts.items():
                 e = E("routeDistribution", id="route%s" % dist_id)
@@ -254,15 +266,6 @@ class Generator(Serializable):
             # add the routes to the .add.xml file
             for (edge, route) in self.rts.items():
                 add.append(E("route", id="route%s" % edge, edges=" ".join(route)))
-
-        ## assume you have the right routes object. then:
-        # for (dist_id, routes) in self.rts: 
-        #     e = E("routeDistribution", id="route%s" % dist_id)
-        #         for route, edges in routes.items():
-        #             # if "probability" in
-        #             e.append(E("route", id="route%s" % route, edges=" ".join(edges), probability="1"))
-        #         add.append(e)
-
 
         # BELOW REQUIRES FURTHER CHANGES. ASK FOR REVIEW
         # for (dist_id, routes) in self.rts.items():
