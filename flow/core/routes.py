@@ -46,7 +46,6 @@ rts =  {"top": {"top": ["top", "left", "bottom", "right"]},
 This is the abstract of how I want my data kept:
 routes = {"start_edge": [route, route]}
 
-
 """
 
 class Routes:
@@ -60,13 +59,14 @@ class Routes:
         ----------
         baseline: bool
         """
-        self.routes = defaultdict(list)
-        # self.distributed = distributed
+        self.routes = {} # mapping of route_id -> route object
 
-    def add(self, route=[], prob=1):
+    def add(self, route_id, route, prob=1):
         """Adds a route to the network.
 
         for the base route case 
+        Requires a unique route_id name
+        Overwrites if an id with the same route_id is added
 
         Parameters
         ----------
@@ -80,83 +80,48 @@ class Routes:
         For information on defining traffic light properties, see:
         http://sumo.dlr.de/wiki/Simulation/Traffic_Lights#Defining_New_TLS-Programs
         """
-        start = route[0]
+        if route_id in self.routes.keys():
+            print("Warning: Overwriting route with id %s" % route_id)
+        route = {"route_id": route_id,
+                 "route": route,
+                 "start": route[0],
+                 "prob": prob}
+        self.routes[route_id] = route
 
-        # If the route is a distribution, it requires a unique id
-        if start in self.routes: # Then this is a distribution an
-            route_id = start + repr(len(self.routes[start]))
-        else:
-            route_id = start + repr(0)
-        route = Route(route_id, prob)
-        self.routes[start].append(route)
+    def get_distribution(self, start):
+        """ 
+        TODO Could maybe change this name
+        """
+        # return self.distribution[start]
+        distrib = [r for r in self.routes.values() if r["start"]==start]
+        return distrib
 
-    # def update(self, tls_subscriptions):
-    #     """Updates the states and phases of the traffic lights to match current
-    #     traffic light data.
+    def get_routes(self):
+        """
+        Return dictionary of all routes in the class.
+        
+        To be used by the generator.
+        """
+        return self.routes
 
-    #     Parameters
-    #     ----------
-    #     tls_subscriptions : dict
-    #         sumo traffic light subscription data
-    #     """
-    #     self.__tls = tls_subscriptions.copy()
-
-    # def get_ids(self):
-    #     """Returns the names of all nodes with traffic lights."""
-    #     return self.__ids
-
-    # def get_properties(self):
-    #     """Returns traffic light properties. This is meant to be used by the
-    #     generator to import traffic light data to the .net.xml file"""
-    #     return self.__tls_properties
-
-    # def set_state(self, node_id, state, env, link_index="all"):
-    #     """Sets the state of the traffic lights on a specific node.
-
-    #     Parameters
-    #     ----------
-    #     node_id : str
-    #         name of the node with the controlled traffic lights
-    #     state : str
-    #         requested state(s) for the traffic light
-    #     env : flow.envs.base_env.Env type
-    #         the environment at the current time step
-    #     link_index : int, optional
-    #         index of the link whose traffic light state is meant to be changed.
-    #         If no value is provided, the lights on all links are updated.
-    #     """
-    #     if link_index == "all":
-    #         # if lights on all lanes are changed
-    #         env.traci_connection.trafficlight.setRedYellowGreenState(
-    #             tlsID=node_id, state=state)
-    #     else:
-    #         # if lights on a single lane is changed
-    #         env.traci_connection.trafficlight.setLinkState(
-    #             tlsID=node_id, tlsLinkIndex=link_index, state=state)
-
-    # def get_state(self, node_id):
-    #     """Returns the state of the traffic light(s) at the specified node
-
-    #     Parameters
-    #     ----------
-    #     node_id: str
-    #         name of the node
-
-    #     Returns
-    #     -------
-    #     state : str
-    #         Index = lane index
-    #         Element = state of the traffic light at that node/lane
-    #     """
-    #     return self.__tls[node_id][tc.TL_RED_YELLOW_GREEN_STATE]
+    def remove(self, route_id):
+        """
+        Remove route with name ROUTE_ID.
+        """
+        del self.routes[route_id]
 
 
-class Route:
-    """
-    A single route object 
-    """
+    def get_ids(self):
+        """Returns the names of all routes."""
+        return self.routes.keys()
 
-    def __init__(self, route_id, route=[], prob=1, **kwargs):
-        self.id = route_id
-        self.route = route
-        self.prob = prob
+
+# class Route:
+#     """
+#     A single route object 
+#     """
+
+#     def __init__(self, route_id, route=[], prob=1, **kwargs):
+#         self.id = route_id
+#         self.route = route
+#         self.prob = prob
