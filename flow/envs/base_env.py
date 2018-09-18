@@ -102,7 +102,7 @@ class Env(gym.Env, Serializable):
         # the available_routes variable contains a dictionary of routes
         # vehicles can traverse; to be used when routes need to be chosen
         # dynamically
-        self.available_routes = self.scenario.generator.rts
+        self.available_routes = self.scenario.generator.rts.generate_routes()
 
         # TraCI connection used to communicate with sumo
         self.traci_connection = None
@@ -126,28 +126,11 @@ class Env(gym.Env, Serializable):
         # TODO(ak): temporary fix to support old pkl files
         if not hasattr(self.env_params, "evaluate"):
             self.env_params.evaluate = False
-        # self.velocities = []
-        # self.rets = []
-        self.edge_set = set()
+
         self.start_sumo()
         self.setup_initial_state()
 
-        # warn about not using restart_instance when using inflows
-        if len(self.scenario.net_params.inflows.get()) > 0 and \
-                not self.sumo_params.restart_instance:
-            print(
-                "**********************************************************\n"
-                "**********************************************************\n"
-                "**********************************************************\n"
-                "WARNING: Inflows will cause computational performance to\n"
-                "significantly decrease after large number of rollouts. In \n"
-                "order to avoid this, set SumoParams(restart_instance=True).\n"
-                "**********************************************************\n"
-                "**********************************************************\n"
-                "**********************************************************"
-            )
-
-    def restart_sumo(self, sumo_params, sumo_binary=None):
+    def restart_sumo(self, sumo_params, render=None):
         """Restart an already initialized sumo instance.
 
         This is used when visualizing a rollout, in order to update the
@@ -520,20 +503,20 @@ class Env(gym.Env, Serializable):
         # reset the time counter
         self.time_counter = 0
 
-        # # warn about not using restart_instance when using inflows
-        # if len(self.scenario.net_params.inflows.get()) > 0 and \
-        #         not self.sumo_params.restart_instance:
-        #     print(
-        #         "**********************************************************\n"
-        #         "**********************************************************\n"
-        #         "**********************************************************\n"
-        #         "WARNING: Inflows will cause computational performance to\n"
-        #         "significantly decrease after large number of rollouts. In \n"
-        #         "order to avoid this, set SumoParams(restart_instance=True).\n"
-        #         "**********************************************************\n"
-        #         "**********************************************************\n"
-        #         "**********************************************************"
-        #     )
+        # warn about not using restart_instance when using inflows
+        if len(self.scenario.net_params.inflows.get()) > 0 and \
+                not self.sumo_params.restart_instance:
+            print(
+                "**********************************************************\n"
+                "**********************************************************\n"
+                "**********************************************************\n"
+                "WARNING: Inflows will cause computational performance to\n"
+                "significantly decrease after large number of rollouts. In \n"
+                "order to avoid this, set SumoParams(restart_instance=True).\n"
+                "**********************************************************\n"
+                "**********************************************************\n"
+                "**********************************************************"
+            )
 
         if self.sumo_params.restart_instance or self.step_counter > 2e6:
             self.step_counter = 0
@@ -779,9 +762,10 @@ class Env(gym.Env, Serializable):
         """
         for i, veh_id in enumerate(veh_ids):
             if route_choices[i] is not None:
-                route = route_choices[i]
+                # TODO: for now, just choose the first route
+                route = route_choices[i][0]
                 if isinstance(route, dict):
-                    route = list(route.values())[0]
+                    route = route['route']
                 self.traci_connection.vehicle.setRoute(
                     vehID=veh_id, edgeList=route)
 
