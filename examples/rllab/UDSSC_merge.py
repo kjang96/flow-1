@@ -27,7 +27,7 @@ HORIZON = 500
 SIM_STEP = 1
 BATCH_SIZE = 20000
 ITR = 100
-exp_tag = "roundabout_a12"  # experiment prefix
+exp_tag = "roundabout_a13"  # experiment prefix
 
 # Sumo settings
 FLOW_RATE = 350
