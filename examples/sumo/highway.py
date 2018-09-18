@@ -11,13 +11,13 @@ from flow.scenarios.highway.scenario import HighwayScenario, \
     ADDITIONAL_NET_PARAMS
 
 
-def highway_example(sumo_binary=None):
+def highway_example(render=None):
     """
     Perform a simulation of vehicles on a highway.
 
     Parameters
     ----------
-    sumo_binary: bool, optional
+    render : bool, optional
         specifies whether to use sumo's gui during execution
 
     Returns
@@ -26,10 +26,10 @@ def highway_example(sumo_binary=None):
         A non-rl experiment demonstrating the performance of human-driven
         vehicles on a figure eight.
     """
-    sumo_params = SumoParams(sumo_binary="sumo-gui")
+    sumo_params = SumoParams(render=True)
 
-    if sumo_binary is not None:
-        sumo_params.sumo_binary = sumo_binary
+    if render is not None:
+        sumo_params.render = render
 
     vehicles = Vehicles()
     vehicles.add(
@@ -46,13 +46,13 @@ def highway_example(sumo_binary=None):
     inflow = InFlows()
     inflow.add(
         veh_type="human",
-        edge="highway",
+        edge="highway_0",
         probability=0.25,
         departLane="free",
         departSpeed=20)
     inflow.add(
         veh_type="human2",
-        edge="highway",
+        edge="highway_0",
         probability=0.25,
         departLane="free",
         departSpeed=20)
