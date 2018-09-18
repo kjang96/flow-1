@@ -49,9 +49,9 @@ def average_velocity(env, fail=False):
         return 0.
     if len(vel) == 0:
         return 0.
-    return sum(vel) / 3 #just cuz
+    # return sum(vel) / 3 #just cuz
 
-    # return np.mean(vel)
+    return np.mean(vel)
 
 
 def reward_density(env):

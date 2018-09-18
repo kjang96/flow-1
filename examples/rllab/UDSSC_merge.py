@@ -27,7 +27,7 @@ HORIZON = 500
 SIM_STEP = 1
 BATCH_SIZE = 20000
 ITR = 100
-exp_tag = "roundabout_a14"  # experiment prefix
+exp_tag = "roundabout_a15"  # experiment prefix
 
 # Sumo settings
 FLOW_RATE = 350
@@ -42,7 +42,7 @@ RL_FLOW_PROB = RL_FLOW_RATE/3600
 # SUMO_BINARY = "sumo-gui"
 # MODE = "local"
 # RESTART_INSTANCE = False
-SEEDS = [1]
+# SEEDS = [1]
 
 # EC2 settings
 N_PARALLEL = 8
