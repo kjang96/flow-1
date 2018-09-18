@@ -1,4 +1,5 @@
 from flow.core.generator import Generator
+from flow.core.routes import Routes
 
 from numpy import pi, sin, cos, linspace, sqrt
 
@@ -171,67 +172,34 @@ class UDSSCMergingGenerator(Generator):
         """
         See parent class
         """
-        # rts = {"top": ["top", "left", "bottom", "right"],
-        #        "left": ["left", "bottom", "right", "top"],
-        #        "bottom": ["bottom", "right", "top", "left"],
-        #        "right": ["right", "top", "left", "bottom"],
-        #        "inflow_1": ["inflow_1", "merge_in_1", "right", "top", "left", "bottom"],
-        #        "merge_in_1": ["merge_in_1", "right", "top", "left", "bottom"],
-        #        "inflow_0": ["inflow_0", "merge_in_0", "left", "merge_out_1", "outflow_1"],
-        #        "merge_in_0": ["merge_in_0", "left", "merge_out_1", "outflow_1"],
-        #        "merge_out_1": ["merge_out_1", "outflow_1"],
-        #        "outflow_1": ["outflow_1"],
-        #        }
-
-        rts = {"top": {"top": ["top", "left", "bottom", "right"]},
-               "left": {"left": ["left", "bottom", "right", "top"]},
-               "bottom": {"bottom": ["bottom", "right", "top", "left"]},
-               "right": {"right": ["right", "top", "left", "bottom"]},
-
-               "inflow_1": {"inflow_1_0": ["inflow_1", "merge_in_1", "right", "top", "left", "merge_out_1", "outflow_1"]}, # added
-            #    "inflow_0": {"inflow_1_1": ["inflow_0", "merge_in_0", "left", "bottom", "right", "merge_out_0", "outflow_0"]},
-
-            #    "inflow_1": {"inflow_1_0": ["inflow_1", "merge_in_1", "right", "top", "left", "merge_out_1", "outflow_1"],
-            #                 "inflow_1_1": ["inflow_1", "merge_in_1", "right", "merge_out_0", "outflow_0"]}, # added
-               "inflow_0": {"inflow_0_0": ["inflow_0", "merge_in_0", "left", "merge_out_1", "outflow_1"],
-                            "inflow_1_1": ["inflow_0", "merge_in_0", "left", "bottom", "right", "merge_out_0", "outflow_0"]},
-
-               "outflow_1": {"outflow_1": ["outflow_1"]},
-               "outflow_0": {"outflow_0": ["outflow_0"]}
-               }
 
         # rts = {"top": {"top": ["top", "left", "bottom", "right"]},
-        #        "left": {"left_0": ["left", "bottom"],
-        #                 "left_1": ["left", "merge_out_1"]},
+        #        "left": {"left": ["left", "bottom", "right", "top"]},
         #        "bottom": {"bottom": ["bottom", "right", "top", "left"]},
-        #        "right": {"right_0": ["right", "top", "left", "bottom"],
-        #                  "right_1": ["right", "merge_out_0"]},
-        #        "inflow_1": {"inflow_1_0": ["inflow_1", "merge_in_1", "right", "top", "left", "bottom"],
-        #                     "inflow_1_1": ["inflow_1", "merge_in_1", "right", "merge_out_0", "outflow_0"]}, # added
-        #        "merge_in_1": {"merge_in_1": ["merge_in_1", "right", "top", "left", "bottom"]},
-        #        "inflow_0": {"inflow_0_0": ["inflow_0", "merge_in_0", "left", "merge_out_1"],
-        #                     "inflow_1_1": ["inflow_0", "merge_in_0", "left", "bottom"]},
-        #        "merge_in_0": {"merge_in_0": ["merge_in_0", "left", "merge_out_1", "outflow_1"]},
-        #        "merge_out_0": {"merge_out_0": ["merge_out_0", "outflow_0"]}, 
-        #        "merge_out_1": {"merge_out_1": ["merge_out_1", "outflow_1"]},
+        #        "right": {"right": ["right", "top", "left", "bottom"]},
+
+        #        "inflow_1": {"inflow_1_0": ["inflow_1", "merge_in_1", "right", "top", "left", "merge_out_1", "outflow_1"]}, # added
+        #     #    "inflow_0": {"inflow_1_1": ["inflow_0", "merge_in_0", "left", "bottom", "right", "merge_out_0", "outflow_0"]},
+
+        #     #    "inflow_1": {"inflow_1_0": ["inflow_1", "merge_in_1", "right", "top", "left", "merge_out_1", "outflow_1"],
+        #     #                 "inflow_1_1": ["inflow_1", "merge_in_1", "right", "merge_out_0", "outflow_0"]}, # added
+        #        "inflow_0": {"inflow_0_0": ["inflow_0", "merge_in_0", "left", "merge_out_1", "outflow_1"],
+        #                     "inflow_1_1": ["inflow_0", "merge_in_0", "left", "bottom", "right", "merge_out_0", "outflow_0"]},
+
         #        "outflow_1": {"outflow_1": ["outflow_1"]},
         #        "outflow_0": {"outflow_0": ["outflow_0"]}
         #        }
 
-        # rts = {"top": [{"id": "top", "edges": ["top", "left", "bottom", "right"]}],
-        #        "left": [{"id": "left", "edges": ["left", "bottom", "right", "top"]}],
-        #        "bottom": [{"id": "bottom", "edges": ["bottom", "right", "top", "left"]}],
-        #        "right": [{"id": "right", "edges":  ["right", "top", "left", "bottom"]}],
-        #        "inflow_1": [{"id": "inflow_1_0", "edges": ["inflow_1", "merge_in_1", "right", "top", "left", "bottom"]},
-        #                     {"id": "inflow_1_1", "edges": ["inflow_1", "merge_in_1", "right", "merge_out_0", "outflow_0"]}], # added
-        #        "merge_in_1": [{"id": "merge_in_1", "edges": ["merge_in_1", "right", "top", "left", "bottom"]}],
-        #        "inflow_0": [{"id" : "inflow_0_0", "edges": ["inflow_0", "merge_in_0", "left", "merge_out_1", "outflow_1"]},
-        #                     {"id": "inflow_1_1", "edges": ["inflow_0", "merge_in_0", "left", "bottom"]}],
-        #        "merge_in_0": [{"id": "merge_in_0", "edges": ["merge_in_0", "left", "merge_out_1", "outflow_1"]}],
-        #        "merge_out_1": [{"id": "merge_out_1", "edges": ["merge_out_1", "outflow_1"]}],
-        #        "outflow_1": [{"id": "outflow_1", "edges": ["outflow_1"]}],
-        #        }
+        routes = Routes()
+        routes.add("top_0", ["top", "left", "bottom", "right"])
+        routes.add("left_0", ["left", "bottom", "right", "top"])
+        routes.add("bottom_0", ["bottom", "right", "top", "left"])
+        routes.add("right_0", ["right", "top", "left", "bottom"])
+        routes.add("inflow_1_0", ["inflow_1", "merge_in_1", "right", "top", "left", "merge_out_1", "outflow_1"])
+        routes.add("inflow_1_1", ["inflow_1", "merge_in_1", "right", "merge_out_0", "outflow_0"])
+        routes.add("inflow_0_0", ["inflow_0", "merge_in_0", "left", "merge_out_1", "outflow_1"])
+        routes.add("inflow_0_1", ["inflow_0", "merge_in_0", "left", "bottom", "right", "merge_out_0", "outflow_0"])
+        routes.add("outflow_1", ["outflow_1"])
+        routes.add("outflow_0", ["outflow_0"])
+        return routes
 
-        
-
-        return rts
