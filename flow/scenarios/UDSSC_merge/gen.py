@@ -196,9 +196,9 @@ class UDSSCMergingGenerator(Generator):
         routes.add("bottom_0", ["bottom", "right", "top", "left"])
         routes.add("right_0", ["right", "top", "left", "bottom"])
         routes.add("inflow_1_0", ["inflow_1", "merge_in_1", "right", "top", "left", "merge_out_1", "outflow_1"])
-        routes.add("inflow_1_1", ["inflow_1", "merge_in_1", "right", "merge_out_0", "outflow_0"])
+        # routes.add("inflow_1_1", ["inflow_1", "merge_in_1", "right", "merge_out_0", "outflow_0"])
         routes.add("inflow_0_0", ["inflow_0", "merge_in_0", "left", "merge_out_1", "outflow_1"])
-        routes.add("inflow_0_1", ["inflow_0", "merge_in_0", "left", "bottom", "right", "merge_out_0", "outflow_0"])
+        # routes.add("inflow_0_1", ["inflow_0", "merge_in_0", "left", "bottom", "right", "merge_out_0", "outflow_0"])
         routes.add("outflow_1", ["outflow_1"])
         routes.add("outflow_0", ["outflow_0"])
         return routes
