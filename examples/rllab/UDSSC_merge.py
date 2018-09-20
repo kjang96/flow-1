@@ -26,8 +26,8 @@ from flow.core.params import InFlows
 HORIZON = 500
 SIM_STEP = 1
 BATCH_SIZE = 20000
-ITR = 100
-exp_tag = "roundabout_a17"  # experiment prefix
+ITR = 300
+exp_tag = "roundabout_a18"  # experiment prefix
 
 # Sumo settings
 FLOW_RATE = 350

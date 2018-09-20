@@ -53,6 +53,15 @@ def average_velocity(env, fail=False):
 
     return np.mean(vel)
 
+def total_velocity(env, fail=False):
+    vel = np.array(env.vehicles.get_speed(env.vehicles.get_ids()))
+
+    if any(vel < -100) or fail:
+        return 0.
+    if len(vel) == 0:
+        return 0.
+    return sum(vel) / 3 #just cuz
+
 
 def reward_density(env):
     return env.vehicles.get_num_arrived() / env.sim_step
