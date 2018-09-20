@@ -163,8 +163,8 @@ class UDSSCMergeEnv(Env):
             # self.vehicles, self.sorted_extra_data, normalization)
         # return vel_reward + headway_reward
         # return vel_reward
-        return total_vel
-        # return avg_vel_reward + penalty
+        # return total_vel
+        return avg_vel_reward + penalty
 
     def get_state(self, **kwargs):
         """
