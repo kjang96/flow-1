@@ -80,6 +80,9 @@ class Scenario(Serializable):
             self.net_params, self.traffic_lights)
 
         #<--
+        # for key in sorted(self._edges.keys()):
+        #     print(key, self.edge_length(key))
+        # import ipdb; ipdb.set_trace()
         # self.edge_info = self.read_edges_from_xml(omit=["shape", "priority", "type", "id"])
         #-->
         # list of edges and internal links (junctions)
@@ -101,7 +104,7 @@ class Scenario(Serializable):
         # is set to "false" while calling sumo's netconvert function
         self.internal_edgestarts = self.specify_internal_edge_starts()
         self.intersection_edgestarts = self.specify_intersection_edge_starts()
-
+        # import ipdb; ipdb.set_trace()
         # in case the user did not write the intersection edge-starts in
         # internal edge-starts as well (because of redundancy), merge the two
         # together

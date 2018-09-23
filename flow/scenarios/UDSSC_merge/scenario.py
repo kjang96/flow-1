@@ -52,7 +52,10 @@ class UDSSCMergingScenario(Scenario):
         for p in ADDITIONAL_NET_PARAMS.keys():
             if p not in net_params.additional_params:
                 raise KeyError('Network parameter "{}" not supplied'.format(p))
+        # <-- 
+        self.es = {}
 
+        # -->
         radius = net_params.additional_params["ring_radius"]
         x = net_params.additional_params["lane_length"]
 
@@ -78,7 +81,8 @@ class UDSSCMergingScenario(Scenario):
 
         super().__init__(name, generator_class, vehicles, net_params,
                          initial_config, traffic_lights)
-        
+
+    
 
     def specify_edge_starts(self):
         """
@@ -98,6 +102,7 @@ class UDSSCMergingScenario(Scenario):
             # prev_edge = float(self.edge_info[edge]["length"])
             prev_edge = float(self.edge_length(edge))
             absolute = new_x
+        self.es.update(edge_dict)
 
         edgestarts = [ #len of prev edge + total prev (including internal edge len)
             ("right", edge_dict["right"]),
@@ -114,6 +119,7 @@ class UDSSCMergingScenario(Scenario):
             ("outflow_1", edge_dict["outflow_1"]),
         ]
 
+        # import ipdb; ipdb.set_trace()
         return edgestarts
 
     def specify_internal_edge_starts(self):
@@ -165,6 +171,7 @@ class UDSSCMergingScenario(Scenario):
                 (":d_0", edge_dict[":d_0"]),
                 (":g_0", edge_dict[":g_0"]),
             ]
+        self.es.update(edge_dict)
 
         return internal_edgestarts
 
