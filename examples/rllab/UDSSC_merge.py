@@ -39,7 +39,7 @@ RL_FLOW_PROB = RL_FLOW_RATE/3600
 
 # Local settings
 N_PARALLEL = 1
-SUMO_BINARY = "sumo"
+SUMO_BINARY = "sumo-gui"
 MODE = "local"
 RESTART_INSTANCE = False
 SEEDS = [1]

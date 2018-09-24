@@ -78,17 +78,22 @@ class UDSSCMergeEnv(Env):
 
         # Maintained as a stack, only apply_rl_actions to the top 1
         self.rl_stack = [] 
+
+        # Keep track of 2D positions. To be stored in vehicles.py at some point
+        self.positions = {}
+
         super().__init__(env_params, sumo_params, scenario)
 
     @property
     def observation_space(self):
-        # Vehicle position and velocity, normalized
+        # Vehicle position and velocity, normalized: 3
         # Queue length x 2
         # Roundabout state = len(MERGE_EDGES) * 3
-        # Roundabout full = (ROUNDABOUT_LENGTH // 5)*2 # 2 cols
+        # Roundabout full = (ROUNDABOUT_LENGTH // 5)*3 # 2 cols
         # rl_pos_2, the pos in the roundabout: 1
+        # + 1 to account for the new cartesian coord for the rl veh
         self.total_obs = self.n_obs_vehicles * 2 + 2 + \
-                         int(self.roundabout_length // 5) * 2 + 1
+                         int(self.roundabout_length // 5) * 3 + 1 + 1
                          
         box = Box(low=0.,
                   high=1,
@@ -121,7 +126,7 @@ class UDSSCMergeEnv(Env):
 
         Notes: More efficient to keep a removal list than to resize
         continuously
-        """
+        """ 
         removal = [] 
         for rl_id in self.rl_stack:
             if rl_id not in self.vehicles.get_rl_ids():
@@ -254,7 +259,12 @@ class UDSSCMergeEnv(Env):
             rl_id = self.rl_stack[0]
 
             # rl_pos, rl_vel
-            rl_pos = [self.get_x_by_id(rl_id) / self.scenario_length]
+            rl_pos = self.vehicles.get_2d_position(rl_id)
+            if not rl_pos:
+                rl_pos = [0, 0]
+            rl_pos[0] = rl_pos[0] / self.scenario.generator.max_x
+            rl_pos[1] = rl_pos[1] / self.scenario.generator.max_y
+
             rl_vel = [self.vehicles.get_speed(rl_id) / max_speed]
             if self.vehicles.get_edge(rl_id) in ROUNDABOUT_EDGES:
                 rl_pos_2 = [self.get_x_by_id(rl_id) / self.roundabout_length]
@@ -294,11 +304,9 @@ class UDSSCMergeEnv(Env):
             else: # No leader
                 headway_vel = [0]
                 headway_dists = [0]
-            # print(rl_id, headway_dists[0] * self.scenario_length, tailway_dists[0]* self.scenario_length)
-
 
         else: # RL vehicle's not in the system. Pass in zeros here 
-            rl_pos = [0]
+            rl_pos = [0, 0]
             rl_pos_2 = [0]
             rl_vel = [0]
             tailway_vel = [0]
@@ -354,11 +362,12 @@ class UDSSCMergeEnv(Env):
         
         roundabout_full = self.roundabout_full()
         
-        # Normalize the 0th column containing absolute position
-        roundabout_full[:,0] = roundabout_full[:,0]/self.roundabout_length
+        # Normalize the 0th and 1st  column by max_x and max_y respectively
+        roundabout_full[:,0] = roundabout_full[:,0]/self.scenario.generator.max_x
+        roundabout_full[:,1] = roundabout_full[:,1]/self.scenario.generator.max_y
 
         # Normalize the 1st column containing velocities
-        roundabout_full[:,1] = roundabout_full[:,1]/max_speed
+        roundabout_full[:,2] = roundabout_full[:,2]/max_speed
         roundabout_full = roundabout_full.flatten().tolist()
 
         state = np.array(np.concatenate([rl_pos, rl_pos_2, rl_vel,
@@ -368,7 +377,6 @@ class UDSSCMergeEnv(Env):
                                         headway_dists, headway_vel,
                                         queue_0, queue_1,
                                         roundabout_full]))
-    
         return state
 
     def k_closest_to_merge(self, k):
@@ -487,14 +495,17 @@ class UDSSCMergeEnv(Env):
         state[0] = abs pos
         state[1] = vel
         """
-        state = np.zeros((int(self.roundabout_length//5), 2))
+        state = np.zeros((int(self.roundabout_length//5), 3))
         i = 0 # index of state to alter
         for edge in ROUNDABOUT_EDGES:
             vehicles = sorted(self.vehicles.get_ids_by_edge(edge),
                               key=lambda x: self.get_x_by_id(x))
             for veh_id in vehicles:
-                state[i][0] = self.get_x_by_id(veh_id)
-                state[i][1] = self.vehicles.get_speed(veh_id)
+                if not self.vehicles.get_2d_position(veh_id):
+                    state[i][:2] = [0, 0]
+                else:
+                    state[i][:2] = self.vehicles.get_2d_position(veh_id)
+                state[i][2] = self.vehicles.get_speed(veh_id)
                 i += 1
         return state
 
@@ -623,7 +634,43 @@ class UDSSCMergeEnv(Env):
             self.velocities = []
             self.velocities.append(np.mean(self.vehicles.get_speed(self.vehicles.get_ids())))
         
+        # # Curate rl_stack
+        # for veh_id in self.vehicles.get_rl_ids():
+        #     if veh_id not in self.rl_stack:
+        #         self.rl_stack.append(veh_id)
+
+    def additional_command_2(self):
+        # try:
+
         # Curate rl_stack
         for veh_id in self.vehicles.get_rl_ids():
             if veh_id not in self.rl_stack:
                 self.rl_stack.append(veh_id)
+
+        # Curate rl_stack
+        removal = [] 
+        for rl_id in self.rl_stack:
+            if rl_id not in self.vehicles.get_rl_ids():
+                removal.append(rl_id)
+        for rl_id in removal:
+            self.rl_stack.remove(rl_id)
+        
+
+        # # Curate positions list.
+        # veh_ids = self.vehicles.get_ids()
+        # removal = []
+        # for veh in self.positions.keys(): 
+        #     if veh not in veh_ids:
+        #         removal.append(veh)
+        # for veh in removal: 
+        #     del self.positions[veh]
+
+        # try: #....I'm not sure why this is
+        #     for veh_id in self.vehicles.get_ids():
+        #         pos = self.traci_connection.vehicle.getPosition(veh_id)
+        #         self.positions[veh_id] = pos
+        # except:
+        #     self.positions[veh_id] = [0, 0]
+        #     # import ipdb; ipdb.set_trace()
+
+        
