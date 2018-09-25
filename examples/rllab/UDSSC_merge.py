@@ -27,7 +27,7 @@ HORIZON = 500
 SIM_STEP = 1
 BATCH_SIZE = 20000
 ITR = 100
-exp_tag = "roundabout_a21"  # experiment prefix
+exp_tag = "roundabout_a22"  # experiment prefix
 
 # Sumo settings
 FLOW_RATE = 350
@@ -38,17 +38,17 @@ RL_FLOW_RATE = 50
 RL_FLOW_PROB = RL_FLOW_RATE/3600
 
 # Local settings
-N_PARALLEL = 1
-SUMO_BINARY = "sumo-gui"
+N_PARALLEL = 2
+SUMO_BINARY = "sumo"
 MODE = "local"
-RESTART_INSTANCE = False
+RESTART_INSTANCE = True
 SEEDS = [1]
 
 # # EC2 settings
 # N_PARALLEL = 8
 # SUMO_BINARY = "sumo"
 # MODE = "ec2"
-# RESTART_INSTANCE = True
+# RESTART_INSTANCE = True 
 # SEEDS = [1, 2, 5, 91]
 
 
@@ -91,17 +91,17 @@ def run_task(*_):
     # inflow.add(veh_type="idm", edge="inflow_0", name="idm", probability=50/3600)
     # inflow.add(veh_type="idm", edge="inflow_0", name="idm", probability=50/3600)
     
-    # inflow.add(veh_type="idm", edge="inflow_1", name="idm", vehs_per_hour=50)
-    # inflow.add(veh_type="idm", edge="inflow_1", name="idm", vehs_per_hour=50)
-    # inflow.add(veh_type="idm", edge="inflow_1", name="idm", vehs_per_hour=50)
-    # inflow.add(veh_type="idm", edge="inflow_1", name="idm", vehs_per_hour=50)
-    # inflow.add(veh_type="idm", edge="inflow_1", name="idm", vehs_per_hour=50)
+    inflow.add(veh_type="idm", edge="inflow_1", name="idm", vehs_per_hour=50)
+    inflow.add(veh_type="idm", edge="inflow_1", name="idm", vehs_per_hour=50)
+    inflow.add(veh_type="idm", edge="inflow_1", name="idm", vehs_per_hour=50)
+    inflow.add(veh_type="idm", edge="inflow_1", name="idm", vehs_per_hour=50)
+    inflow.add(veh_type="idm", edge="inflow_1", name="idm", vehs_per_hour=50)
     # inflow.add(veh_type="idm", edge="inflow_1", name="idm", probability=50/3600)
     # inflow.add(veh_type="idm", edge="inflow_1", name="idm", probability=50/3600)
     # inflow.add(veh_type="idm", edge="inflow_1", name="idm", probability=50/3600)
     # inflow.add(veh_type="idm", edge="inflow_1", name="idm", probability=50/3600)
     # inflow.add(veh_type="idm", edge="inflow_1", name="idm", probability=50/3600)
-    inflow.add(veh_type="idm", edge="inflow_1", name="idm", probability=300/3600)
+    # inflow.add(veh_type="idm", edge="inflow_1", name="idm", probability=300/3600)
     # note that the vehicles are added sequentially by the generator,
     # so place the merging vehicles after the vehicles in the ring
     vehicles = Vehicles()
