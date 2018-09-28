@@ -68,7 +68,7 @@ worker_nodes:
 
 file_mounts: {
 # path to your repo and the desired branch name
-"/tmp/path": "/Users/kathyjang/research/rllab-multiagent/learning-traffic/.git/refs/heads/rllab_autoscaler",
+"/tmp/path": "/Users/kathyjang/research/rllab-multiagent/learning-traffic/.git/refs/heads/roundabout_inflows",
 }
 
 setup_commands:
