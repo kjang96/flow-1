@@ -73,7 +73,8 @@ file_mounts: {
 
 setup_commands:
     # checkout your desired branch on all worker nodes
-    - cd flow && git fetch && git checkout `cat /tmp/path`
+    - cd flow && git remote add kathy https://github.com/kjang96/flow-1 && git fetch && git fetch kathy && git checkout `cat /tmp/path`
+    # - git fetch && git fetch kathy && git checkout `cat /tmp/path`
     - echo 'export PATH="/home/ubuntu/anaconda3/bin:$PATH"' >> ~/.bashrc
 # Custom commands that will be run on the head node after common setup.
 head_setup_commands:

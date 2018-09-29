@@ -18,7 +18,7 @@ HORIZON = 1500
 
 def run_task(*_):
     """Implement the run_task method needed to run experiments with rllab."""
-    sumo_params = SumoParams(sim_step=0.1, render=True)
+    sumo_params = SumoParams(sim_step=0.1, render=True, sumo_binary="sumo")
 
     vehicles = Vehicles()
     vehicles.add(
@@ -81,7 +81,7 @@ def run_task(*_):
         baseline=baseline,
         batch_size=15000,
         max_path_length=horizon,
-        n_itr=500,
+        n_itr=50,
         # whole_paths=True,
         discount=0.999,
         # step_size=v["step_size"],
@@ -91,11 +91,11 @@ def run_task(*_):
 
 exp_tag = "figure-eight-control"
 
-for seed in [5]:  # , 20, 68]:
+for seed in [5, 20, 68]:
     run_experiment_lite(
         run_task,
         # Number of parallel workers for sampling
-        n_parallel=1,
+        n_parallel=10,
         # Keeps the snapshot parameters for all iterations
         snapshot_mode="all",
         # Specifies the seed for the experiment. If this is not provided, a
