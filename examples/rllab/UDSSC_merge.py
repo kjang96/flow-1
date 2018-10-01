@@ -27,7 +27,7 @@ HORIZON = 500
 SIM_STEP = 1
 BATCH_SIZE = 20000
 ITR = 100
-exp_tag = "roundabout_a22"  # experiment prefix
+exp_tag = "roundabout_24"  # experiment prefix
 
 # Sumo settings
 FLOW_RATE = 350
@@ -37,12 +37,12 @@ FLOW_PROB = FLOW_RATE/3600
 RL_FLOW_RATE = 50
 RL_FLOW_PROB = RL_FLOW_RATE/3600
 
-# Local settings
-N_PARALLEL = 2
-SUMO_BINARY = "sumo"
-MODE = "local"
-RESTART_INSTANCE = True
-SEEDS = [1]
+# # Local settings
+# N_PARALLEL = 1
+# SUMO_BINARY = "sumo-gui"
+# MODE = "local"
+# RESTART_INSTANCE = False
+# SEEDS = [1]
 
 # # EC2 settings
 # N_PARALLEL = 8
@@ -51,6 +51,12 @@ SEEDS = [1]
 # RESTART_INSTANCE = True 
 # SEEDS = [1, 2, 5, 91]
 
+# Autoscaler settings
+N_PARALLEL = 8
+SUMO_BINARY = "sumo"
+MODE = "local"
+RESTART_INSTANCE = True
+SEEDS = [1, 2, 5, 91]
 
 def main():
     for seed in SEEDS:
