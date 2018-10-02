@@ -119,7 +119,7 @@ class UDSSCMergeEnv(Env):
         """
         return Box(low=-np.abs(self.env_params.additional_params["max_decel"]),
                    high=self.env_params.additional_params["max_accel"],
-                   shape=(1,),
+                   shape=(2,),
                    dtype=np.float32)
 
     def _apply_rl_actions(self, rl_actions):
@@ -148,9 +148,9 @@ class UDSSCMergeEnv(Env):
         for rl_id in removal_2:
             self.rl_stack_2.remove(rl_id)
         if self.rl_stack:
-            self.apply_acceleration(self.rl_stack[:1], rl_actions)
+            self.apply_acceleration(self.rl_stack[:1], rl_actions[:1])
         if self.rl_stack_2:
-            self.apply_acceleration(self.rl_stack_2[:1], rl_actions)
+            self.apply_acceleration(self.rl_stack_2[:1], rl_actions[1:])
 
     def compute_reward(self, state, rl_actions, **kwargs):
         """
