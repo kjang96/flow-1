@@ -27,7 +27,7 @@ HORIZON = 500
 SIM_STEP = 1
 BATCH_SIZE = 20000
 ITR = 80
-exp_tag = "roundabout_28"  # experiment prefix
+exp_tag = "roundabout_29"  # experiment prefix
 
 # Sumo settings
 FLOW_RATE = 350
@@ -53,7 +53,7 @@ RL_FLOW_PROB = RL_FLOW_RATE/3600
 
 # Autoscaler settings
 N_PARALLEL = 8
-SUMO_BINARY = "sumo"
+SUMO_BINARY = "sumo-gui"
 MODE = "local"
 RESTART_INSTANCE = True
 SEEDS = [1, 2, 5, 91]
@@ -160,7 +160,7 @@ def run_task(*_):
         # radius of the loops
         "ring_radius": 15,#15.25,
         # length of the straight edges connected the outer loop to the inner loop
-        "lane_length": 30,
+        "lane_length": 45,
         # length of the merge next to the roundabout
         "merge_length": 15,
         # number of lanes in the inner loop
