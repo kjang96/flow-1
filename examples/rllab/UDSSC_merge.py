@@ -27,7 +27,7 @@ HORIZON = 500
 SIM_STEP = 1
 BATCH_SIZE = 20000
 ITR = 80
-exp_tag = "roundabout_29"  # experiment prefix
+exp_tag = "roundabout_30"  # experiment prefix
 
 # Sumo settings
 FLOW_RATE = 350
@@ -160,7 +160,7 @@ def run_task(*_):
         # radius of the loops
         "ring_radius": 15,#15.25,
         # length of the straight edges connected the outer loop to the inner loop
-        "lane_length": 45,
+        "lane_length": 30,
         # length of the merge next to the roundabout
         "merge_length": 15,
         # number of lanes in the inner loop
@@ -168,7 +168,7 @@ def run_task(*_):
         # number of lanes in the outer loop
         "outer_lanes": 1,
         # max speed limit in the roundabout
-        "roundabout_speed_limit": 8,
+        "roundabout_speed_limit": 15,
         # max speed limit in the rest of the roundabout
         "outside_speed_limit": 15,
         # resolution of the curved portions
