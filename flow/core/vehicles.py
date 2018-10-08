@@ -370,6 +370,13 @@ class Vehicles:
                 except KeyError:
                     pass
 
+        for veh_id in self.__ids:
+            position = vehicle_obs.get(veh_id, {}).get(tc.VAR_POSITION, None)
+            if not position:
+                self.__vehicles[veh_id]["2Dposition"] = None
+            else:
+                self.__vehicles[veh_id]["2Dposition"] = list(position)
+
         # update the sumo observations variable
         self.__sumo_obs = vehicle_obs.copy()
 
@@ -440,7 +447,7 @@ class Vehicles:
         # subscribe the new vehicle
         env.traci_connection.vehicle.subscribe(veh_id, [
             tc.VAR_LANE_INDEX, tc.VAR_LANEPOSITION, tc.VAR_ROAD_ID,
-            tc.VAR_SPEED, tc.VAR_EDGES
+            tc.VAR_SPEED, tc.VAR_EDGES, tc.VAR_POSITION
         ])
         env.traci_connection.vehicle.subscribeLeader(veh_id, 2000)
 
@@ -705,6 +712,28 @@ class Vehicles:
                 self.get_absolute_position(vehID, error) for vehID in veh_id
             ]
         return self.__vehicles.get(veh_id, {}).get("absolute_position", error)
+
+    def get_2d_position(self, veh_id, error=[0, 0]):
+        """Return the 2d position of the specified vehicle.
+
+        Parameters
+        ----------
+        veh_id : str or list<str>
+            vehicle id, or list of vehicle ids
+        error : any, optional
+            value that is returned if the vehicle is not found
+
+        Returns
+        -------
+        float
+
+        """
+        if isinstance(veh_id, (list, np.ndarray)):
+            return [
+                self.get_2d_position(vehID, error) for vehID in veh_id
+            ]
+        ret = self.__vehicles.get(veh_id, {}).get("2Dposition", error)
+        return ret
 
     def get_position(self, veh_id, error=-1001):
         """Return the position of the vehicle relative to its current edge.

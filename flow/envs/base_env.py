@@ -305,7 +305,7 @@ class Env(gym.Env, Serializable):
         for veh_id in self.vehicles.get_ids():
             self.traci_connection.vehicle.subscribe(veh_id, [
                 tc.VAR_LANE_INDEX, tc.VAR_LANEPOSITION, tc.VAR_ROAD_ID,
-                tc.VAR_SPEED, tc.VAR_EDGES
+                tc.VAR_SPEED, tc.VAR_EDGES, tc.VAR_POSITION
             ])
             self.traci_connection.vehicle.subscribeLeader(veh_id, 2000)
 
@@ -463,6 +463,7 @@ class Env(gym.Env, Serializable):
             # store new observations in the vehicles and traffic lights class
             self.vehicles.update(vehicle_obs, id_lists, self)
             self.traffic_lights.update(tls_obs)
+            self.additional_command_2()
 
             # update the colors of vehicles
             self.update_vehicle_colors()
@@ -649,6 +650,11 @@ class Env(gym.Env, Serializable):
 
     def additional_command(self):
         """Additional commands that may be performed by the step method."""
+        pass
+        
+    def additional_command_2(self):
+        """Additional commands that may be performed by the step method
+        after the simulationStep()."""
         pass
 
     def apply_rl_actions(self, rl_actions=None):

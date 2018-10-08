@@ -37,19 +37,19 @@ FLOW_PROB = FLOW_RATE/3600
 RL_FLOW_RATE = 50
 RL_FLOW_PROB = RL_FLOW_RATE/3600
 
-# # Local settings
-# N_PARALLEL = 1
-# SUMO_BINARY = "sumo-gui"
-# MODE = "local"
-# RESTART_INSTANCE = False
-# SEEDS = [1]
+# Local settings
+N_PARALLEL = 1
+SUMO_BINARY = "sumo-gui"
+MODE = "local"
+RESTART_INSTANCE = False
+SEEDS = [1]
 
-# EC2 settings
-N_PARALLEL = 8
-SUMO_BINARY = "sumo"
-MODE = "ec2"
-RESTART_INSTANCE = True
-SEEDS = [1, 2, 5, 91]
+# # EC2 settings
+# N_PARALLEL = 8
+# SUMO_BINARY = "sumo"
+# MODE = "ec2"
+# RESTART_INSTANCE = True
+# SEEDS = [1, 2, 5, 91]
 
 
 def main():
@@ -194,7 +194,7 @@ def run_task(*_):
         initial_config=initial_config
     )
 
-    env_name = "UDSSCMergeEnv"
+    env_name = "CartesianEnv"
     pass_params = (env_name, sumo_params, vehicles, env_params,
                    net_params, initial_config, scenario)
     env = GymEnv(env_name, record_video=False, register_params=pass_params)

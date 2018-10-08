@@ -40,9 +40,14 @@ class UDSSCMergingGenerator(Generator):
                  {"id": "e",   "x": repr(0), "y": repr(r + m), "type": default},
                  {"id": "f",   "x": repr(0), "y": repr(r + m + x), "type": default},
                  {"id": "g",   "x": repr(-r - m), "y": repr(-r - 0.1*r), "type": default},
-                 {"id": "h",   "x": repr(-r - m - x), "y": repr(-r - 0.2*r), "type": default},
+                 {"id":
+                 "h",   "x": repr(-r - m - x), "y": repr(-r - 0.2*r), "type": default},
                 ]
-
+        min_x = min([float(node['x']) for node in nodes])
+        min_y = min([float(node['y']) for node in nodes])
+        self.max_x = max([float(node['x']) for node in nodes]) + abs(min_x) + r
+        self.max_y = max([float(node['y']) for node in nodes]) + abs(min_y)
+        
         return nodes
 
     def specify_edges(self, net_params):

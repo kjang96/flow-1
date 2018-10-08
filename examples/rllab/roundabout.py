@@ -197,7 +197,8 @@ def run_task(*_):
         initial_config=initial_config
     )
 
-    env_name = "RoundaboutEnv"
+    # env_name = "RoundaboutEnv"
+    env_name = "CartesianEnv"
     pass_params = (env_name, sumo_params, vehicles, env_params,
                    net_params, initial_config, scenario)
     env = GymEnv(env_name, record_video=False, register_params=pass_params)
