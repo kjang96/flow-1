@@ -126,13 +126,15 @@ class RoundaboutEnv(Env):
         return Box(low=-np.abs(self.env_params.additional_params["max_decel"]),
                    high=self.env_params.additional_params["max_accel"],
                 #    shape=(self.vehicles.num_rl_vehicles,),
-                   shape=(1,),
+                   shape=(2,),
                    dtype=np.float32)
 
     def _apply_rl_actions(self, rl_actions):
         # Curating rl_stack
         # Remove rl vehicles that are no longer in the system
         # more efficient to keep removal list than to resize continually
+        # if 1:
+        #     return
         removal = [] 
         for rl_id in self.rl_stack:
             if rl_id not in self.vehicles.get_rl_ids():
@@ -140,16 +142,14 @@ class RoundaboutEnv(Env):
         for rl_id in removal:
             self.rl_stack.remove(rl_id)
         if self.rl_stack:
-            self.apply_acceleration(self.rl_stack[:1], rl_actions)
+            self.apply_acceleration(self.rl_stack[:1], rl_actions[:1])
 
-        # # <-- old 
-        # sorted_rl_ids = [veh_id for veh_id in self.sorted_ids
-        #                  if veh_id in self.vehicles.get_rl_ids()]
-        # if sorted_rl_ids:
-        #     self.apply_acceleration(sorted_rl_ids[:1], rl_actions)
-        # else: # don't need this 
-        #     pass 
-        # # old -->
+            direction = np.round(rl_actions[1:])
+            for i, x in enumerate(direction):
+                if x not in [-1, 0, 1]:
+                    direction[i] = 0
+            self.apply_lane_change(self.rl_stack[:1], direction=direction)
+
 
     def compute_reward(self, state, rl_actions, **kwargs):
         vel_reward = rewards.desired_velocity(self, fail=kwargs["fail"])

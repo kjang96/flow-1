@@ -86,10 +86,10 @@ def run_task(*_):
     # # -->
 
     inflow = InFlows()
-    inflow.add(veh_type="rl", edge="inflow_0", name="rl", vehs_per_hour=50)
+    inflow.add(veh_type="rl", edge="inflow_0", name="rl", vehs_per_hour=50, departLane="random")
     # inflow.add(veh_type="rl", edge="inflow_0", name="rl", probability=50/3600)
-    inflow.add(veh_type="idm", edge="inflow_0", name="idm", vehs_per_hour=50)
-    inflow.add(veh_type="idm", edge="inflow_0", name="idm", vehs_per_hour=50)
+    inflow.add(veh_type="idm", edge="inflow_0", name="idm", vehs_per_hour=50, departLane="random")
+    inflow.add(veh_type="idm", edge="inflow_0", name="idm", vehs_per_hour=50, departLane="random")
     # inflow.add(veh_type="idm", edge="inflow_0", name="idm", probability=50/3600)
     # inflow.add(veh_type="idm", edge="inflow_0", name="idm", probability=50/3600)
     
@@ -103,7 +103,7 @@ def run_task(*_):
     # inflow.add(veh_type="idm", edge="inflow_1", name="idm", probability=50/3600)
     # inflow.add(veh_type="idm", edge="inflow_1", name="idm", probability=50/3600)
     # inflow.add(veh_type="idm", edge="inflow_1", name="idm", probability=50/3600)
-    inflow.add(veh_type="idm", edge="inflow_1", name="idm", probability=300/3600)
+    inflow.add(veh_type="idm", edge="inflow_1", name="idm", probability=300/3600, departLane="random")
     # note that the vehicles are added sequentially by the generator,
     # so place the merging vehicles after the vehicles in the ring
     vehicles = Vehicles()
@@ -160,7 +160,7 @@ def run_task(*_):
         # radius of the loops
         "ring_radius": 30,#15.25,
         # length of the straight edges connected the outer loop to the inner loop
-        "lane_length": 30,
+        "lane_length": 45,
         # length of the merge next to the roundabout
         "merge_length": 15,
         # number of lanes in the inner loop
