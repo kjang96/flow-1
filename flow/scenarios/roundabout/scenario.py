@@ -84,11 +84,11 @@ class RoundaboutScenario(Scenario):
         """
         See parent class
         """
+        self.es={}
         edge_dict = {}
         absolute = 0
         prev_edge = 0
         for edge in self.specify_absolute_order():
-            
             if edge.startswith(":"):
                 # absolute += float(self.edge_info[edge]["length"])
                 absolute += float(self.edge_length(edge))
@@ -98,21 +98,24 @@ class RoundaboutScenario(Scenario):
             # prev_edge = float(self.edge_info[edge]["length"])
             prev_edge = float(self.edge_length(edge))
             absolute = new_x
-
-        edgestarts = [ #len of prev edge + total prev (including internal edge len)
-            ("right", edge_dict["right"]),
-            ("top", edge_dict["top"]), 
-            ("left", edge_dict["left"]),
-            ("bottom", edge_dict["bottom"]),
-            ("inflow_1", edge_dict["inflow_1"]),
-            ("merge_in_1", edge_dict["merge_in_1"]),
-            ("merge_out_0", edge_dict["merge_out_0"]),
-            ("outflow_0", edge_dict["outflow_0"]),
-            ("inflow_0", edge_dict["inflow_0"]),
-            ("merge_in_0", edge_dict["merge_in_0"]),
-            ("merge_out_1", edge_dict["merge_out_1"]),
-            ("outflow_1", edge_dict["outflow_1"]),
-        ]
+        self.es.update(edge_dict)
+        edges = [edge for edge in self.specify_absolute_order() if not edge.startswith(':')]
+        edgestarts = [(e, edge_dict[e]) for e in edges]
+        # edgestarts = [ #len of prev edge + total prev (including internal edge len)
+        #     ("right", edge_dict["right"]),
+        #     ("top", edge_dict["top"]), 
+        #     ("left", edge_dict["left"]),
+        #     ("bottom", edge_dict["bottom"]),
+        #     ("inflow_1", edge_dict["inflow_1"]),
+        #     ("merge_in_1", edge_dict["merge_in_1"]),
+        #     ("merge_out_0", edge_dict["merge_out_0"]),
+        #     ("outflow_0", edge_dict["outflow_0"]),
+        #     ("inflow_0", edge_dict["inflow_0"]),
+        #     ("merge_in_0", edge_dict["merge_in_0"]),
+        #     ("merge_out_1", edge_dict["merge_out_1"]),
+        #     ("outflow_1", edge_dict["outflow_1"]),
+        # ]
+        # import ipdb; ipdb.set_trace()
 
         return edgestarts
 
@@ -134,38 +137,42 @@ class RoundaboutScenario(Scenario):
             # prev_edge = float(self.edge_info[edge]["length"])
             prev_edge = float(self.edge_length(edge))
             absolute = new_x
+        self.es.update(edge_dict)
+        edges = [edge for edge in self.specify_absolute_order() if edge.startswith(':')]
+        internal_edgestarts = [(e, edge_dict[e]) for e in edges]
+        # if self.lane_num == 2: 
+        # # two lane 
+        #     internal_edgestarts = [ # in increasing order
+        #         (":a_2", edge_dict[":a_2"]),
+        #         (":b_2", edge_dict[":b_2"]),
+        #         (":c_2", edge_dict[":c_2"]),
+        #         (":d_2", edge_dict[":d_2"]),
+        #         (":g_3", edge_dict[":g_3"]),
+        #         (":b_0", edge_dict[":b_0"]),
+        #         (":e_2", edge_dict[":e_2"]),
+        #         (":e_0", edge_dict[":e_0"]),
+        #         (":d_0", edge_dict[":d_0"]),
+        #         (":g_0", edge_dict[":g_0"]),
+        #     ]
+        # elif self.lane_num == 1:
+        # # one lane
+        #     internal_edgestarts = [ # in increasing order
+        #         (":a_1", edge_dict[":a_1"]),
+        #         (":b_1", edge_dict[":b_1"]),
+        #         (":c_1", edge_dict[":c_1"]),
+        #         (":d_1", edge_dict[":d_1"]),
+        #         (":g_2", edge_dict[":g_2"]),
+        #         (":a_0", edge_dict[":a_0"]),
+        #         (":b_0", edge_dict[":b_0"]),
+        #         (":e_1", edge_dict[":e_1"]),
+        #         (":e_0", edge_dict[":e_0"]),
+        #         (":c_0", edge_dict[":c_0"]),
+        #         (":d_0", edge_dict[":d_0"]),
+        #         (":g_0", edge_dict[":g_0"]),
+        #     ]
 
-        if self.lane_num == 2: 
-        # two lane 
-            internal_edgestarts = [ # in increasing order
-                (":a_2", edge_dict[":a_2"]),
-                (":b_2", edge_dict[":b_2"]),
-                (":c_2", edge_dict[":c_2"]),
-                (":d_2", edge_dict[":d_2"]),
-                (":g_3", edge_dict[":g_3"]),
-                (":b_0", edge_dict[":b_0"]),
-                (":e_2", edge_dict[":e_2"]),
-                (":e_0", edge_dict[":e_0"]),
-                (":d_0", edge_dict[":d_0"]),
-                (":g_0", edge_dict[":g_0"]),
-            ]
-        elif self.lane_num == 1:
-        # one lane
-            internal_edgestarts = [ # in increasing order
-                (":a_1", edge_dict[":a_1"]),
-                (":b_1", edge_dict[":b_1"]),
-                (":c_1", edge_dict[":c_1"]),
-                (":d_1", edge_dict[":d_1"]),
-                (":g_2", edge_dict[":g_2"]),
-                (":a_0", edge_dict[":a_0"]),
-                (":b_0", edge_dict[":b_0"]),
-                (":e_1", edge_dict[":e_1"]),
-                (":e_0", edge_dict[":e_0"]),
-                (":c_0", edge_dict[":c_0"]),
-                (":d_0", edge_dict[":d_0"]),
-                (":g_0", edge_dict[":g_0"]),
-            ]
-
+        self.es.update(edge_dict)
+        # return [(':a_2', 0)]
         return internal_edgestarts
 
     def gen_custom_start_pos(self, initial_config, num_vehicles, **kwargs):
@@ -355,20 +362,67 @@ class RoundaboutScenario(Scenario):
                 pass
         return edges
 
-    def specify_absolute_order(self):
-        if self.lane_num == 2: 
+    # def specify_absolute_order(self):
+    #     """
+    #     The variables first thru fourth describe the points at which 
+    #     the algorithm can follow until it hits an edge that has already been added 
+    #     """
+    #     ### old stuff below
+    #     if self.lane_num == 2: 
         
-            return [":a_2", "right", ":b_2", "top", ":c_2",
-                    "left", ":d_2", "bottom", "inflow_1",
-                    ":g_3", "merge_in_1", ":a_0", ":b_0",
-                    "merge_out_0", ":e_2", "outflow_0", "inflow_0",
-                    ":e_0", "merge_in_0", ":c_0", ":d_0",
-                    "merge_out_1", ":g_0", "outflow_1" ]
-        elif self.lane_num == 1: 
-        # one lane
-            return [":a_1", "right", ":b_1", "top", ":c_1",
-                    "left", ":d_1", "bottom", "inflow_1",
-                    ":g_2", "merge_in_1", ":a_0", ":b_0",
-                    "merge_out_0", ":e_1", "outflow_0", "inflow_0",
-                    ":e_0", "merge_in_0", ":c_0", ":d_0",
-                    "merge_out_1", ":g_0", "outflow_1" ]
+    #         return [":a_2", "right", ":b_2", "top", ":c_2",
+    #                 "left", ":d_2", "bottom", "inflow_1",
+    #                 ":g_3", "merge_in_1", ":a_0", ":b_0",
+    #                 "merge_out_0", ":e_2", "outflow_0", "inflow_0",
+    #                 ":e_0", "merge_in_0", ":c_0", ":d_0",
+    #                 "merge_out_1", ":g_0", "outflow_1" ]
+    #     elif self.lane_num == 1: 
+    #     # one lane
+    #         return [":a_1", "right", ":b_1", "top", ":c_1",
+    #                 "left", ":d_1", "bottom", "inflow_1",
+    #                 ":g_2", "merge_in_1", ":a_0", ":b_0",
+    #                 "merge_out_0", ":e_1", "outflow_0", "inflow_0",
+    #                 ":e_0", "merge_in_0", ":c_0", ":d_0",
+    #                 "merge_out_1", ":g_0", "outflow_1" ]
+
+    def specify_absolute_order(self):
+        """
+        The variables first thru fourth describe the points at which 
+        the algorithm can follow until it hits an edge that has already been added 
+
+        Run DFS
+        
+        EXCLUSIONS NEED TO BE FILLED IN MANUALLY
+
+        THIS IS NOT ROBUST. SHOULD DO SOME MANUAL CHECKING TO MAKE SURE THIS IS UP TO PAR
+        """
+        # exclusions = [':e_2', ':g_1']
+        exclusions = [':e_4', ':e_5', ':g_1', ':g_2', ':g_5']
+        # exclusions = [':e_8', ':e_9', ':e_6', ':e_7', ':g_1', ':g_2', ':g_3', ':g_4', ':g_9', ':g_8']
+
+        zero = self._connections['next']['bottom'][0][0][0]
+        first = "inflow_1"
+        second = self._connections['prev']['merge_out_0'][0][0][0]
+        third = "inflow_0"
+        fourth  = self._connections['prev']['merge_out_1'][0][0][0]
+        stack = [fourth, third, second, first, zero]
+
+        ordering = []
+
+        def get_next(edge):
+            if edge not in self._connections['next']:
+                return None
+            return list(np.concatenate([[x[0] for x in y] 
+                   for y in list(self._connections['next'][edge].values())]))
+
+        while stack:
+            curr_edge = stack.pop()
+            if curr_edge in ordering:
+                continue
+            ordering.append(curr_edge)
+            next_edges = get_next(curr_edge)
+            if next_edges:
+                for e in next_edges[::-1]:
+                    if e not in ordering and e not in stack and e not in exclusions:
+                        stack.append(e)
+        return ordering

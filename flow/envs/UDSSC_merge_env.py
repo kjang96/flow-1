@@ -98,7 +98,11 @@ class UDSSCMergeEnv(Env):
 
         # Maintained as a stack, only apply_rl_actions to the top 1
         self.rl_stack = [] 
+
         super().__init__(env_params, sumo_params, scenario)
+
+        self.all_edges = self.scenario.specify_absolute_order()
+        self.roundabout_edges = self.all_edges[:self.all_edges.index('bottom') + 1]
 
     @property
     def observation_space(self):
@@ -109,6 +113,7 @@ class UDSSCMergeEnv(Env):
         # rl_pos_2, the pos in the roundabout: 1
         self.total_obs = self.n_obs_vehicles * 2 + 2 + \
                          int(self.roundabout_length // 5) * 2 + 1
+        # import ipdb; ipdb.set_trace()
                          
         box = Box(low=0.,
                   high=1,
@@ -218,7 +223,7 @@ class UDSSCMergeEnv(Env):
             # rl_pos, rl_vel
             rl_pos = [self.get_x_by_id(rl_id) / self.scenario_length]
             rl_vel = [self.vehicles.get_speed(rl_id) / max_speed]
-            if self.vehicles.get_edge(rl_id) in ROUNDABOUT_EDGES:
+            if self.vehicles.get_edge(rl_id) in self.roundabout_edges:
                 rl_pos_2 = [self.get_x_by_id(rl_id) / self.roundabout_length]
             else: 
                 rl_pos_2 = [0]
@@ -241,6 +246,7 @@ class UDSSCMergeEnv(Env):
                 if not tailway_dists or tailway_dists[0] == 1e+3:
                     tailway_dists = [0]
                 else:
+                    tailway_dists = tailway_dists[:1]
                     tailway_dists[0] = tailway_dists[0] / self.scenario_length
             else: # No 
                 tailway_vel = [0]
@@ -254,6 +260,7 @@ class UDSSCMergeEnv(Env):
                 if not headway_dists or headway_dists[0] == 1e+3:
                     headway_dists = [0]
                 else:
+                    headway_dists = headway_dists[:1]
                     headway_dists[0] = headway_dists[0] / self.scenario_length
                 # print(headway_dists)
             else: # No leader
@@ -330,6 +337,8 @@ class UDSSCMergeEnv(Env):
                                         headway_dists, headway_vel,
                                         queue_0, queue_1,
                                         roundabout_full]))
+        # if len(state) != 93:
+        #     import ipdb; ipdb.set_trace()
     
         return state
 
@@ -474,7 +483,7 @@ class UDSSCMergeEnv(Env):
         """
         state = np.zeros((int(self.roundabout_length//5), 2))
         i = 0 # index of state to alter
-        for edge in ROUNDABOUT_EDGES:
+        for edge in self.roundabout_edges:
             vehicles = sorted(self.vehicles.get_ids_by_edge(edge),
                               key=lambda x: self.get_x_by_id(x))
             for veh_id in vehicles:
@@ -505,7 +514,7 @@ class UDSSCMergeEnv(Env):
         #                "merge_out_1", ":g_0", "outflow_1" ] # len 24
         # import ipdb; ipdb.set_trace()
         states = []
-        for edge in ROUNDABOUT_EDGES:
+        for edge in self.roundabout_edges:
             density = self._edge_density(edge) # No need to normalize, already under 0
             states.append(density)
             avg_velocity = self._edge_velocity(edge) 
@@ -564,9 +573,9 @@ class UDSSCMergeEnv(Env):
         annoyingly it's not 2*pi*r
         """
         # circ = 0
-        edges = [":a_1", "right", ":b_1", "top", ":c_1",
-                 "left", ":d_1", "bottom"]
-        circ = sum([self.scenario.edge_length(e) for e in edges])
+        # edges = [":a_1", "right", ":b_1", "top", ":c_1",
+        #          "left", ":d_1", "bottom"]
+        circ = sum([self.scenario.edge_length(e) for e in self.roundabout_edges])
         return circ
         
     def get_k_followers(self, veh_id, k):
@@ -597,12 +606,12 @@ class UDSSCMergeEnv(Env):
 
     @property
     def roundabout_length(self):
-        rl = sum([self.scenario.edge_length(e) for e in ROUNDABOUT_EDGES])
+        rl = sum([self.scenario.edge_length(e) for e in self.roundabout_edges])
         return rl
 
     @property
     def scenario_length(self):
-        length = sum([self.scenario.edge_length(e) for e in ALL_EDGES])
+        length = sum([self.scenario.edge_length(e) for e in self.all_edges])
         return length
 
     def additional_command(self):

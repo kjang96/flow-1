@@ -41,6 +41,8 @@ class RoundaboutGenerator(Generator):
                  {"id": "f",   "x": repr(0), "y": repr(r + m + x), "type": default},
                  {"id": "g",   "x": repr(-r - m), "y": repr(-r - 0.1*r), "type": default},
                  {"id": "h",   "x": repr(-r - m - x), "y": repr(-r - 0.2*r), "type": default},
+                 {"id": "i",   "x": repr(r + m), "y": repr(-r - 0.1*r), "type": default},
+
                 ]
 
         return nodes
@@ -152,6 +154,7 @@ class RoundaboutGenerator(Generator):
              "to": "g",
              "numLanes": lanes,
             },
+            
         ]
 
         return edges

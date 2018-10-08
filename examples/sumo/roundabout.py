@@ -47,7 +47,7 @@ def merge_example(sumo_binary=None):
                  sumo_car_following_params=SumoCarFollowingParams(
                      tau=1.1,
                  ),
-                 lane_change_mode=1621,
+                 lane_change_mode="strategic",
                 #  lane_change_mode=0,
                  sumo_lc_params=SumoLaneChangeParams())
 
@@ -87,7 +87,7 @@ def merge_example(sumo_binary=None):
         # resolution of the curved portions
         "resolution": 100,
         # num lanes
-        "lane_num": 1,
+        "lane_num": 2,
     }
 
     net_params = NetParams(
@@ -102,7 +102,7 @@ def merge_example(sumo_binary=None):
         additional_params={"merge_bunching": 0}
     )
 
-    exp_tag = "UDSSC_Merge_3"
+    exp_tag = "roundabout"
     scenario = RoundaboutScenario(
         name=exp_tag,
         generator_class=RoundaboutGenerator,
