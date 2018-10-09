@@ -29,7 +29,7 @@ HORIZON = 500
 SIM_STEP = 1
 BATCH_SIZE = 20000
 ITR = 100
-exp_tag = "roundabout"  # experiment prefix
+exp_tag = "roundabout_41"  # experiment prefix
 
 # Sumo settings
 FLOW_RATE = 350
@@ -39,12 +39,12 @@ FLOW_PROB = FLOW_RATE/3600
 RL_FLOW_RATE = 50
 RL_FLOW_PROB = RL_FLOW_RATE/3600
 
-# Local settings
-N_PARALLEL = 1
-SUMO_BINARY = "sumo-gui"
-MODE = "local"
-RESTART_INSTANCE = False
-SEEDS = [1]
+# # Local settings
+# N_PARALLEL = 1
+# SUMO_BINARY = "sumo-gui"
+# MODE = "local"
+# RESTART_INSTANCE = False
+# SEEDS = [1]
 
 # # EC2 settings
 # N_PARALLEL = 8
@@ -52,6 +52,13 @@ SEEDS = [1]
 # MODE = "ec2"
 # RESTART_INSTANCE = True
 # SEEDS = [1, 2, 5, 91]
+
+# Autoscaler settings
+N_PARALLEL = 8
+SUMO_BINARY = "sumo"
+MODE = "local"
+RESTART_INSTANCE = True
+SEEDS = [1, 2, 5, 91]
 
 
 def main():
@@ -90,6 +97,8 @@ def run_task(*_):
     # inflow.add(veh_type="rl", edge="inflow_0", name="rl", probability=50/3600)
     inflow.add(veh_type="idm", edge="inflow_0", name="idm", vehs_per_hour=50, departLane="random")
     inflow.add(veh_type="idm", edge="inflow_0", name="idm", vehs_per_hour=50, departLane="random")
+    inflow.add(veh_type="idm", edge="inflow_0", name="idm", vehs_per_hour=50, departLane="random")
+    inflow.add(veh_type="idm", edge="inflow_0", name="idm", vehs_per_hour=50, departLane="random")
     # inflow.add(veh_type="idm", edge="inflow_0", name="idm", probability=50/3600)
     # inflow.add(veh_type="idm", edge="inflow_0", name="idm", probability=50/3600)
     
@@ -103,7 +112,7 @@ def run_task(*_):
     # inflow.add(veh_type="idm", edge="inflow_1", name="idm", probability=50/3600)
     # inflow.add(veh_type="idm", edge="inflow_1", name="idm", probability=50/3600)
     # inflow.add(veh_type="idm", edge="inflow_1", name="idm", probability=50/3600)
-    inflow.add(veh_type="idm", edge="inflow_1", name="idm", probability=300/3600, departLane="random")
+    inflow.add(veh_type="idm", edge="inflow_1", name="idm", probability=500/3600, departLane="random")
     # note that the vehicles are added sequentially by the generator,
     # so place the merging vehicles after the vehicles in the ring
     vehicles = Vehicles()
@@ -198,7 +207,7 @@ def run_task(*_):
     )
 
     # env_name = "RoundaboutEnv"
-    env_name = "CartesianEnv"
+    env_name = "RoundaboutCartesianEnv"
     pass_params = (env_name, sumo_params, vehicles, env_params,
                    net_params, initial_config, scenario)
     env = GymEnv(env_name, record_video=False, register_params=pass_params)
