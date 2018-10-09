@@ -29,7 +29,7 @@ HORIZON = 500
 SIM_STEP = 1
 BATCH_SIZE = 20000
 ITR = 100
-exp_tag = "roundabout_41"  # experiment prefix
+exp_tag = "roundabout_43"  # experiment prefix
 
 # Sumo settings
 FLOW_RATE = 350
@@ -98,7 +98,7 @@ def run_task(*_):
     inflow.add(veh_type="idm", edge="inflow_0", name="idm", vehs_per_hour=50, departLane="random")
     inflow.add(veh_type="idm", edge="inflow_0", name="idm", vehs_per_hour=50, departLane="random")
     inflow.add(veh_type="idm", edge="inflow_0", name="idm", vehs_per_hour=50, departLane="random")
-    inflow.add(veh_type="idm", edge="inflow_0", name="idm", vehs_per_hour=50, departLane="random")
+    # inflow.add(veh_type="idm", edge="inflow_0", name="idm", vehs_per_hour=50, departLane="random")
     # inflow.add(veh_type="idm", edge="inflow_0", name="idm", probability=50/3600)
     # inflow.add(veh_type="idm", edge="inflow_0", name="idm", probability=50/3600)
     
@@ -112,7 +112,7 @@ def run_task(*_):
     # inflow.add(veh_type="idm", edge="inflow_1", name="idm", probability=50/3600)
     # inflow.add(veh_type="idm", edge="inflow_1", name="idm", probability=50/3600)
     # inflow.add(veh_type="idm", edge="inflow_1", name="idm", probability=50/3600)
-    inflow.add(veh_type="idm", edge="inflow_1", name="idm", probability=500/3600, departLane="random")
+    inflow.add(veh_type="idm", edge="inflow_1", name="idm", probability=900/3600, departLane="random")
     # note that the vehicles are added sequentially by the generator,
     # so place the merging vehicles after the vehicles in the ring
     vehicles = Vehicles()
