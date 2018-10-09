@@ -92,6 +92,7 @@ class RoundaboutEnv(Env):
         self.n_obs_vehicles = \
             1 + self.n_preceding + self.n_following + 2*self.n_merging_in
         self.ring_radius = scenario.net_params.additional_params["ring_radius"]
+        self.num_lanes = scenario.net_params.additional_params["lane_num"]
         self.obs_var_labels = \
             ["speed", "pos", "queue_length", "velocity_stats"]
         self.accels = []
@@ -637,21 +638,38 @@ class RoundaboutEnv(Env):
 #         ":e_0", "merge_in_0", ":c_0", ":d_0",
 #         "merge_out_1", ":g_0", "outflow_1" ]
 
-class CartesianEnv(RoundaboutEnv):
+class RoundaboutCartesianEnv(RoundaboutEnv):
     def __init__(self, env_params, sumo_params, scenario):
         self.positions = {}
         super().__init__(env_params, sumo_params, scenario)
 
+    # @property
+    # def observation_space(self):
+    #     # Vehicle position and velocity, normalized
+    #     # Queue length x 2
+    #     # Roundabout state = len(MERGE_EDGES) * 3
+    #     # Roundabout full = (ROUNDABOUT_LENGTH // 5)*2 # 2 cols
+    #     # rl_pos_2, the pos in the roundabout: 1
+    #     self.total_obs = self.n_obs_vehicles * 2 + 2 + \
+    #                      int(self.roundabout_length // 5) * 2 + 1
+    #     # import ipdb; ipdb.set_trace()
+                         
+    #     box = Box(low=0.,
+    #               high=1,
+    #               shape=(self.total_obs,),
+    #               dtype=np.float32)          
+    #     return box
+
     @property
     def observation_space(self):
-        # Vehicle position and velocity, normalized: 3
-        # Queue length x 2
-        # Roundabout state = len(MERGE_EDGES) * 3
-        # Roundabout full = (ROUNDABOUT_LENGTH // 5)*3 # 2 cols
-        # rl_pos_2, the pos in the roundabout: 1
-        # + 1 to account for the new cartesian coord for the rl veh
-        self.total_obs = self.n_obs_vehicles * 2 + 2 + \
-                         int(self.roundabout_length // 5) * 3 + 1 + 1
+        # rl_pos, rl_pos_2, rl_vel: 4
+        # merge_dists_0, merge_0_vel, merge_dists_1, merge_1_vel: n_merging_in * 4
+        # tailway_dists, tailway_vel, headway_dists, headway_vel: 4 * self.num_lanes
+        # queue_0, queue_1: 2
+        # roundabout_full: ROUNDABOUT_LENGTH // 5)*3 # 2 cols
+                            
+        self.total_obs = 4 + self.n_merging_in*4 + 4*self.num_lanes + 2 + \
+                         int(self.roundabout_length // 5) * 3
                          
         box = Box(low=0.,
                   high=1,
@@ -735,7 +753,6 @@ class CartesianEnv(RoundaboutEnv):
         * max_speed = 15 
 
         """
-        print('hollaaaaaa')
         rl_id = None
         
         # Get normalization factors 
@@ -781,37 +798,42 @@ class CartesianEnv(RoundaboutEnv):
                 tailway_vel = [self.vehicles.get_speed(tail_id) / max_speed]
                 tailway_dists = self.vehicles.get_lane_tailways(rl_id)
                 if not tailway_vel:
-                    tailway_vel = [0]
+                    tailway_vel = [0] * self.num_lanes
                 if not tailway_dists or tailway_dists[0] == 1e+3:
-                    tailway_dists = [0]
+                    tailway_dists = [0] * self.num_lanes
                 else:
-                    tailway_dists[0] = tailway_dists[0] / self.scenario_length
+                    tailway_dists = [x / self.scenario_length for x in tailway_dists]
+                    # tailway_dists[0] = tailway_dists[0] / self.scenario_length
             else: # No 
-                tailway_vel = [0]
-                tailway_dists = [0]
+                tailway_vel = [0] * self.num_lanes
+                tailway_dists = [0] * self.num_lanes
+            tailway_vel = self.process(tailway_vel, length=self.num_lanes)
+            tailway_dists = self.process(tailway_dists, length=self.num_lanes)
             if head_id:
                 headway_vel = [self.vehicles.get_speed(head_id) / max_speed]
                 headway_dists = self.vehicles.get_lane_headways(rl_id)
                 # print(headway_dists)
                 if not headway_vel:
-                    headway_vel = [0]
+                    headway_vel = [0] * self.num_lanes
                 if not headway_dists or headway_dists[0] == 1e+3:
-                    headway_dists = [0]
+                    headway_dists = [0] * self.num_lanes
                 else:
-                    headway_dists[0] = headway_dists[0] / self.scenario_length
+                    headway_dists = [x / self.scenario_length for x in headway_dists]
+                    # headway_dists[0] = headway_dists[0] / self.scenario_length
                 # print(headway_dists)
             else: # No leader
-                headway_vel = [0]
-                headway_dists = [0]
-
+                headway_vel = [0] * self.num_lanes
+                headway_dists = [0] * self.num_lanes
+            headway_vel = self.process(headway_vel, length=self.num_lanes)
+            headway_dists = self.process(headway_dists, length=self.num_lanes)
         else: # RL vehicle's not in the system. Pass in zeros here 
             rl_pos = [0, 0]
             rl_pos_2 = [0]
             rl_vel = [0]
-            tailway_vel = [0]
-            tailway_dists = [0]
-            headway_vel = [0]
-            headway_dists = [0]
+            tailway_vel = [0] * self.num_lanes
+            tailway_dists = [0] * self.num_lanes
+            headway_vel = [0] * self.num_lanes
+            headway_dists = [0] * self.num_lanes
 
         # DISTANCES
         # sorted by closest to farthest
@@ -876,6 +898,8 @@ class CartesianEnv(RoundaboutEnv):
                                         headway_dists, headway_vel,
                                         queue_0, queue_1,
                                         roundabout_full]))
+        if len(state) != 191:    
+            import ipdb; ipdb.set_trace()
         return state
 
     

@@ -396,8 +396,8 @@ class RoundaboutScenario(Scenario):
 
         THIS IS NOT ROBUST. SHOULD DO SOME MANUAL CHECKING TO MAKE SURE THIS IS UP TO PAR
         """
-        # exclusions = [':e_2', ':g_1']
-        exclusions = [':e_4', ':e_5', ':g_1', ':g_2', ':g_5']
+        exclusions = [':e_2', ':g_1']
+        # exclusions = [':e_4', ':e_5', ':g_1', ':g_2', ':g_5']
         # exclusions = [':e_8', ':e_9', ':e_6', ':e_7', ':g_1', ':g_2', ':g_3', ':g_4', ':g_9', ':g_8']
 
         zero = self._connections['next']['bottom'][0][0][0]
