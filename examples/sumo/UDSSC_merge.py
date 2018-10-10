@@ -29,8 +29,16 @@ def merge_example(sumo_binary=None):
     inflow = InFlows()
     # inflow.add(veh_type="idm", edge="inflow_1", vehs_per_hour=FLOW_RATE)
     # inflow.add(veh_type="idm", edge="inflow_0", vehs_per_hour=FLOW_RATE)
-    inflow.add(veh_type="idm", edge="inflow_1", probability=FLOW_PROB)
-    inflow.add(veh_type="idm", edge="inflow_0", probability=FLOW_PROB)
+    # inflow.add(veh_type="idm", edge="inflow_1", probability=FLOW_PROB)
+    # inflow.add(veh_type="idm", edge="inflow_0", probability=FLOW_PROB)
+
+    inflow.add(veh_type="idm", edge="inflow_0", name="idm", probability=50/3600)
+    inflow.add(veh_type="idm", edge="inflow_0", name="idm", vehs_per_hour=50)
+    # inflow.add(veh_type="idm", edge="inflow_1", name="idm", vehs_per_hour=50)
+
+    # inflow.add(veh_type="rl", edge="inflow_0", name="rl", probability=50/3600)
+    inflow.add(veh_type="idm", edge="inflow_1", name="idm", probability=300/3600)
+    inflow.add(veh_type="idm", edge="inflow_1", name="idm", vehs_per_hour=50)
 
 
     # note that the vehicles are added sequentially by the generator,
