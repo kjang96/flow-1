@@ -60,7 +60,7 @@ def total_velocity(env, fail=False):
         return 0.
     if len(vel) == 0:
         return 0.
-    return sum(vel) / 3 #just cuz
+    return sum(vel)#just cuz
 
 
 def reward_density(env):
@@ -196,6 +196,14 @@ def penalize_standstill(env, gain=1):
     num_standstill = len(vel[vel==0])
     penalty = gain * num_standstill
     return -penalty
+
+def penalize_jerkiness(env, gain=1):
+    """
+    A penalty function the penalizes jerky driving 
+    """
+    pass
+
+
 
 def penalize_headway_variance(vehicles,
                               vids,
