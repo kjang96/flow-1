@@ -60,7 +60,7 @@ def total_velocity(env, fail=False):
         return 0.
     if len(vel) == 0:
         return 0.
-    return sum(vel)#just cuz
+    return sum(vel)/3#just cuz
 
 
 def reward_density(env):
