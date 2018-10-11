@@ -23,11 +23,11 @@ from flow.scenarios.UDSSC_merge.scenario import UDSSCMergingScenario
 from flow.core.params import InFlows
 
 # Training settings
-HORIZON = 500
-SIM_STEP = 1
+HORIZON = 5000
+SIM_STEP = 0.1
 BATCH_SIZE = 20000
 ITR = 200
-exp_tag = "roundabout_49"  # experiment prefix
+exp_tag = "roundabout_50"  # experiment prefix
 
 # Sumo settings
 FLOW_RATE = 350
