@@ -185,28 +185,30 @@ class UDSSCMergeEnv(Env):
         The state space includes:
         *************************
 
-        * distance, velocity of the RL-controlled vehicle
-        * distance, velocity of all vehicles in the roundabout
-        * distance, velocity of all vehicles closest to merge_0
-        * distance, velocity of vehicles closest to merge_1
-        * distance, velocity of vehicles leading and following
+        * absolute distance, velocity of the RL-controlled vehicle
+        * absolute distance, velocity of all vehicles in the roundabout
+        * relative distance, velocity of all vehicles closest to merge_0
+        * relative distance, velocity of vehicles closest to merge_1
+        * tailway and headway distance, velocity of vehicles leading and following
           the RL vehicle 
         * number of vehicles in each queue 
 
         The state space is returned in the form:
-
-            [rl_pos, rl_pos_2, rl_vel,
+            [rl_info, rl_info_2,
             merge_dists_0, merge_0_vel,
             merge_dists_1, merge_1_vel,
-            tailway_dists, tailway_vel,
-            headway_dists, headway_vel,
             queue_0, queue_1,
             roundabout_full]
 
         ***********************************************
         Description of the variables in the state space
         ***********************************************
-
+        * rl_info: the concatenation of [rl_pos, rl_pos_2, rl_vel, tailway_vel,
+                   tailway_dists, headway_vel, headway_dists] for the Northern-origin
+                   RL vehicle, variables described below
+        * rl_info_2: the concatenation of [rl_pos, rl_pos_2, rl_vel, tailway_vel,
+                   tailway_dists, headway_vel, headway_dists] for the Western-origin
+                   RL vehicle, variables described below
         * rl_pos: absolute position of the RL vehicle / total_scenario_length.
             0 if there is no RL vehicle in the system.
         * rl_pos_2: absolute position of the RL vehicle / roundabout_length.
