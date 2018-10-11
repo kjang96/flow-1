@@ -173,8 +173,10 @@ class UDSSCMergeEnv(Env):
         # headway_reward = 0.2 * max_cost * rewards.penalize_headway_variance(
             # self.vehicles, self.sorted_extra_data, normalization)
         # return vel_reward + headway_reward
-        # return vel_reward
-        return total_vel
+        if np.isnan(vel_reward):
+            vel_reward = 0
+        return vel_reward
+        # return total_vel    
         # return avg_vel_reward + penalty
 
     def get_state(self, **kwargs):
