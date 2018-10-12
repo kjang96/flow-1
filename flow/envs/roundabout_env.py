@@ -833,9 +833,9 @@ class RoundaboutCartesianEnv(RoundaboutEnv):
                                         roundabout_full]))
         if len(state) != 227:
             import ipdb; ipdb.set_trace()
-        for x in state: 
-            if x >1 or x < -1: 
-                import ipdb; ipdb.set_trace()
+        # for x in state: 
+        #     if x >1 or x < -1: 
+        #         import ipdb; ipdb.set_trace()
         return state
 
     def rl_info(self, stack):
