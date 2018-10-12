@@ -175,8 +175,9 @@ class UDSSCMergeEnv(Env):
         # return vel_reward + headway_reward
         if np.isnan(vel_reward):
             vel_reward = 0
-        # return total_vel   
+        # return total_vel    
         return vel_reward
+        # return total_vel
         # return avg_vel_reward + penalty
 
     def get_state(self, **kwargs):
