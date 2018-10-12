@@ -27,7 +27,7 @@ HORIZON = 500
 SIM_STEP = 1
 BATCH_SIZE = 20000
 ITR = 200
-exp_tag = "roundabout_54"  # experiment prefix
+exp_tag = "roundabout_55"  # experiment prefix
 
 # Sumo settings
 FLOW_RATE = 350
@@ -39,7 +39,7 @@ RL_FLOW_PROB = RL_FLOW_RATE/3600
 
 # # Local settings
 # N_PARALLEL = 1
-# SUMO_BINARY = "sumo-gui"
+# SUMO_BINARY = "sumo"
 # MODE = "local"
 # RESTART_INSTANCE = False
 # SEEDS = [1]
@@ -91,14 +91,14 @@ def run_task(*_):
 
     inflow = InFlows()
     
-    # inflow.add(veh_type="rl", edge="inflow_1", name="rl", probability=50/3600)
-    inflow.add(veh_type="idm", edge="inflow_0", name="idm", probability=100/3600)
+    inflow.add(veh_type="rl", edge="inflow_1", name="rl", probability=50/3600)
+    # inflow.add(veh_type="idm", edge="inflow_0", name="idm", probability=100/3600)
     # inflow.add(veh_type="rl", edge="inflow_0", name="rl", vehs_per_hour=50)
     inflow.add(veh_type="rl", edge="inflow_0", name="rl", probability=50/3600)
     # inflow.add(veh_type="idm", edge="inflow_1", name="idm", vehs_per_hour=50)
 
     # inflow.add(veh_type="rl", edge="inflow_0", name="rl", probability=50/3600)
-    inflow.add(veh_type="idm", edge="inflow_1", name="idm", probability=250/3600)
+    inflow.add(veh_type="idm", edge="inflow_1", name="idm", probability=300/3600)
     inflow.add(veh_type="rl", edge="inflow_1", name="rl", probability=50/3600)
     # inflow.add(veh_type="rl", edge="inflow_1", name="rl", vehs_per_hour=50)
     # inflow.add(veh_type="idm", edge="inflow_0", name="idm", vehs_per_hour=300)
