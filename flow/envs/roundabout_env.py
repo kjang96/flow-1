@@ -135,7 +135,6 @@ class RoundaboutEnv(Env):
     def action_space(self):
         return Box(low=-np.abs(self.env_params.additional_params["max_decel"]),
                    high=self.env_params.additional_params["max_accel"],
-                #    shape=(4,),
                    shape=(self.rl_control*self.num_stacks*2,),
                    dtype=np.float32)
 
@@ -156,7 +155,6 @@ class RoundaboutEnv(Env):
                     if x not in [-1, 0, 1]:
                         direction[i] = 0
                 self.apply_lane_change(stack[:num_rl], direction=direction[:num_rl])
-
         apply_stack(0, self.rl_stack)
         apply_stack(1, self.rl_stack_2)
 
@@ -624,7 +622,9 @@ class RoundaboutEnv(Env):
         
         # Curate rl_stack
         for veh_id in self.vehicles.get_rl_ids():
-            if veh_id not in self.rl_stack:
+            if veh_id in self.rl_stack or veh_id in self.rl_stack_2:
+                continue
+            if veh_id not in self.rl_stack and self.vehicles.get_edge(veh_id) == "inflow_0":
                 self.rl_stack.append(veh_id) # TODO also need step for removing it from the system
             elif veh_id not in self.rl_stack_2 and self.vehicles.get_edge(veh_id) == "inflow_1":
                 self.rl_stack_2.append(veh_id)
@@ -768,6 +768,10 @@ class RoundaboutCartesianEnv(RoundaboutEnv):
         * max_speed = 15 
 
         """
+        # for v1 in self.rl_stack:
+        #     if v1 in self.rl_stack_2:
+        #         raise Exception('duplicates in the rl stack')
+                 
         rl_id = None
         
         # Get normalization factors 
@@ -827,7 +831,11 @@ class RoundaboutCartesianEnv(RoundaboutEnv):
                                         merge_dists_1, merge_1_vel,
                                         queue_0, queue_1,
                                         roundabout_full]))
-        import ipdb; ipdb.set_trace()
+        if len(state) != 227:
+            import ipdb; ipdb.set_trace()
+        for x in state: 
+            if x >1 or x < -1: 
+                import ipdb; ipdb.set_trace()
         return state
 
     def rl_info(self, stack):
@@ -846,7 +854,8 @@ class RoundaboutCartesianEnv(RoundaboutEnv):
                 rl_pos[0] = rl_pos[0] / self.scenario.generator.max_x
                 rl_pos[1] = rl_pos[1] / self.scenario.generator.max_y
 
-                rl_vel = [self.vehicles.get_speed(rl_id) / max_speed]
+                rl_vel = [self.vehicles.get_speed(rl_id) / max_speed] if \
+                          self.vehicles.get_speed(rl_id)!= -1001 else [0]
                 if self.vehicles.get_edge(rl_id) in self.roundabout_edges:
                     rl_pos_2 = [self.get_x_by_id(rl_id) / self.roundabout_length]
                 else: 
@@ -880,11 +889,13 @@ class RoundaboutCartesianEnv(RoundaboutEnv):
 
             # Pad
             if self.rl_control - len(rl_ids) >= 1:
-                state += ([0] * 4 + [0] * 4 * self.num_lanes) * (self.rl_control - len(rl_ids))
+                state = np.concatenate([state, ([0] * 4 + [0] * 4 * self.num_lanes) * (self.rl_control - len(rl_ids))])
 
 
         else: # RL vehicle's not in the system. Pass in zeros here 
             state = ([0]*4 + [0]*4*self.num_lanes) * self.rl_control
+        # if len(state) != 24:
+        # import ipdb; ipdb.set_trace()
         return state
 
     
@@ -916,9 +927,16 @@ class RoundaboutCartesianEnv(RoundaboutEnv):
         # try:
 
         # Curate rl_stack
+        # for veh_id in self.vehicles.get_rl_ids():
+        #     if veh_id not in self.rl_stack:
+        #         self.rl_stack.append(veh_id)
         for veh_id in self.vehicles.get_rl_ids():
-            if veh_id not in self.rl_stack:
-                self.rl_stack.append(veh_id)
+            if veh_id in self.rl_stack or veh_id in self.rl_stack_2:
+                continue
+            if veh_id not in self.rl_stack and self.vehicles.get_edge(veh_id) == "inflow_0":
+                self.rl_stack.append(veh_id) # TODO also need step for removing it from the system
+            elif veh_id not in self.rl_stack_2 and self.vehicles.get_edge(veh_id) == "inflow_1":
+                self.rl_stack_2.append(veh_id)
 
         # Curate rl_stack
         removal = []
