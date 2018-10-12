@@ -21,6 +21,10 @@ ADDITIONAL_ENV_PARAMS = {
     "n_following": 2,
     # number of observable merging-in vehicle from the larger loop
     "n_merging_in": 2,
+    # number of rl vehicles can be controlled per stack
+    "rl_control": 1,
+    # number of rl stacks we want to keep
+    "num_stacks": 2,
 }
 
 MERGE_EDGES = [":a_1", "right", ":b_1", "top", ":c_1",
@@ -89,6 +93,8 @@ class RoundaboutEnv(Env):
         self.n_preceding = env_params.additional_params["n_preceding"]
         self.n_following = env_params.additional_params["n_following"]
         self.n_merging_in = env_params.additional_params["n_merging_in"]
+        self.rl_control = env_params.additional_params["rl_control"]
+        self.num_stacks = env_params.additional_params["num_stacks"]
         self.n_obs_vehicles = \
             1 + self.n_preceding + self.n_following + 2*self.n_merging_in
         self.ring_radius = scenario.net_params.additional_params["ring_radius"]
@@ -108,14 +114,17 @@ class RoundaboutEnv(Env):
 
     @property
     def observation_space(self):
-        # rl_pos, rl_pos_2, rl_vel for 2 vehicles: 3 * 2
+        # rl_info, rl_info_2 = rl_pos, rl_pos_2, rl_vel, tailway_vel, tailway_dists,
+        #           headway_vel, headway_dists for 2 RL vehicles:  (3 + 4*self.num_lanes) * self.rl_control * self.num_stacks
         # merge_dists_0, merge_0_vel, merge_dists_1, merge_1_vel: n_merging_in * 4
-        # tailway_dists, tailway_vel, headway_dists, headway_vel for 2 rl veh: 4 * self.num_lanes * 2
         # queue_0, queue_1: 2
-        # roundabout_full: ROUNDABOUT_LENGTH // 5)*2 # 2 cols
-        self.total_obs = 6 + self.n_merging_in*4 + 4*self.num_lanes*2 + 2 + \
-                         int(self.roundabout_length // 5) * 2
+        # roundabout_full: ROUNDABOUT_LENGTH // 5)*2
                          
+        self.total_obs = (3 + 4*self.num_lanes) * self.rl_control * self.num_stacks \
+                         + self.n_merging_in * 4 \
+                         + 2 \
+                         + int(self.roundabout_length // 5) * 2
+        
         box = Box(low=0.,
                   high=1,
                   shape=(self.total_obs,),
@@ -126,44 +135,30 @@ class RoundaboutEnv(Env):
     def action_space(self):
         return Box(low=-np.abs(self.env_params.additional_params["max_decel"]),
                    high=self.env_params.additional_params["max_accel"],
-                #    shape=(self.vehicles.num_rl_vehicles,),
-                   shape=(4,),
+                #    shape=(4,),
+                   shape=(self.rl_control*self.num_stacks*2,),
                    dtype=np.float32)
 
     def _apply_rl_actions(self, rl_actions):
-        # Curating rl_stack
-        # Remove rl vehicles that are no longer in the system
-        # more efficient to keep removal list than to resize continually
-        # if 1:
-        #     return
-        removal = [] 
-        removal_2 = []
-        for rl_id in self.rl_stack:
-            if rl_id not in self.vehicles.get_rl_ids():
-                removal.append(rl_id)
-        for rl_id in self.rl_stack_2:
-            if rl_id not in self.vehicles.get_rl_ids():
-                removal_2.append(rl_id)
-        for rl_id in removal:
-            self.rl_stack.remove(rl_id)
-        for rl_id in removal_2:
-            self.rl_stack_2.remove(rl_id)    
-        if self.rl_stack:
-            self.apply_acceleration(self.rl_stack[:1], [rl_actions[0]])
+       
+        self.curate_stack()
 
-            direction = np.round([rl_actions[2]])
-            for i, x in enumerate(direction):
-                if x not in [-1, 0, 1]:
-                    direction[i] = 0
-            self.apply_lane_change(self.rl_stack[:1], direction=direction)
-        if self.rl_stack_2:
-            self.apply_acceleration(self.rl_stack_2[:1], [rl_actions[1]])
+        def apply_stack(stack_index, stack):
+            stack_action_len = self.rl_control * 2 # 2 for acc, lc action
 
-            direction = np.round([rl_actions[3]])
-            for i, x in enumerate(direction):
-                if x not in [-1, 0, 1]:
-                    direction[i] = 0
-            self.apply_lane_change(self.rl_stack_2[:1], direction=direction)
+            if stack:
+                num_rl = min(self.rl_control, len(stack))
+                actions = rl_actions[stack_index*stack_action_len:stack_index*stack_action_len + stack_action_len]
+                self.apply_acceleration(stack[:num_rl], actions[:num_rl])
+
+                direction = np.round(actions[self.rl_control:])
+                for i, x in enumerate(direction):
+                    if x not in [-1, 0, 1]:
+                        direction[i] = 0
+                self.apply_lane_change(stack[:num_rl], direction=direction[:num_rl])
+
+        apply_stack(0, self.rl_stack)
+        apply_stack(1, self.rl_stack_2)
 
 
     def compute_reward(self, state, rl_actions, **kwargs):
@@ -172,15 +167,8 @@ class RoundaboutEnv(Env):
         penalty = rewards.penalize_standstill(self, gain=1)
         total_vel = rewards.total_velocity(self, fail=kwargs["fail"])
 
-        # Use a similar weighting of of the headway reward as the velocity
-        # reward
-        # max_cost = np.array([self.env_params.additional_params[
-        #                          "target_velocity"]] *
-        #                     self.vehicles.num_vehicles)
-        # max_cost = np.linalg.norm(max_cost)
-        # normalization = self.scenario.length / self.vehicles.num_vehicles
-        # headway_reward = 0.2 * max_cost * rewards.penalize_headway_variance(
-            # self.vehicles, self.sorted_extra_data, normalization)
+        if np.isnan(vel_reward):
+            vel_reward = 0
         # return vel_reward + headway_reward
         # return vel_reward
         # return total_vel
@@ -231,109 +219,9 @@ class RoundaboutEnv(Env):
         # Get the RL-dependent info
         # TODO potential error here if normalizing with self.scenario.length
         # because I'm not sure if this includes internal edges or not
-        if self.rl_stack:
-            # Get the rl_id
-            rl_id = self.rl_stack[0]
+        rl_info = self.rl_info(self.rl_stack)
+        rl_info_2 = self.rl_info(self.rl_stack_2)
 
-            # rl_pos, rl_vel
-            rl_pos = [self.get_x_by_id(rl_id) / self.scenario_length]
-            rl_vel = [self.vehicles.get_speed(rl_id) / max_speed]
-            if self.vehicles.get_edge(rl_id) in self.roundabout_edges:
-                rl_pos_2 = [self.get_x_by_id(rl_id) / self.roundabout_length]
-            else: 
-                rl_pos_2 = [0]
-
-            # tailway_dists, tailway_vel
-            # headway_dists, headway_vel
-            tail_id = self.vehicles.get_follower(rl_id)
-            head_id = self.vehicles.get_leader(rl_id)
-            
-            if tail_id: 
-                tailway_vel = [self.vehicles.get_speed(tail_id) / max_speed]
-                tailway_dists = self.vehicles.get_lane_tailways(rl_id)
-                if not tailway_vel:
-                    tailway_vel = [0] * self.num_lanes
-                if not tailway_dists or tailway_dists[0] == 1e+3:
-                    tailway_dists = [0] * self.num_lanes
-                else:
-                    tailway_dists = [x / self.scenario_length for x in tailway_dists]
-            else: # No 
-                tailway_vel = [0]
-                tailway_dists = [0]
-            tailway_vel = self.process(tailway_vel, length=self.num_lanes)
-            tailway_dists = self.process(tailway_dists, length=self.num_lanes)
-            if head_id:
-                headway_vel = [self.vehicles.get_speed(head_id) / max_speed]
-                headway_dists = self.vehicles.get_lane_headways(rl_id)
-                if not headway_vel:
-                    headway_vel = [0] * self.num_lanes
-                if not headway_dists or headway_dists[0] == 1e+3:
-                    headway_dists = [0] * self.num_lanes
-                else:
-                    headway_dists = [x / self.scenario_length for x in headway_dists]
-            else: # No leader
-                headway_vel = [0]
-                headway_dists = [0]
-            headway_vel = self.process(headway_vel, length=self.num_lanes)
-            headway_dists = self.process(headway_dists, length=self.num_lanes)
-            # print(rl_id, headway_dists[0] * self.scenario_length, tailway_dists[0]* self.scenario_length)
-            rl_info = np.concatenate([rl_pos, rl_pos_2, rl_vel, tailway_vel,
-                        tailway_dists, headway_vel, headway_dists])
-
-        else: # RL vehicle's not in the system. Pass in zeros here 
-            # rl_info = [0] * 7
-            rl_info = [0] * 3 + [0] * 4 * self.num_lanes
-        if self.rl_stack_2:
-            # Get the rl_id
-            rl_id = self.rl_stack_2[0]
-
-            # rl_pos, rl_vel
-            rl_pos = [self.get_x_by_id(rl_id) / self.scenario_length]
-            rl_vel = [self.vehicles.get_speed(rl_id) / max_speed]
-            if self.vehicles.get_edge(rl_id) in ROUNDABOUT_EDGES:
-                rl_pos_2 = [self.get_x_by_id(rl_id) / self.roundabout_length]
-            else: 
-                rl_pos_2 = [0]
-
-            # tailway_dists, tailway_vel
-            # headway_dists, headway_vel
-            tail_id = self.vehicles.get_follower(rl_id)
-            head_id = self.vehicles.get_leader(rl_id)
-
-            # This is kinda shitty coding, but I'm not that confident
-            # in get_lane_tailways atm, Idrk how it works 
-            if tail_id: 
-                tailway_vel = [self.vehicles.get_speed(tail_id) / max_speed]
-                tailway_dists = self.vehicles.get_lane_tailways(rl_id)
-                if not tailway_vel:
-                    tailway_vel = [0]
-                if not tailway_dists or tailway_dists[0] == 1e+3:
-                    tailway_dists = [0]
-                else:
-                    tailway_dists[0] = tailway_dists[0] / self.scenario_length
-            else: # No 
-                tailway_vel = [0]
-                tailway_dists = [0]
-            if head_id:
-                headway_vel = [self.vehicles.get_speed(head_id) / max_speed]
-                headway_dists = self.vehicles.get_lane_headways(rl_id)
-                # print(headway_dists)
-                if not headway_vel:
-                    headway_vel = [0]
-                if not headway_dists or headway_dists[0] == 1e+3:
-                    headway_dists = [0]
-                else:
-                    headway_dists[0] = headway_dists[0] / self.scenario_length
-                # print(headway_dists)
-            else: # No leader
-                headway_vel = [0]
-                headway_dists = [0]
-            
-            rl_info_2 = np.concatenate([rl_pos, rl_pos_2, rl_vel, tailway_vel,
-                       tailway_dists, headway_vel, headway_dists])
-            # print(rl_id, headway_dists[0] * self.scenario_length, tailway_dists[0]* self.scenario_length)
-        else: # RL vehicle's not in the system. Pass in zeros here 
-            rl_info_2 = [0] * 3 + [0] * 4 * self.num_lanes
 
         # DISTANCES
         # sorted by closest to farthest
@@ -345,24 +233,6 @@ class RoundaboutEnv(Env):
                                     length=self.n_merging_in,
                                     normalizer=merge_1_norm)
 
-        # OBSOLETE NOW 
-        # # Get (ID, dist_from_RL) for the k vehicles closest to 
-        # # the RL vehicle. 0 if there is no k_closest.
-        # tailway, headway = self.k_closest_to_rl('rl_0', self.n_preceding) #todo
-        # tailway_ids = [x[0] for x in tailway]
-        # tailway_dists = [x[1] for x in tailway]
-        # tailway_dists = self.process(tailway_dists,
-        #                             length=self.n_preceding,
-        #                             normalizer=circ)
-
-        # headway_ids = [x[0] for x in headway]
-        # headway_dists = [x[1] for x in headway]
-        # headway_dists = self.process(headway_dists,
-        #                             length=self.n_preceding,
-        #                             normalizer=circ)
-        # tailway_dists = [self.vehicles.get_follower('rl_0')]
-
-
         # VELOCITIES
         merge_0_vel = self.process(self.vehicles.get_speed(merge_id_0),
                                 length=self.n_merging_in,
@@ -370,12 +240,6 @@ class RoundaboutEnv(Env):
         merge_1_vel = self.process(self.vehicles.get_speed(merge_id_1),
                                 length=self.n_merging_in,
                                 normalizer=max_speed)
-        # tailway_vel = self.process(self.vehicles.get_speed(tailway_ids),
-        #                         length=self.n_preceding,
-        #                         normalizer=max_speed)
-        # headway_vel = self.process(self.vehicles.get_speed(headway_ids),
-        #                         length=self.n_following,
-        #                         normalizer=max_speed)
 
         queue_0, queue_1 = self.queue_length()
         queue_0 = [queue_0 / queue_0_norm]
@@ -385,13 +249,6 @@ class RoundaboutEnv(Env):
         roundabout_full[:,0] = roundabout_full[:,0]/self.roundabout_length
         roundabout_full[:,1] = roundabout_full[:,1]/max_speed
         roundabout_full = roundabout_full.flatten().tolist()
-        # state = np.array(np.concatenate([rl_pos, rl_pos_2, rl_vel,
-        #                                 merge_dists_0, merge_0_vel,
-        #                                 merge_dists_1, merge_1_vel,
-        #                                 tailway_dists, tailway_vel,
-        #                                 headway_dists, headway_vel,
-        #                                 queue_0, queue_1,
-        #                                 roundabout_full]))
 
         state = np.array(np.concatenate([rl_info, rl_info_2,
                                         merge_dists_0, merge_0_vel,
@@ -402,6 +259,71 @@ class RoundaboutEnv(Env):
             import ipdb; ipdb.set_trace()
     
         return state
+
+    def rl_info(self, stack):
+        max_speed = self.scenario.max_speed 
+        state = [] 
+        if stack:
+            # Get the rl_id
+            num_rl = min(self.rl_control, len(stack))
+            rl_ids = stack[:num_rl]
+            for rl_id in rl_ids:
+
+                # rl_pos, rl_vel
+                rl_pos = [self.get_x_by_id(rl_id) / self.scenario_length]
+                rl_vel = [self.vehicles.get_speed(rl_id) / max_speed]
+                if self.vehicles.get_edge(rl_id) in self.roundabout_edges:
+                    rl_pos_2 = [self.get_x_by_id(rl_id) / self.roundabout_length]
+                else: 
+                    rl_pos_2 = [0]
+
+                # tailway_dists, tailway_vel
+                # headway_dists, headway_vel
+                tail_id = self.vehicles.get_follower(rl_id)
+                head_id = self.vehicles.get_leader(rl_id)
+                
+                if tail_id: 
+                    tailway_vel = [self.vehicles.get_speed(tail_id) / max_speed]
+                    tailway_dists = self.vehicles.get_lane_tailways(rl_id)
+                    if not tailway_vel:
+                        tailway_vel = [0] * self.num_lanes
+                    if not tailway_dists or tailway_dists[0] == 1e+3:
+                        tailway_dists = [0] * self.num_lanes
+                    else:
+                        tailway_dists = [x / self.scenario_length for x in tailway_dists]
+                else: # No 
+                    tailway_vel = [0]
+                    tailway_dists = [0]
+                tailway_vel = self.process(tailway_vel, length=self.num_lanes)
+                tailway_dists = self.process(tailway_dists, length=self.num_lanes)
+                if head_id:
+                    headway_vel = [self.vehicles.get_speed(head_id) / max_speed]
+                    headway_dists = self.vehicles.get_lane_headways(rl_id)
+                    if not headway_vel:
+                        headway_vel = [0] * self.num_lanes
+                    if not headway_dists or headway_dists[0] == 1e+3:
+                        headway_dists = [0] * self.num_lanes
+                    else:
+                        headway_dists = [x / self.scenario_length for x in headway_dists]
+                else: # No leader
+                    headway_vel = [0]
+                    headway_dists = [0]
+                headway_vel = self.process(headway_vel, length=self.num_lanes)
+                headway_dists = self.process(headway_dists, length=self.num_lanes)
+                rl_info = np.concatenate([rl_pos, rl_pos_2, rl_vel, tailway_vel,
+                            tailway_dists, headway_vel, headway_dists])
+                state = np.concatenate([state, rl_info])
+
+            # Pad
+            if self.rl_control - len(rl_ids) >= 1:
+                state += ([0] * 3 + [0] * 4 * self.num_lanes) * (self.rl_control - len(rl_ids))
+
+
+        else: # RL vehicle's not in the system. Pass in zeros here 
+            state = ([0]*3 + [0]*4*self.num_lanes) * self.rl_control
+        # import ipdb; ipdb.set_trace()
+        return state
+
 
     def sort_by_position(self):
         """
@@ -676,6 +598,23 @@ class RoundaboutEnv(Env):
         length = sum([self.scenario.edge_length(e) for e in self.all_edges])
         return length
 
+    def curate_stack(self):
+        # Curating rl_stack
+        # Remove rl vehicles that are no longer in the system
+        # more efficient to keep removal list than to resize continually
+        removal = [] 
+        removal_2 = []
+        for rl_id in self.rl_stack:
+            if rl_id not in self.vehicles.get_rl_ids():
+                removal.append(rl_id)
+        for rl_id in self.rl_stack_2:
+            if rl_id not in self.vehicles.get_rl_ids():
+                removal_2.append(rl_id)
+        for rl_id in removal:
+            self.rl_stack.remove(rl_id)
+        for rl_id in removal_2:
+            self.rl_stack_2.remove(rl_id) 
+
     def additional_command(self):
         try: 
             self.velocities.append(np.mean(self.vehicles.get_speed(self.vehicles.get_ids())))
@@ -725,7 +664,13 @@ class RoundaboutCartesianEnv(RoundaboutEnv):
     @property
     def observation_space(self):
         # rl_info, rl_info_2 = rl_pos, rl_pos_2, rl_vel, tailway_vel, tailway_dists,
-        #           headway_vel, headway_dists for 2 RL vehicles:  (4 + 4*self.num_lanes) * 2
+        #           headway_vel, headway_dists for 2 RL vehicles:  (3 + 4*self.num_lanes) * self.rl_control * self.num_stacks
+        # merge_dists_0, merge_0_vel, merge_dists_1, merge_1_vel: n_merging_in * 4
+        # queue_0, queue_1: 2
+        # roundabout_full: ROUNDABOUT_LENGTH // 5)*2
+
+        # rl_info, rl_info_2 = rl_pos, rl_pos_2, rl_vel, tailway_vel, tailway_dists,
+        #           headway_vel, headway_dists for 2 RL vehicles:  (4 + 4*self.num_lanes) * self.rl_control * self.num_stacks
         # merge_dists_0, merge_0_vel, merge_dists_1, merge_1_vel: n_merging_in * 4
         # queue_0, queue_1: 2
         # roundabout_full: ROUNDABOUT_LENGTH // 5)*3
@@ -736,7 +681,7 @@ class RoundaboutCartesianEnv(RoundaboutEnv):
         # + len(queue_0) + len(queue_1) \
         # + len(roundabout_full)
 
-        self.total_obs = (4 + 4*self.num_lanes)*2 + \
+        self.total_obs = (4 + 4*self.num_lanes)*self.rl_control*self.num_stacks + \
                           self.n_merging_in*4 + \
                           2 + \
                           int(self.roundabout_length // 5) * 3
@@ -840,135 +785,9 @@ class RoundaboutCartesianEnv(RoundaboutEnv):
         queue_1_norm = ceil(merge_1_norm/5 + 1)
 
         # Get the RL-dependent info
-        if self.rl_stack:
-            # Get the rl_id
-            rl_id = self.rl_stack[0]
-
-            # rl_pos, rl_vel
-            rl_pos = self.vehicles.get_2d_position(rl_id)
-            if not rl_pos:
-                rl_pos = [0, 0]
-            rl_pos[0] = rl_pos[0] / self.scenario.generator.max_x
-            rl_pos[1] = rl_pos[1] / self.scenario.generator.max_y
-
-            rl_vel = [self.vehicles.get_speed(rl_id) / max_speed]
-            if self.vehicles.get_edge(rl_id) in ROUNDABOUT_EDGES:
-                rl_pos_2 = [self.get_x_by_id(rl_id) / self.roundabout_length]
-            else: 
-                rl_pos_2 = [0]
-
-            # tailway_dists, tailway_vel
-            # headway_dists, headway_vel
-            tail_id = self.vehicles.get_follower(rl_id)
-            head_id = self.vehicles.get_leader(rl_id)
-
-            # This is kinda shitty coding, but I'm not that confident
-            # in get_lane_tailways atm, Idrk how it works 
-            if tail_id: 
-                tailway_vel = [self.vehicles.get_speed(tail_id) / max_speed]
-                tailway_dists = self.vehicles.get_lane_tailways(rl_id)
-                if not tailway_vel:
-                    tailway_vel = [0] * self.num_lanes
-                if not tailway_dists or tailway_dists[0] == 1e+3:
-                    tailway_dists = [0] * self.num_lanes
-                else:
-                    tailway_dists = [x / self.scenario_length for x in tailway_dists]
-                    # tailway_dists[0] = tailway_dists[0] / self.scenario_length
-            else: # No 
-                tailway_vel = [0] * self.num_lanes
-                tailway_dists = [0] * self.num_lanes
-            tailway_vel = self.process(tailway_vel, length=self.num_lanes)
-            tailway_dists = self.process(tailway_dists, length=self.num_lanes)
-            if head_id:
-                headway_vel = [self.vehicles.get_speed(head_id) / max_speed]
-                headway_dists = self.vehicles.get_lane_headways(rl_id)
-                # print(headway_dists)
-                if not headway_vel:
-                    headway_vel = [0] * self.num_lanes
-                if not headway_dists or headway_dists[0] == 1e+3:
-                    headway_dists = [0] * self.num_lanes
-                else:
-                    headway_dists = [x / self.scenario_length for x in headway_dists]
-                    # headway_dists[0] = headway_dists[0] / self.scenario_length
-                # print(headway_dists)
-            else: # No leader
-                headway_vel = [0] * self.num_lanes
-                headway_dists = [0] * self.num_lanes
-            headway_vel = self.process(headway_vel, length=self.num_lanes)
-            headway_dists = self.process(headway_dists, length=self.num_lanes)
-
-            rl_info = np.concatenate([rl_pos, rl_pos_2, rl_vel, tailway_vel,
-                        tailway_dists, headway_vel, headway_dists])
-        else: # RL vehicle's not in the system. Pass in zeros here 
-            rl_info = [0] * 4 + [0] * 4 * self.num_lanes
-            # rl_pos = [0, 0]
-            # rl_pos_2 = [0]
-            # rl_vel = [0]
-            # tailway_vel = [0] * self.num_lanes
-            # tailway_dists = [0] * self.num_lanes
-            # headway_vel = [0] * self.num_lanes
-            # headway_dists = [0] * self.num_lanes
-        if self.rl_stack_2:
-            # Get the rl_id
-            rl_id = self.rl_stack_2[0]
-
-            # rl_pos, rl_vel
-            rl_pos = self.vehicles.get_2d_position(rl_id)
-            if not rl_pos:
-                rl_pos = [0, 0]
-            rl_pos[0] = rl_pos[0] / self.scenario.generator.max_x
-            rl_pos[1] = rl_pos[1] / self.scenario.generator.max_y
-
-            rl_vel = [self.vehicles.get_speed(rl_id) / max_speed]
-            if self.vehicles.get_edge(rl_id) in ROUNDABOUT_EDGES:
-                rl_pos_2 = [self.get_x_by_id(rl_id) / self.roundabout_length]
-            else: 
-                rl_pos_2 = [0]
-
-            # tailway_dists, tailway_vel
-            # headway_dists, headway_vel
-            tail_id = self.vehicles.get_follower(rl_id)
-            head_id = self.vehicles.get_leader(rl_id)
-
-            # This is kinda shitty coding, but I'm not that confident
-            # in get_lane_tailways atm, Idrk how it works 
-            if tail_id: 
-                tailway_vel = [self.vehicles.get_speed(tail_id) / max_speed]
-                tailway_dists = self.vehicles.get_lane_tailways(rl_id)
-                if not tailway_vel:
-                    tailway_vel = [0] * self.num_lanes
-                if not tailway_dists or tailway_dists[0] == 1e+3:
-                    tailway_dists = [0] * self.num_lanes
-                else:
-                    tailway_dists = [x / self.scenario_length for x in tailway_dists]
-                    # tailway_dists[0] = tailway_dists[0] / self.scenario_length
-            else: # No 
-                tailway_vel = [0] * self.num_lanes
-                tailway_dists = [0] * self.num_lanes
-            tailway_vel = self.process(tailway_vel, length=self.num_lanes)
-            tailway_dists = self.process(tailway_dists, length=self.num_lanes)
-            if head_id:
-                headway_vel = [self.vehicles.get_speed(head_id) / max_speed]
-                headway_dists = self.vehicles.get_lane_headways(rl_id)
-                # print(headway_dists)
-                if not headway_vel:
-                    headway_vel = [0] * self.num_lanes
-                if not headway_dists or headway_dists[0] == 1e+3:
-                    headway_dists = [0] * self.num_lanes
-                else:
-                    headway_dists = [x / self.scenario_length for x in headway_dists]
-                    # headway_dists[0] = headway_dists[0] / self.scenario_length
-                # print(headway_dists)
-            else: # No leader
-                headway_vel = [0] * self.num_lanes
-                headway_dists = [0] * self.num_lanes
-            headway_vel = self.process(headway_vel, length=self.num_lanes)
-            headway_dists = self.process(headway_dists, length=self.num_lanes)
-
-            rl_info_2 = np.concatenate([rl_pos, rl_pos_2, rl_vel, tailway_vel,
-                        tailway_dists, headway_vel, headway_dists])
-        else: # RL vehicle's not in the system. Pass in zeros here 
-            rl_info_2 = [0] * 4 + [0] * 4 * self.num_lanes
+        rl_info = self.rl_info(self.rl_stack)
+        rl_info_2 = self.rl_info(self.rl_stack_2)
+        # import ipdb; ipdb.set_trace()
 
         # DISTANCES
         # sorted by closest to farthest
@@ -980,23 +799,6 @@ class RoundaboutCartesianEnv(RoundaboutEnv):
                                     length=self.n_merging_in,
                                     normalizer=merge_1_norm)
 
-        # OBSOLETE NOW 
-        # # Get (ID, dist_from_RL) for the k vehicles closest to 
-        # # the RL vehicle. 0 if there is no k_closest.
-        # tailway, headway = self.k_closest_to_rl('rl_0', self.n_preceding) #todo
-        # tailway_ids = [x[0] for x in tailway]
-        # tailway_dists = [x[1] for x in tailway]
-        # tailway_dists = self.process(tailway_dists,
-        #                             length=self.n_preceding,
-        #                             normalizer=circ)
-
-        # headway_ids = [x[0] for x in headway]
-        # headway_dists = [x[1] for x in headway]
-        # headway_dists = self.process(headway_dists,
-        #                             length=self.n_preceding,
-        #                             normalizer=circ)
-        # tailway_dists = [self.vehicles.get_follower('rl_0')]
-
 
         # VELOCITIES
         merge_0_vel = self.process(self.vehicles.get_speed(merge_id_0),
@@ -1005,12 +807,6 @@ class RoundaboutCartesianEnv(RoundaboutEnv):
         merge_1_vel = self.process(self.vehicles.get_speed(merge_id_1),
                                 length=self.n_merging_in,
                                 normalizer=max_speed)
-        # tailway_vel = self.process(self.vehicles.get_speed(tailway_ids),
-        #                         length=self.n_preceding,
-        #                         normalizer=max_speed)
-        # headway_vel = self.process(self.vehicles.get_speed(headway_ids),
-        #                         length=self.n_following,
-        #                         normalizer=max_speed)
 
         queue_0, queue_1 = self.queue_length()
         queue_0 = [queue_0 / queue_0_norm]
@@ -1031,6 +827,64 @@ class RoundaboutCartesianEnv(RoundaboutEnv):
                                         merge_dists_1, merge_1_vel,
                                         queue_0, queue_1,
                                         roundabout_full]))
+        import ipdb; ipdb.set_trace()
+        return state
+
+    def rl_info(self, stack):
+        max_speed = self.scenario.max_speed 
+        state = [] 
+        if stack:
+            # Get the rl_id
+            num_rl = min(self.rl_control, len(stack))
+            rl_ids = stack[:num_rl]
+            for rl_id in rl_ids:
+
+                # rl_pos, rl_vel
+                rl_pos = self.vehicles.get_2d_position(rl_id)
+                if not rl_pos:
+                    rl_pos = [0, 0]
+                rl_pos[0] = rl_pos[0] / self.scenario.generator.max_x
+                rl_pos[1] = rl_pos[1] / self.scenario.generator.max_y
+
+                rl_vel = [self.vehicles.get_speed(rl_id) / max_speed]
+                if self.vehicles.get_edge(rl_id) in self.roundabout_edges:
+                    rl_pos_2 = [self.get_x_by_id(rl_id) / self.roundabout_length]
+                else: 
+                    rl_pos_2 = [0]
+
+                # tailway_dists, tailway_vel
+                # headway_dists, headway_vel
+                tail_ids = self.vehicles.get_lane_followers(rl_id)
+                head_ids = self.vehicles.get_lane_leaders(rl_id)
+                
+                tailway_vel = []
+                tailway_dists = []
+                headway_vel = []
+                headway_dists = []
+
+                tailway_vel = [x / max_speed if x != -1001 else 0 for x in self.vehicles.get_speed(tail_ids)]
+                tailway_dists = self.vehicles.get_lane_tailways(rl_id)
+                tailway_dists = [x / self.scenario_length if x != 1000 else 0 for x in tailway_dists]
+                tailway_vel = self.process(tailway_vel, length=self.num_lanes)
+                tailway_dists = self.process(tailway_dists, length=self.num_lanes)
+
+                headway_vel = [x / max_speed if x != -1001 else 0 for x in self.vehicles.get_speed(head_ids)]
+                headway_dists = self.vehicles.get_lane_headways(rl_id)
+                headway_dists = [x / self.scenario_length if x != 1000 else 0 for x in headway_dists]
+                headway_vel = self.process(headway_vel, length=self.num_lanes)
+                headway_dists = self.process(headway_dists, length=self.num_lanes)
+
+                rl_info = np.concatenate([rl_pos, rl_pos_2, rl_vel, tailway_vel,
+                            tailway_dists, headway_vel, headway_dists])
+                state = np.concatenate([state, rl_info])
+
+            # Pad
+            if self.rl_control - len(rl_ids) >= 1:
+                state += ([0] * 4 + [0] * 4 * self.num_lanes) * (self.rl_control - len(rl_ids))
+
+
+        else: # RL vehicle's not in the system. Pass in zeros here 
+            state = ([0]*4 + [0]*4*self.num_lanes) * self.rl_control
         return state
 
     

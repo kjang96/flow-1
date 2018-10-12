@@ -41,7 +41,7 @@ RL_FLOW_PROB = RL_FLOW_RATE/3600
 
 # Local settings
 N_PARALLEL = 1
-SUMO_BINARY = "sumo"
+SUMO_BINARY = "sumo-gui"
 MODE = "local"
 RESTART_INSTANCE = False
 SEEDS = [1]
@@ -162,6 +162,10 @@ def run_task(*_):
         "n_following": 1, # HAS TO BE 1
         # number of observable merging-in vehicle from the larger loop
         "n_merging_in": 6,
+        # number of rl vehicles can be controlled per stack
+        "rl_control": 1,
+        # number of rl stacks we want to keep
+        "num_stacks": 2,
     }
 
     env_params = EnvParams(horizon=HORIZON,
