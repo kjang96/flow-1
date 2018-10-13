@@ -29,7 +29,7 @@ HORIZON = 500
 SIM_STEP = 1
 BATCH_SIZE = 20000
 ITR = 250
-exp_tag = "complex_7"  # experiment prefix
+exp_tag = "complex_8"  # experiment prefix
 
 # Sumo settings
 FLOW_RATE = 350
@@ -155,7 +155,7 @@ def run_task(*_):
         # number of observable merging-in vehicle from the larger loop
         "n_merging_in": 6,
         # number of rl vehicles can be controlled per stack
-        "rl_control": 2,
+        "rl_control": 3,
         # number of rl stacks we want to keep
         "num_stacks": 2,
     }
