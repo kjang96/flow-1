@@ -29,7 +29,7 @@ HORIZON = 500
 SIM_STEP = 1
 BATCH_SIZE = 20000
 ITR = 250
-exp_tag = "complex_6"  # experiment prefix
+exp_tag = "complex_7"  # experiment prefix
 
 # Sumo settings
 FLOW_RATE = 350
