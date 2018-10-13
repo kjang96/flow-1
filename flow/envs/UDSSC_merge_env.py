@@ -135,6 +135,8 @@ class UDSSCMergeEnv(Env):
         Notes: More efficient to keep a removal list than to resize
         continuously
         """
+        if 1:
+            return 
         removal = [] 
         removal_2 = []
         for rl_id in self.rl_stack:
@@ -779,7 +781,18 @@ class UDSSCMergeEnv(Env):
             elif veh_id not in self.rl_stack_2 and self.vehicles.get_edge(veh_id) == "inflow_1":
                 self.rl_stack_2.append(veh_id)
         # Curate second rl_stack
-
+        removal = [] 
+        removal_2 = []
+        for rl_id in self.rl_stack:
+            if rl_id not in self.vehicles.get_rl_ids():
+                removal.append(rl_id)
+        for rl_id in self.rl_stack_2:
+            if rl_id not in self.vehicles.get_rl_ids():
+                removal_2.append(rl_id)
+        for rl_id in removal:
+            self.rl_stack.remove(rl_id)
+        for rl_id in removal_2:
+            self.rl_stack_2.remove(rl_id)
         # Color RL vehicles
         rl_control = self.rl_stack[:min(1, len(self.rl_stack))]
         rl_control_2 = self.rl_stack_2[:min(1, len(self.rl_stack_2))]
