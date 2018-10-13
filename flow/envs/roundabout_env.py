@@ -139,7 +139,6 @@ class RoundaboutEnv(Env):
                    dtype=np.float32)
 
     def _apply_rl_actions(self, rl_actions):
-       
         self.curate_stack()
 
         def apply_stack(stack_index, stack):
@@ -628,6 +627,14 @@ class RoundaboutEnv(Env):
                 self.rl_stack.append(veh_id) # TODO also need step for removing it from the system
             elif veh_id not in self.rl_stack_2 and self.vehicles.get_edge(veh_id) == "inflow_1":
                 self.rl_stack_2.append(veh_id)
+        
+        # Color RL vehicles
+        rl_control = self.rl_stack[:min(self.rl_control, len(self.rl_stack))]
+        rl_control_2 = self.rl_stack_2[:min(self.rl_control, len(self.rl_stack_2))]
+        
+        for veh_id in rl_control + rl_control_2:
+            self.traci_connection.vehicle.setColor(
+                        vehID=veh_id, color=(0, 255, 255, 255))
 
 
 
