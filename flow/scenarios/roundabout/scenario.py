@@ -101,21 +101,6 @@ class RoundaboutScenario(Scenario):
         self.es.update(edge_dict)
         edges = [edge for edge in self.specify_absolute_order() if not edge.startswith(':')]
         edgestarts = [(e, edge_dict[e]) for e in edges]
-        # edgestarts = [ #len of prev edge + total prev (including internal edge len)
-        #     ("right", edge_dict["right"]),
-        #     ("top", edge_dict["top"]), 
-        #     ("left", edge_dict["left"]),
-        #     ("bottom", edge_dict["bottom"]),
-        #     ("inflow_1", edge_dict["inflow_1"]),
-        #     ("merge_in_1", edge_dict["merge_in_1"]),
-        #     ("merge_out_0", edge_dict["merge_out_0"]),
-        #     ("outflow_0", edge_dict["outflow_0"]),
-        #     ("inflow_0", edge_dict["inflow_0"]),
-        #     ("merge_in_0", edge_dict["merge_in_0"]),
-        #     ("merge_out_1", edge_dict["merge_out_1"]),
-        #     ("outflow_1", edge_dict["outflow_1"]),
-        # ]
-        # import ipdb; ipdb.set_trace()
 
         return edgestarts
 
@@ -396,8 +381,8 @@ class RoundaboutScenario(Scenario):
 
         THIS IS NOT ROBUST. SHOULD DO SOME MANUAL CHECKING TO MAKE SURE THIS IS UP TO PAR
         """
-        exclusions = [':e_2', ':g_1']
-        # exclusions = [':e_4', ':e_5', ':g_1', ':g_2', ':g_5']
+        # exclusions = [':e_2', ':g_1'] # one lane? confirm
+        exclusions = [':e_4', ':e_5', ':g_1', ':g_2', ':g_5'] # two lane? confirm
         # exclusions = [':e_8', ':e_9', ':e_6', ':e_7', ':g_1', ':g_2', ':g_3', ':g_4', ':g_9', ':g_8']
 
         zero = self._connections['next']['bottom'][0][0][0]
