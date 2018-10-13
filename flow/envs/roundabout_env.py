@@ -831,8 +831,8 @@ class RoundaboutCartesianEnv(RoundaboutEnv):
                                         merge_dists_1, merge_1_vel,
                                         queue_0, queue_1,
                                         roundabout_full]))
-        if len(state) != 227:
-            import ipdb; ipdb.set_trace()
+        # if len(state) != 227:
+        #     import ipdb; ipdb.set_trace()
         # for x in state: 
         #     if x >1 or x < -1: 
         #         import ipdb; ipdb.set_trace()
