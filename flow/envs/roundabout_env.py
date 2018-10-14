@@ -25,6 +25,8 @@ ADDITIONAL_ENV_PARAMS = {
     "rl_control": 1,
     # number of rl stacks we want to keep
     "num_stacks": 2,
+    # whether ot not to encode routes in the state space
+    "route_encoding": True
 }
 
 MERGE_EDGES = [":a_1", "right", ":b_1", "top", ":c_1",
@@ -95,6 +97,7 @@ class RoundaboutEnv(Env):
         self.n_merging_in = env_params.additional_params["n_merging_in"]
         self.rl_control = env_params.additional_params["rl_control"]
         self.num_stacks = env_params.additional_params["num_stacks"]
+        self.route_encoding = env_params.additional_params["route_encoding"]
         self.n_obs_vehicles = \
             1 + self.n_preceding + self.n_following + 2*self.n_merging_in
         self.ring_radius = scenario.net_params.additional_params["ring_radius"]
@@ -316,9 +319,8 @@ class RoundaboutEnv(Env):
                 state += ([0] * 3 + [0] * 4 * self.num_lanes) * (self.rl_control - len(rl_ids))
 
 
-        else: # RL vehicle's not in the system. Pass in zeros here 
+        else: # RL vehicle's not in the system. Pass in zeros here
             state = ([0]*3 + [0]*4*self.num_lanes) * self.rl_control
-        # import ipdb; ipdb.set_trace()
         return state
 
 
@@ -651,47 +653,33 @@ class RoundaboutCartesianEnv(RoundaboutEnv):
         self.positions = {}
         super().__init__(env_params, sumo_params, scenario)
 
-    # @property
-    # def observation_space(self):
-    #     # Vehicle position and velocity, normalized
-    #     # Queue length x 2
-    #     # Roundabout state = len(MERGE_EDGES) * 3
-    #     # Roundabout full = (ROUNDABOUT_LENGTH // 5)*2 # 2 cols
-    #     # rl_pos_2, the pos in the roundabout: 1
-    #     self.total_obs = self.n_obs_vehicles * 2 + 2 + \
-    #                      int(self.roundabout_length // 5) * 2 + 1
-    #     # import ipdb; ipdb.set_trace()
-                         
-    #     box = Box(low=0.,
-    #               high=1,
-    #               shape=(self.total_obs,),
-    #               dtype=np.float32)          
-    #     return box
 
     @property
     def observation_space(self):
-        # rl_info, rl_info_2 = rl_pos, rl_pos_2, rl_vel, tailway_vel, tailway_dists,
-        #           headway_vel, headway_dists for 2 RL vehicles:  (3 + 4*self.num_lanes) * self.rl_control * self.num_stacks
-        # merge_dists_0, merge_0_vel, merge_dists_1, merge_1_vel: n_merging_in * 4
-        # queue_0, queue_1: 2
-        # roundabout_full: ROUNDABOUT_LENGTH // 5)*2
-
         # rl_info, rl_info_2 = rl_pos, rl_pos_2, rl_vel, tailway_vel, tailway_dists,
         #           headway_vel, headway_dists for 2 RL vehicles:  (4 + 4*self.num_lanes) * self.rl_control * self.num_stacks
         # merge_dists_0, merge_0_vel, merge_dists_1, merge_1_vel: n_merging_in * 4
         # queue_0, queue_1: 2
         # roundabout_full: ROUNDABOUT_LENGTH // 5)*3
 
-        # len(rl_info)+ len(rl_info_2) \
-        # + len(merge_dists_0) + len(merge_0_vel) \
-        # + len(merge_dists_1) + len(merge_1_vel) \
-        # + len(queue_0) + len(queue_1) \
-        # + len(roundabout_full)
-
-        self.total_obs = (4 + 4*self.num_lanes)*self.rl_control*self.num_stacks + \
-                          self.n_merging_in*4 + \
-                          2 + \
-                          int(self.roundabout_length // 5) * 3
+        # With route_encoding
+        # rl_info, rl_info_2 = rl_pos, rl_pos_2, rl_vel, route, tailway_vel, tailway_dists,
+        #           headway_vel, headway_dists for 2 RL vehicles:  (5 + 4*self.num_lanes) * self.rl_control * self.num_stacks
+        # merge_dists_0, merge_0_vel, merge_dists_1, merge_1_vel: n_merging_in * 4
+        # merge_route_0, merge_route_1: n_merging_in * 2
+        # queue_0, queue_1: 2
+        # roundabout_full: ROUNDABOUT_LENGTH // 5)*4
+        if self.route_encoding:
+            self.total_obs = (5 + 4*self.num_lanes)*self.rl_control*self.num_stacks + \
+                            self.n_merging_in*4 + \
+                            self.n_merging_in*2 + \
+                            2 + \
+                            int(self.roundabout_length // 5) * 4
+        else:
+            self.total_obs = (4 + 4*self.num_lanes)*self.rl_control*self.num_stacks + \
+                            self.n_merging_in*4 + \
+                            2 + \
+                            int(self.roundabout_length // 5) * 3
                          
         box = Box(low=0.,
                   high=1,
@@ -794,6 +782,7 @@ class RoundaboutCartesianEnv(RoundaboutEnv):
                         self.scenario.edge_length(':a_0')
         queue_0_norm = ceil(merge_0_norm/5 + 1) # 5 is the car length
         queue_1_norm = ceil(merge_1_norm/5 + 1)
+        route_norm = 5
 
         # Get the RL-dependent info
         rl_info = self.rl_info(self.rl_stack)
@@ -809,6 +798,7 @@ class RoundaboutCartesianEnv(RoundaboutEnv):
         merge_dists_1 = self.process(self._dist_to_merge_1(merge_id_1),
                                     length=self.n_merging_in,
                                     normalizer=merge_1_norm)
+        
 
 
         # VELOCITIES
@@ -825,24 +815,40 @@ class RoundaboutCartesianEnv(RoundaboutEnv):
         
         roundabout_full = self.roundabout_full()
         
+        # ROUTE IDS
+        if self.route_encoding:
+            merge_route_0 = self.process(self.encode_routes(merge_id_0),
+                                        length=self.n_merging_in,
+                                        normalizer=route_norm)
+            merge_route_1 = self.process(self.encode_routes(merge_id_1),
+                                        length=self.n_merging_in,
+                                        normalizer=route_norm)
+
         # Normalize the 0th and 1st  column by max_x and max_y respectively
         roundabout_full[:,0] = roundabout_full[:,0]/self.scenario.generator.max_x
         roundabout_full[:,1] = roundabout_full[:,1]/self.scenario.generator.max_y
 
         # Normalize the 1st column containing velocities
         roundabout_full[:,2] = roundabout_full[:,2]/max_speed
+        if self.route_encoding:
+            roundabout_full[:,3] = roundabout_full[:,3]/route_norm
         roundabout_full = roundabout_full.flatten().tolist()
 
-        state = np.array(np.concatenate([rl_info, rl_info_2,
-                                        merge_dists_0, merge_0_vel,
-                                        merge_dists_1, merge_1_vel,
-                                        queue_0, queue_1,
-                                        roundabout_full]))
-        # if len(state) != 227:
-        #     import ipdb; ipdb.set_trace()
-        # for x in state: 
-        #     if x >1 or x < -1: 
-        #         import ipdb; ipdb.set_trace()
+
+        if self.route_encoding:
+            state = np.array(np.concatenate([rl_info, rl_info_2,
+                                            merge_route_0, merge_route_1,
+                                            merge_dists_0, merge_0_vel,
+                                            merge_dists_1, merge_1_vel,
+                                            queue_0, queue_1,
+                                            roundabout_full]))
+        else:
+            state = np.array(np.concatenate([rl_info, rl_info_2,
+                                            merge_dists_0, merge_0_vel,
+                                            merge_dists_1, merge_1_vel,
+                                            queue_0, queue_1,
+                                            roundabout_full]))
+
         return state
 
     def rl_info(self, stack):
@@ -889,18 +895,28 @@ class RoundaboutCartesianEnv(RoundaboutEnv):
                 headway_dists = [x / self.scenario_length if x != 1000 else 0 for x in headway_dists]
                 headway_vel = self.process(headway_vel, length=self.num_lanes)
                 headway_dists = self.process(headway_dists, length=self.num_lanes)
-
-                rl_info = np.concatenate([rl_pos, rl_pos_2, rl_vel, tailway_vel,
-                            tailway_dists, headway_vel, headway_dists])
+                if self.route_encoding:
+                    route = [self.encode_routes(rl_id) / 5]
+                    rl_info = np.concatenate([rl_pos, rl_pos_2, route, rl_vel, tailway_vel,
+                                tailway_dists, headway_vel, headway_dists])
+                else:
+                    rl_info = np.concatenate([rl_pos, rl_pos_2, rl_vel, tailway_vel,
+                                tailway_dists, headway_vel, headway_dists])
                 state = np.concatenate([state, rl_info])
 
             # Pad
             if self.rl_control - len(rl_ids) >= 1:
-                state = np.concatenate([state, ([0] * 4 + [0] * 4 * self.num_lanes) * (self.rl_control - len(rl_ids))])
+                if self.route_encoding:
+                    state = np.concatenate([state, ([0] * 5 + [0] * 4 * self.num_lanes) * (self.rl_control - len(rl_ids))])
+                else:
+                    state = np.concatenate([state, ([0] * 4 + [0] * 4 * self.num_lanes) * (self.rl_control - len(rl_ids))])
 
 
         else: # RL vehicle's not in the system. Pass in zeros here 
-            state = ([0]*4 + [0]*4*self.num_lanes) * self.rl_control
+            if self.route_encoding:
+                state = ([0]*5 + [0]*4*self.num_lanes) * self.rl_control
+            else:
+                state = ([0]*4 + [0]*4*self.num_lanes) * self.rl_control
         # if len(state) != 24:
         # import ipdb; ipdb.set_trace()
         return state
@@ -916,19 +932,58 @@ class RoundaboutCartesianEnv(RoundaboutEnv):
         state[0] = abs pos
         state[1] = vel
         """
-        state = np.zeros((int(self.roundabout_length//5), 3))
-        i = 0 # index of state to alter
-        for edge in self.roundabout_edges:
-            vehicles = sorted(self.vehicles.get_ids_by_edge(edge),
-                              key=lambda x: self.get_x_by_id(x))
-            for veh_id in vehicles:
-                if not self.vehicles.get_2d_position(veh_id):
-                    state[i][:2] = [0, 0]
-                else:
-                    state[i][:2] = self.vehicles.get_2d_position(veh_id)
-                state[i][2] = self.vehicles.get_speed(veh_id)
-                i += 1
+        if self.route_encoding:
+            state = np.zeros((int(self.roundabout_length//5), 4))
+            i = 0 # index of state to alter
+            for edge in self.roundabout_edges:
+                vehicles = sorted(self.vehicles.get_ids_by_edge(edge),
+                                key=lambda x: self.get_x_by_id(x))
+                for veh_id in vehicles:
+                    if not self.vehicles.get_2d_position(veh_id):
+                        state[i][:2] = [0, 0]
+                    else:
+                        state[i][:2] = self.vehicles.get_2d_position(veh_id)
+                    state[i][2] = self.vehicles.get_speed(veh_id)
+                    state[i][3] = self.encode_routes(veh_id)
+                    i += 1
+        else:
+            state = np.zeros((int(self.roundabout_length//5), 3))
+            i = 0 # index of state to alter
+            for edge in self.roundabout_edges:
+                vehicles = sorted(self.vehicles.get_ids_by_edge(edge),
+                                key=lambda x: self.get_x_by_id(x))
+                for veh_id in vehicles:
+                    if not self.vehicles.get_2d_position(veh_id):
+                        state[i][:2] = [0, 0]
+                    else:
+                        state[i][:2] = self.vehicles.get_2d_position(veh_id)
+                    state[i][2] = self.vehicles.get_speed(veh_id)
+                    i += 1
         return state
+
+
+    def encode_routes(self, veh_id):
+        """
+        HARDCODE
+        """
+        if isinstance(veh_id, (list, np.ndarray)):
+            return [self.encode_routes(vehID) for vehID in veh_id]
+
+        route = self.vehicles.get_route(veh_id)
+        if not route:
+            return 0
+        if route == ["inflow_1", "merge_in_1", "right", "top", "left", "merge_out_1", "outflow_1"]:
+            return 1
+        elif route == ["inflow_1", "merge_in_1", "right", "merge_out_0", "outflow_0"]:
+            return 2
+        elif route == ["inflow_0", "merge_in_0", "left", "merge_out_1", "outflow_1"]:
+            return 3
+        elif route == ["inflow_0", "merge_in_0", "left", "bottom", "right", "merge_out_0", "outflow_0"]:
+            return 4
+        else: 
+            return 5
+
+
 
     def additional_command_2(self):
         # try:
