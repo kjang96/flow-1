@@ -29,7 +29,7 @@ HORIZON = 500
 SIM_STEP = 1
 BATCH_SIZE = 20000
 ITR = 600
-exp_tag = "complex_12"  # experiment prefix
+exp_tag = "complex_13"  # experiment prefix
 
 # Sumo settings
 FLOW_RATE = 350
@@ -41,7 +41,7 @@ RL_FLOW_PROB = RL_FLOW_RATE/3600
 
 # # Local settings
 # N_PARALLEL = 1
-# SUMO_BINARY = "sumo"
+# SUMO_BINARY = "sumo-gui"
 # MODE = "local"
 # RESTART_INSTANCE = False
 # SEEDS = [1]
@@ -93,20 +93,14 @@ def run_task(*_):
     # # -->
 
     inflow = InFlows()
-    # ### <-- basecase
-    # inflow.add(veh_type="idm", edge="inflow_0", name="idm", probability=50/3600)
-    # inflow.add(veh_type="rl", edge="inflow_0", name="rl", vehs_per_hour=50)
-
-    # inflow.add(veh_type="idm", edge="inflow_1", name="idm", probability=300/3600)
-    # inflow.add(veh_type="rl", edge="inflow_1", name="rl", vehs_per_hour=50)
-    # ### basecase --->
-
+    # inflow.add(veh_type="rl", edge="inflow_0", name="rl", vehs_per_hour=100, departLane="random")
     inflow.add(veh_type="rl", edge="inflow_0", name="rl", probability=100/3600, departLane="random")
-    inflow.add(veh_type="idm", edge="inflow_0", name="idm", probability=200/3600)
+    inflow.add(veh_type="idm", edge="inflow_0", name="idm", probability=100/3600)
+    # inflow.add(veh_type="idm", edge="inflow_0", name="idm", probability=50/3600)
     
-    inflow.add(veh_type="rl", edge="inflow_1", name="rl", probability=200/3600, departLane="random")
+    
+    inflow.add(veh_type="rl", edge="inflow_1", name="rl", probability=100/3600, departLane="random")
     inflow.add(veh_type="idm", edge="inflow_1", name="idm", probability=450/3600, departLane="random")
-
     # note that the vehicles are added sequentially by the generator,
     # so place the merging vehicles after the vehicles in the ring
     vehicles = Vehicles()
