@@ -310,20 +310,12 @@ class UDSSCMergeEnv(Env):
         # Normalize the 1st column containing velocities
         roundabout_full[:,1] = roundabout_full[:,1]/max_speed
         roundabout_full = roundabout_full.flatten().tolist()
-        # import ipdb; ipdb.set_trace()
+        
         state = np.array(np.concatenate([rl_info, rl_info_2,
                                         merge_dists_0, merge_0_vel,
                                         merge_dists_1, merge_1_vel,
                                         queue_0, queue_1,
                                         roundabout_full]))
-        # import ipdb; ipdb.set_trace()
-        # if 'rl_0' in self.vehicles.get_ids() and 'idm_0' in self.vehicles.get_ids():
-        #     print(self.get_tailway('rl_0', 'idm_0'))
-        # a = lambda x: self.vehicles.get_follower(x)
-        # b = lambda x: self.vehicles.get_leader(x)
-
-        # if rl_info[3] != 0 and rl_info[4] == 0:
-        #     import ipdb; ipdb.set_trace()
 
         return state
     
