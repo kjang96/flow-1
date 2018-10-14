@@ -177,8 +177,8 @@ class UDSSCMergeEnv(Env):
         # return vel_reward + headway_reward
         if np.isnan(vel_reward):
             vel_reward = 0
-        # return vel_reward
-        return total_vel
+        return vel_reward
+        # return total_vel
         # return avg_vel_reward + penalty
 
     def get_state(self, **kwargs):
@@ -321,11 +321,11 @@ class UDSSCMergeEnv(Env):
         # import ipdb; ipdb.set_trace()
         # if 'rl_0' in self.vehicles.get_ids() and 'idm_0' in self.vehicles.get_ids():
         #     print(self.get_tailway('rl_0', 'idm_0'))
-        a = lambda x: self.vehicles.get_follower(x)
-        b = lambda x: self.vehicles.get_leader(x)
+        # a = lambda x: self.vehicles.get_follower(x)
+        # b = lambda x: self.vehicles.get_leader(x)
 
-        if rl_info[3] != 0 and rl_info[4] == 0:
-            import ipdb; ipdb.set_trace()
+        # if rl_info[3] != 0 and rl_info[4] == 0:
+        #     import ipdb; ipdb.set_trace()
 
         return state
     
