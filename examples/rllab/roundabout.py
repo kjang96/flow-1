@@ -29,7 +29,7 @@ HORIZON = 500
 SIM_STEP = 1
 BATCH_SIZE = 20000
 ITR = 600
-exp_tag = "complex_14"  # experiment prefix
+exp_tag = "complex_15"  # experiment prefix
 
 # Sumo settings
 FLOW_RATE = 350
@@ -93,28 +93,20 @@ def run_task(*_):
     # # -->
 
     inflow = InFlows()
-    inflow.add(veh_type="rl", edge="inflow_0", name="rl", vehs_per_hour=50, departLane="random")
-    # inflow.add(veh_type="rl", edge="inflow_0", name="rl", probability=50/3600)
-    inflow.add(veh_type="idm", edge="inflow_0", name="idm", vehs_per_hour=50, departLane="random")
-    inflow.add(veh_type="idm", edge="inflow_0", name="idm", vehs_per_hour=50, departLane="random")
-    inflow.add(veh_type="idm", edge="inflow_0", name="idm", vehs_per_hour=50, departLane="random")
-    # inflow.add(veh_type="idm", edge="inflow_0", name="idm", vehs_per_hour=50, departLane="random")
+    # ### <-- basecase
     # inflow.add(veh_type="idm", edge="inflow_0", name="idm", probability=50/3600)
-    # inflow.add(veh_type="idm", edge="inflow_0", name="idm", probability=50/3600)
+    # inflow.add(veh_type="rl", edge="inflow_0", name="rl", vehs_per_hour=50)
+
+    # inflow.add(veh_type="idm", edge="inflow_1", name="idm", probability=300/3600)
+    # inflow.add(veh_type="rl", edge="inflow_1", name="rl", vehs_per_hour=50)
+    # ### basecase --->
+
+    inflow.add(veh_type="rl", edge="inflow_0", name="rl", probability=100/3600, departLane="random")
+    inflow.add(veh_type="idm", edge="inflow_0", name="idm", probability=200/3600)
     
-    # inflow.add(veh_type="idm", edge="inflow_1", name="idm", vehs_per_hour=50)
-    # inflow.add(veh_type="idm", edge="inflow_1", name="idm", vehs_per_hour=50)
-    # inflow.add(veh_type="idm", edge="inflow_1", name="idm", vehs_per_hour=50)
-    # inflow.add(veh_type="idm", edge="inflow_1", name="idm", vehs_per_hour=50)
-    # inflow.add(veh_type="idm", edge="inflow_1", name="idm", vehs_per_hour=50)
-    # inflow.add(veh_type="idm", edge="inflow_1", name="idm", probability=50/3600)
-    # inflow.add(veh_type="idm", edge="inflow_1", name="idm", probability=50/3600)
-    # inflow.add(veh_type="idm", edge="inflow_1", name="idm", probability=50/3600)
-    # inflow.add(veh_type="idm", edge="inflow_1", name="idm", probability=50/3600)
-    # inflow.add(veh_type="idm", edge="inflow_1", name="idm", probability=50/3600)
-    
-    inflow.add(veh_type="rl", edge="inflow_1", name="rl", vehs_per_hour=50, departLane="random")
-    inflow.add(veh_type="idm", edge="inflow_1", name="idm", probability=500/3600, departLane="random")
+    inflow.add(veh_type="rl", edge="inflow_1", name="rl", probability=200/3600, departLane="random")
+    inflow.add(veh_type="idm", edge="inflow_1", name="idm", probability=450/3600, departLane="random")
+
     # note that the vehicles are added sequentially by the generator,
     # so place the merging vehicles after the vehicles in the ring
     vehicles = Vehicles()
@@ -167,7 +159,7 @@ def run_task(*_):
         # number of rl stacks we want to keep
         "num_stacks": 2,
         # whether ot not to encode routes in the state space
-        "route_encoding": False
+        "route_encoding": True
     }
 
     env_params = EnvParams(horizon=HORIZON,
