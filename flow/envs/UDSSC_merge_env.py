@@ -281,131 +281,6 @@ class UDSSCMergeEnv(Env):
         rl_info = self.rl_info(self.rl_stack)
         rl_info_2 = self.rl_info(self.rl_stack_2)
 
-        # import ipdb; ipdb.set_trace()
-        # Get the RL-dependent info
-        # if self.rl_stack:
-        #     # Get the rl_id
-        #     rl_id = self.rl_stack[0]
-
-        #     # rl_pos, rl_vel
-        #     rl_pos = [self.get_x_by_id(rl_id) / self.scenario_length]
-        #     rl_vel = [self.vehicles.get_speed(rl_id) / max_speed]
-        #     if self.vehicles.get_edge(rl_id) in ROUNDABOUT_EDGES:
-        #         rl_pos_2 = [self.get_x_by_id(rl_id) / self.roundabout_length]
-        #     else: 
-        #         rl_pos_2 = [0]
-
-        #     # tailway_dists, tailway_vel
-        #     # headway_dists, headway_vel
-        #     tail_id = self.vehicles.get_follower(rl_id)
-        #     head_id = self.vehicles.get_leader(rl_id)
-
-        #     # This is kinda shitty coding, but I'm not that confident
-        #     # in get_lane_tailways atm, Idrk how it works 
-        #     if tail_id: 
-        #         tailway_vel = [self.vehicles.get_speed(tail_id) / max_speed]
-        #         tailway_dists = self.vehicles.get_lane_tailways(rl_id)
-        #         if not tailway_vel:
-        #             tailway_vel = [0]
-        #         if not tailway_dists or tailway_dists[0] == 1e+3:
-        #             tailway_dists = [0]
-        #         else:
-        #             tailway_dists[0] = tailway_dists[0] / self.scenario_length
-        #     else: # No 
-        #         tailway_vel = [0]
-        #         tailway_dists = [0]
-        #     if head_id:
-        #         headway_vel = [self.vehicles.get_speed(head_id) / max_speed]
-        #         headway_dists = self.vehicles.get_lane_headways(rl_id)
-        #         # print(headway_dists)
-        #         if not headway_vel:
-        #             headway_vel = [0]
-        #         if not headway_dists or headway_dists[0] == 1e+3:
-        #             headway_dists = [0]
-        #         else:
-        #             headway_dists[0] = headway_dists[0] / self.scenario_length
-        #         # print(headway_dists)
-        #     else: # No leader
-        #         headway_vel = [0]
-        #         headway_dists = [0]
-
-        #     rl_info = np.concatenate([rl_pos, rl_pos_2, rl_vel, tailway_vel,
-        #                tailway_dists, headway_vel, headway_dists])
-        #     # print(rl_id, headway_dists[0] * self.scenario_length, tailway_dists[0]* self.scenario_length)
-
-
-        # else: # RL vehicle's not in the system. Pass in zeros here 
-        #     rl_info = [0] * 7
-        #     # rl_pos = [0]
-        #     # rl_pos_2 = [0]
-        #     # rl_vel = [0]
-        #     # tailway_vel = [0]
-        #     # tailway_dists = [0]
-        #     # headway_vel = [0]
-        #     # headway_dists = [0]
-
-        # #<--
-        # # Get the RL-dependent info
-        # if self.rl_stack_2:
-        #     # Get the rl_id
-        #     rl_id = self.rl_stack_2[0]
-
-        #     # rl_pos, rl_vel
-        #     rl_pos = [self.get_x_by_id(rl_id) / self.scenario_length]
-        #     rl_vel = [self.vehicles.get_speed(rl_id) / max_speed]
-        #     if self.vehicles.get_edge(rl_id) in ROUNDABOUT_EDGES:
-        #         rl_pos_2 = [self.get_x_by_id(rl_id) / self.roundabout_length]
-        #     else: 
-        #         rl_pos_2 = [0]
-
-        #     # tailway_dists, tailway_vel
-        #     # headway_dists, headway_vel
-        #     tail_id = self.vehicles.get_follower(rl_id)
-        #     head_id = self.vehicles.get_leader(rl_id)
-
-        #     # This is kinda shitty coding, but I'm not that confident
-        #     # in get_lane_tailways atm, Idrk how it works 
-        #     if tail_id: 
-        #         tailway_vel = [self.vehicles.get_speed(tail_id) / max_speed]
-        #         tailway_dists = self.vehicles.get_lane_tailways(rl_id)
-        #         if not tailway_vel:
-        #             tailway_vel = [0]
-        #         if not tailway_dists or tailway_dists[0] == 1e+3:
-        #             tailway_dists = [0]
-        #         else:
-        #             tailway_dists[0] = tailway_dists[0] / self.scenario_length
-        #     else: # No 
-        #         tailway_vel = [0]
-        #         tailway_dists = [0]
-        #     if head_id:
-        #         headway_vel = [self.vehicles.get_speed(head_id) / max_speed]
-        #         headway_dists = self.vehicles.get_lane_headways(rl_id)
-        #         # print(headway_dists)
-        #         if not headway_vel:
-        #             headway_vel = [0]
-        #         if not headway_dists or headway_dists[0] == 1e+3:
-        #             headway_dists = [0]
-        #         else:
-        #             headway_dists[0] = headway_dists[0] / self.scenario_length
-        #         # print(headway_dists)
-        #     else: # No leader
-        #         headway_vel = [0]
-        #         headway_dists = [0]
-            
-        #     rl_info_2 = np.concatenate([rl_pos, rl_pos_2, rl_vel, tailway_vel,
-        #                tailway_dists, headway_vel, headway_dists])
-        #     # print(rl_id, headway_dists[0] * self.scenario_length, tailway_dists[0]* self.scenario_length)
-        # else: # RL vehicle's not in the system. Pass in zeros here 
-        #     rl_info_2 = [0] * 7
-            # rl_pos = [0]
-            # rl_pos_2 = [0]
-            # rl_vel = [0]
-            # tailway_vel = [0]
-            # tailway_dists = [0]
-            # headway_vel = [0]
-            # headway_dists = [0]
-        # -->
-
         # DISTANCES
         # sorted by closest to farthest
         merge_id_0, merge_id_1 = self.k_closest_to_merge(self.n_merging_in)
@@ -416,23 +291,6 @@ class UDSSCMergeEnv(Env):
                                     length=self.n_merging_in,
                                     normalizer=merge_1_norm)
 
-        # OBSOLETE NOW 
-        # # Get (ID, dist_from_RL) for the k vehicles closest to 
-        # # the RL vehicle. 0 if there is no k_closest.
-        # tailway, headway = self.k_closest_to_rl('rl_0', self.n_preceding) #todo
-        # tailway_ids = [x[0] for x in tailway]
-        # tailway_dists = [x[1] for x in tailway]
-        # tailway_dists = self.process(tailway_dists,
-        #                             length=self.n_preceding,
-        #                             normalizer=circ)
-
-        # headway_ids = [x[0] for x in headway]
-        # headway_dists = [x[1] for x in headway]
-        # headway_dists = self.process(headway_dists,
-        #                             length=self.n_preceding,
-        #                             normalizer=circ)
-        # tailway_dists = [self.vehicles.get_follower('rl_0')]
-
 
         # VELOCITIES
         merge_0_vel = self.process(self.vehicles.get_speed(merge_id_0),
@@ -441,12 +299,6 @@ class UDSSCMergeEnv(Env):
         merge_1_vel = self.process(self.vehicles.get_speed(merge_id_1),
                                 length=self.n_merging_in,
                                 normalizer=max_speed)
-        # tailway_vel = self.process(self.vehicles.get_speed(tailway_ids),
-        #                         length=self.n_preceding,
-        #                         normalizer=max_speed)
-        # headway_vel = self.process(self.vehicles.get_speed(headway_ids),
-        #                         length=self.n_following,
-        #                         normalizer=max_speed)
 
         queue_0, queue_1 = self.queue_length()
         queue_0 = [queue_0 / queue_0_norm]
@@ -466,7 +318,15 @@ class UDSSCMergeEnv(Env):
                                         merge_dists_1, merge_1_vel,
                                         queue_0, queue_1,
                                         roundabout_full]))
-    
+        # import ipdb; ipdb.set_trace()
+        # if 'rl_0' in self.vehicles.get_ids() and 'idm_0' in self.vehicles.get_ids():
+        #     print(self.get_tailway('rl_0', 'idm_0'))
+        a = lambda x: self.vehicles.get_follower(x)
+        b = lambda x: self.vehicles.get_leader(x)
+
+        if rl_info[3] != 0 and rl_info[4] == 0:
+            import ipdb; ipdb.set_trace()
+
         return state
     
     def rl_info(self, stack):
@@ -488,21 +348,21 @@ class UDSSCMergeEnv(Env):
 
             # tailway_dists, tailway_vel
             # headway_dists, headway_vel
-            tail_ids = self.vehicles.get_lane_followers(rl_id)
-            head_ids = self.vehicles.get_lane_leaders(rl_id)
+            tail_id = [self.vehicles.get_follower(rl_id)]
+            head_id = [self.vehicles.get_leader(rl_id)]
             
             tailway_vel = []
             tailway_dists = []
             headway_vel = []
             headway_dists = []
 
-            tailway_vel = [x / max_speed if x != -1001 else 0 for x in self.vehicles.get_speed(tail_ids)]
+            tailway_vel = [x / max_speed if x != -1001 else 0 for x in self.vehicles.get_speed(tail_id)]
             tailway_dists = self.vehicles.get_lane_tailways(rl_id)
             tailway_dists = [x / self.scenario_length if x != 1000 else 0 for x in tailway_dists]
             tailway_vel = self.process(tailway_vel, length=1)
             tailway_dists = self.process(tailway_dists, length=1)
 
-            headway_vel = [x / max_speed if x != -1001 else 0 for x in self.vehicles.get_speed(head_ids)]
+            headway_vel = [x / max_speed if x != -1001 else 0 for x in self.vehicles.get_speed(head_id)]
             headway_dists = self.vehicles.get_lane_headways(rl_id)
             headway_dists = [x / self.scenario_length if x != 1000 else 0 for x in headway_dists]
             headway_vel = self.process(headway_vel, length=1)
@@ -516,12 +376,46 @@ class UDSSCMergeEnv(Env):
         else:
             rl_info = rl_info = [0] * 7
 
-        # for x in rl_info:
-        #     if x < -1.5 or x > 1.5:
-        #         import ipdb; ipdb.set_trace()
         
         return rl_info
 
+
+    def get_tailway(self, v1, v2):
+        # Iterative approach
+
+        if self.vehicles.get_edge(v1) == self.vehicles.get_edge(v2): #they're on the same edge
+            return self.vehicles.get_position(v1) - self.vehicles.get_position(v2) - self.vehicles.get_length(v1)# might have to add vehicle length
+
+        route = self.vehicles.get_route(v1)
+        prev = self.scenario.prev_edge(self.vehicles.get_edge(v1), 0)
+        if not prev:
+            return 
+        prev = [x[0] for x in prev]
+        
+        v2_edge = self.vehicles.get_edge(v2)
+        
+        for p in prev: # iterate until you find the vehicle, reach the end, or go in a circle
+            visited = [self.vehicles.get_edge(v1)]
+
+            # queue contains tuples of (EDGE to check, accumulated tailway up to said EDGE)
+            queue = [(p, self.vehicles.get_position(v1) - self.vehicles.get_length(v1))]
+            while queue:
+                curr, tailway = queue.pop(0)
+                if v2_edge == curr:
+                    return tailway + self.scenario.edge_length(curr) - self.vehicles.get_position(v2)
+                if curr in visited or (not curr.startswith(':') and curr not in route):
+                    continue
+                visited.append(curr)
+                
+                previous = self.scenario.prev_edge(curr, 0)
+                previous = [x[0] for x in previous]
+                for pr in previous:
+                    queue.append((pr, tailway + self.scenario.edge_length(curr)))
+
+        return None
+
+
+    # env.vehicles.get_route(self.veh_id)
     def k_closest_to_merge(self, k):
         """
         Return a list of IDs, NO DISTANCES. NO TRUNCATION.
