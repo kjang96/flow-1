@@ -197,6 +197,13 @@ def penalize_standstill(env, gain=1):
     penalty = gain * num_standstill
     return -penalty
 
+def penalize_near_standstill(env, thresh=0.3, gain=1):
+    veh_ids = env.vehicles.get_ids()
+    vel = np.array(env.vehicles.get_speed(veh_ids))
+    penalize = len(vel[vel < 0.3])
+    penalty = gain * penalize
+    return -penalty
+
 def penalize_jerkiness(env, gain=1):
     """
     A penalty function the penalizes jerky driving 
