@@ -95,6 +95,7 @@ class UDSSCMergeEnv(Env):
         # queues = 2 # 2 queues
         # Roundabout state = len(MERGE_EDGES) * 3
         # roundabout_full = (ROUNDABOUT_LENGTH // 5) * 2 # 2 cols
+
         
         self.total_obs = 7 * 2 + \
                          self.n_merging_in * 4 + \
@@ -102,6 +103,9 @@ class UDSSCMergeEnv(Env):
                          int(self.roundabout_length // 5) * 2
         # self.total_obs = self.n_obs_vehicles * 2 + 2 + \
         #                  int(self.roundabout_length // 5) * 2
+
+        if 1:
+            self.total_obs = 2*2 + len(ALL_EDGES)
                          
         box = Box(low=0.,
                   high=1,
@@ -259,6 +263,9 @@ class UDSSCMergeEnv(Env):
         * max_speed = 15 
 
         """
+        if 1:
+            return self.get_state_test()
+        # import ipdb; ipdb.set_trace()
         # for v in self.rl_stack: 
         #     if v in self.rl_stack_2:
         #         import ipdb; ipdb.set_trace()
@@ -320,6 +327,34 @@ class UDSSCMergeEnv(Env):
                                         roundabout_full]))
 
         return state
+
+    def get_state_test(self): 
+        # number of vehicles on each edge
+
+        def edge_index(veh_id):
+            try:
+                edge_index = (ALL_EDGES.index(self.vehicles.get_edge(veh_id))+1)/len(ALL_EDGES)
+                return edge_index
+            except ValueError:
+                return 0
+      
+        rl_info = [0] * 2
+        rl_info_2 = [0] * 2
+
+        if self.rl_stack:
+            rl_id = self.rl_stack[0]
+            rl_info[0] = self.get_x_by_id(rl_id) / self.scenario_length
+            rl_info[1] = edge_index(rl_id)
+
+
+        if self.rl_stack_2:
+            rl_id_2 = self.rl_stack_2[0]
+            rl_info_2[0] = self.get_x_by_id(rl_id_2) / self.scenario_length
+            rl_info_2[1] = edge_index(rl_id_2)   
+
+        edge_info = [len(self.vehicles.get_ids_by_edge(edge)) for edge in ALL_EDGES]
+        state = np.array(np.concatenate([edge_info, rl_info, rl_info_2]))
+        return state
     
     def rl_info(self, stack):
         max_speed = self.scenario.max_speed 
@@ -370,6 +405,8 @@ class UDSSCMergeEnv(Env):
 
         
         return rl_info
+
+
 
 
     def get_tailway(self, v1, v2):
