@@ -536,15 +536,15 @@ class UDSSCMergeEnv(Env):
         return np.mean(vel) if vel else 0
 
     def _dist_to_merge_1(self, veh_id):
-        reference = self.scenario.total_edgestarts_dict["merge_in_1"] + \
-                    self.scenario.edge_length("merge_in_1")
+        reference = self.scenario.total_edgestarts_dict[":a_0"] + \
+                    self.scenario.edge_length(":a_0")
         distances = [reference - self.get_x_by_id(v)
                      for v in veh_id]
         return distances
 
     def _dist_to_merge_0(self, veh_id):
-        reference = self.scenario.total_edgestarts_dict["merge_in_0"] + \
-                    self.scenario.edge_length("merge_in_0")
+        reference = self.scenario.total_edgestarts_dict[":c_0"] + \
+                    self.scenario.edge_length(":c_0")
         distances = [reference - self.get_x_by_id(v)
                      for v in veh_id]
         return distances
