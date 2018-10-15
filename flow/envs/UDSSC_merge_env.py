@@ -135,6 +135,8 @@ class UDSSCMergeEnv(Env):
         Notes: More efficient to keep a removal list than to resize
         continuously
         """
+        # if 1:
+            # return
         removal = [] 
         removal_2 = []
         for rl_id in self.rl_stack:
