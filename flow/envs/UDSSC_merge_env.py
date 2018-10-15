@@ -175,7 +175,7 @@ class UDSSCMergeEnv(Env):
         vel_reward = rewards.desired_velocity(self, fail=kwargs["fail"])
         avg_vel_reward = rewards.average_velocity(self, fail=kwargs["fail"])
         penalty = rewards.penalize_standstill(self, gain=1.5)
-        penalty_2 = rewards.penalize_near_standstill(self, thresh=0.3, gain=1)
+        penalty_2 = rewards.penalize_near_standstill(self, thresh=0.2, gain=0.5)
         
         total_vel = rewards.total_velocity(self, fail=kwargs["fail"])
 
@@ -191,7 +191,7 @@ class UDSSCMergeEnv(Env):
         # return vel_reward + headway_reward
         if np.isnan(vel_reward):
             vel_reward = 0
-        return vel_reward + penalty #+ penalty_2
+        return vel_reward + penalty + penalty_2
         # return total_vel
         # return avg_vel_reward + penalty
 

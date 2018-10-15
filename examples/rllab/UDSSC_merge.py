@@ -28,7 +28,7 @@ HORIZON = 500
 SIM_STEP = 1
 BATCH_SIZE = 20000
 ITR = 100
-exp_tag = "roundabout_84"  # experiment prefix
+exp_tag = "roundabout_85"  # experiment prefix
 
 # Sumo settings
 FLOW_RATE = 350
@@ -217,14 +217,14 @@ def run_task(*_):
     horizon = env.horizon
     env = normalize(env)
 
-    policy = GaussianGRUPolicy(
-        env_spec=env.spec,
-        hidden_sizes=(64,)
-    )
-    # policy = GaussianMLPPolicy(
+    # policy = GaussianGRUPolicy(
     #     env_spec=env.spec,
-    #     hidden_sizes=(100, 50, 25)
+    #     hidden_sizes=(64,)
     # )
+    policy = GaussianMLPPolicy(
+        env_spec=env.spec,
+        hidden_sizes=(100, 50, 25)
+    )
 
     baseline = LinearFeatureBaseline(env_spec=env.spec)
     algo = TRPO(
