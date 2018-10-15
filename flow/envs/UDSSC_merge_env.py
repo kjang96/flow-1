@@ -141,12 +141,12 @@ class UDSSCMergeEnv(Env):
                 perturbation = np.random.normal(0, 0.7) # 0.7 is arbitrary. but since accels are capped at +- 1 i don't want thi sto be too big
                 rl_actions[i] = rl_action + perturbation
 
-        # Reclip
-        if isinstance(self.action_space, Box):
-            rl_actions = np.clip(
-                rl_actions,
-                a_min=self.action_space.low,
-                a_max=self.action_space.high)
+            # Reclip
+            if isinstance(self.action_space, Box):
+                rl_actions = np.clip(
+                    rl_actions,
+                    a_min=self.action_space.low,
+                    a_max=self.action_space.high)
         # if 1:
             # return
         removal = [] 
@@ -332,6 +332,21 @@ class UDSSCMergeEnv(Env):
                                         merge_dists_1, merge_1_vel,
                                         queue_0, queue_1,
                                         roundabout_full]))
+
+        if "state_noise" in self.env_params.additional_params:
+            var = self.env_params.additional_params.get("state_noise")
+            for i, st in enumerate(state):
+                perturbation = np.random.normal(0, var) 
+                state[i] = st + perturbation
+
+            # Reclip
+            # if isinstance(self.action_space, Box):
+            # state = np.clip(
+            #     state,
+            #     a_min=self.action_space.low,
+            #     a_max=self.action_space.high)
+
+            # what happens if you don't clip it
 
         return state
 

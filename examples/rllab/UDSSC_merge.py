@@ -27,7 +27,7 @@ HORIZON = 500
 SIM_STEP = 1
 BATCH_SIZE = 20000
 ITR = 100
-exp_tag = "roundabout_78"  # experiment prefix
+exp_tag = "roundabout_79"  # experiment prefix
 
 # Sumo settings
 FLOW_RATE = 350
@@ -150,7 +150,9 @@ def run_task(*_):
         # number of observable merging-in vehicle from the larger loop
         "n_merging_in": 6,
         # rl action noise
-        "rl_action_noise": 0.1
+        "rl_action_noise": 0.1,
+        # noise to add to the state space
+        "state_noise": 0.1
     }
 
     env_params = EnvParams(horizon=HORIZON,
