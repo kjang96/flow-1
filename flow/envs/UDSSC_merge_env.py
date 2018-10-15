@@ -34,8 +34,8 @@ ROUNDABOUT_EDGES = [":a_1", "right", ":b_1", "top", ":c_1",
                     "left", ":d_1", "bottom"]
 
 ALL_EDGES = ROUNDABOUT_EDGES + \
-            ['inflow_1', ':g_3', 'merge_in_1', ':a_0'
-             , ':b_0', 'merge_out_0', ':e_2', 'outflow_0'
+            ['inflow_1', ':g_2', 'merge_in_1', ':a_0'
+             , ':b_0', 'merge_out_0', ':e_1', 'outflow_0'
              , 'inflow_0', ':e_0', 'merge_in_0', ':c_0'
              , ':d_0', 'merge_out_1', ':g_0', 'outflow_1']
 
