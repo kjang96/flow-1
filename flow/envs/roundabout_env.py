@@ -114,6 +114,7 @@ class RoundaboutEnv(Env):
 
         self.all_edges = self.scenario.specify_absolute_order()
         self.roundabout_edges = self.all_edges[:self.all_edges.index('bottom') + 1]
+        import ipdb; ipdb.set_trace()
 
     @property
     def observation_space(self):
@@ -519,15 +520,15 @@ class RoundaboutEnv(Env):
         return np.mean(vel) if vel else 0
 
     def _dist_to_merge_1(self, veh_id):
-        reference = self.scenario.total_edgestarts_dict["merge_in_1"] + \
-                    self.scenario.edge_length("merge_in_1")
+        reference = self.scenario.total_edgestarts_dict[":a_0"] + \
+                    self.scenario.edge_length(":a_0")
         distances = [reference - self.get_x_by_id(v)
                      for v in veh_id]
         return distances
 
     def _dist_to_merge_0(self, veh_id):
-        reference = self.scenario.total_edgestarts_dict["merge_in_0"] + \
-                    self.scenario.edge_length("merge_in_0")
+        reference = self.scenario.total_edgestarts_dict[":c_0"] + \
+                    self.scenario.edge_length(":c_0")
         distances = [reference - self.get_x_by_id(v)
                      for v in veh_id]
         return distances
@@ -876,8 +877,8 @@ class RoundaboutCartesianEnv(RoundaboutEnv):
 
                 # tailway_dists, tailway_vel
                 # headway_dists, headway_vel
-                tail_ids = self.vehicles.get_lane_followers(rl_id)
-                head_ids = self.vehicles.get_lane_leaders(rl_id)
+                tail_ids = self.vehicles.get_lane_followers(rl_id) #todo fix
+                head_ids = self.vehicles.get_lane_leaders(rl_id) #TODO FIX
                 
                 tailway_vel = []
                 tailway_dists = []
