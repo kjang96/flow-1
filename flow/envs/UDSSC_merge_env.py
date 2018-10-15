@@ -96,9 +96,12 @@ class UDSSCMergeEnv(Env):
         # Roundabout state = len(MERGE_EDGES) * 3
         # roundabout_full = (ROUNDABOUT_LENGTH // 5) * 2 # 2 cols
         
+        # self.total_obs = 7 * 2 + \
+        #                  self.n_merging_in * 4 + \
+        #                  2 + \
+        #                  int(self.roundabout_length // 5) * 2
         self.total_obs = 7 * 2 + \
                          self.n_merging_in * 4 + \
-                         2 + \
                          int(self.roundabout_length // 5) * 2
         # self.total_obs = self.n_obs_vehicles * 2 + 2 + \
         #                  int(self.roundabout_length // 5) * 2
@@ -175,7 +178,7 @@ class UDSSCMergeEnv(Env):
         vel_reward = rewards.desired_velocity(self, fail=kwargs["fail"])
         avg_vel_reward = rewards.average_velocity(self, fail=kwargs["fail"])
         penalty = rewards.penalize_standstill(self, gain=1.5)
-        penalty_2 = rewards.penalize_near_standstill(self, thresh=0.2, gain=0.5)
+        penalty_2 = rewards.penalize_near_standstill(self, thresh=0.3, gain=1)
         
         total_vel = rewards.total_velocity(self, fail=kwargs["fail"])
 
@@ -330,7 +333,7 @@ class UDSSCMergeEnv(Env):
         state = np.array(np.concatenate([rl_info, rl_info_2,
                                         merge_dists_0, merge_0_vel,
                                         merge_dists_1, merge_1_vel,
-                                        queue_0, queue_1,
+                                        #queue_0, queue_1,
                                         roundabout_full]))
                                         
         if "state_noise" in self.env_params.additional_params:
