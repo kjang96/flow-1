@@ -114,7 +114,6 @@ class RoundaboutEnv(Env):
 
         self.all_edges = self.scenario.specify_absolute_order()
         self.roundabout_edges = self.all_edges[:self.all_edges.index('bottom') + 1]
-        import ipdb; ipdb.set_trace()
 
     @property
     def observation_space(self):
