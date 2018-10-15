@@ -535,7 +535,7 @@ class RoundaboutEnv(Env):
 
     def queue_length(self):
         queue_0 = len(self.vehicles.get_ids_by_edge(["inflow_0", ":e_0", "merge_in_0", ":c_0"]))
-        queue_1 = len(self.vehicles.get_ids_by_edge(["inflow_1", ":g_2", "merge_in_1", ":a_0"]))
+        queue_1 = len(self.vehicles.get_ids_by_edge(["inflow_1", ":g_3", "merge_in_1", ":a_0"]))
         return queue_0, queue_1
 
     def process(self, state, length=None, normalizer=1):
@@ -778,7 +778,7 @@ class RoundaboutCartesianEnv(RoundaboutEnv):
                         self.scenario.edge_length('merge_in_0') + \
                         self.scenario.edge_length(':c_0')
         merge_1_norm = self.scenario.edge_length('inflow_1') + \
-                        self.scenario.edge_length(':g_2') + \
+                        self.scenario.edge_length(':g_3') + \
                         self.scenario.edge_length('merge_in_1') + \
                         self.scenario.edge_length(':a_0')
         queue_0_norm = ceil(merge_0_norm/5 + 1) # 5 is the car length
