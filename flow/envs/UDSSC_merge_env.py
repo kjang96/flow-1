@@ -682,8 +682,11 @@ class UDSSCMergeEnv(Env):
         # Color RL vehicles
         rl_control = self.rl_stack[:min(1, len(self.rl_stack))]
         rl_control_2 = self.rl_stack_2[:min(1, len(self.rl_stack_2))]
-        
-        for veh_id in rl_control + rl_control_2:
-            self.traci_connection.vehicle.setColor(
-                        vehID=veh_id, color=(0, 255, 255, 255))
+
+        try:
+            for veh_id in rl_control + rl_control_2:
+                self.traci_connection.vehicle.setColor(
+                            vehID=veh_id, color=(0, 255, 255, 255))
+        except:
+            pass
 
