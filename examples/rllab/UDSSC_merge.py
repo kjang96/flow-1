@@ -27,7 +27,7 @@ HORIZON = 500
 SIM_STEP = 1
 BATCH_SIZE = 20000
 ITR = 100
-exp_tag = "roundabout_76"  # experiment prefix
+exp_tag = "roundabout_77"  # experiment prefix
 
 # Sumo settings
 FLOW_RATE = 350
@@ -91,18 +91,25 @@ def run_task(*_):
 
     inflow = InFlows()
     
-    inflow.add(veh_type="idm", edge="inflow_0", name="idm", probability=50/3600)
     inflow.add(veh_type="rl", edge="inflow_0", name="rl", vehs_per_hour=50)
+    inflow.add(veh_type="idm", edge="inflow_0", name="idm", vehs_per_hour=50)
+    inflow.add(veh_type="idm", edge="inflow_0", name="idm", vehs_per_hour=50)
+    # inflow.add(veh_type="rl", edge="inflow_0", name="rl", probability=50/3600)
 
-    inflow.add(veh_type="idm", edge="inflow_1", name="idm", probability=300/3600)
+
+    # inflow.add(veh_type="idm", edge="inflow_1", name="idm", probability=300/3600)
     inflow.add(veh_type="rl", edge="inflow_1", name="rl", vehs_per_hour=50)
+    inflow.add(veh_type="idm", edge="inflow_1", name="idm", vehs_per_hour=50)
+    inflow.add(veh_type="idm", edge="inflow_1", name="idm", vehs_per_hour=50)
+    inflow.add(veh_type="idm", edge="inflow_1", name="idm", vehs_per_hour=50)
+
     # note that the vehicles are added sequentially by the generator,
     # so place the merging vehicles after the vehicles in the ring
     vehicles = Vehicles()
 
     # Inner ring vehicles
     vehicles.add(veh_id="idm",
-                 acceleration_controller=(IDMController, {"noise": 0.1}),
+                 acceleration_controller=(IDMController, {"noise": 0.2}),
                  lane_change_controller=(SumoLaneChangeController, {}),
                  routing_controller=(ContinuousRouter, {}),
                  speed_mode="all_checks",
@@ -142,6 +149,8 @@ def run_task(*_):
         "n_following": 1, # HAS TO BE 1
         # number of observable merging-in vehicle from the larger loop
         "n_merging_in": 6,
+        # rl action noise
+        "rl_action_noise": 0.1
     }
 
     env_params = EnvParams(horizon=HORIZON,
