@@ -95,7 +95,6 @@ class UDSSCMergeEnv(Env):
         # queues = 2 # 2 queues
         # Roundabout state = len(MERGE_EDGES) * 3
         # roundabout_full = (ROUNDABOUT_LENGTH // 5) * 2 # 2 cols
-
         
         self.total_obs = 7 * 2 + \
                          self.n_merging_in * 4 + \
@@ -103,9 +102,6 @@ class UDSSCMergeEnv(Env):
                          int(self.roundabout_length // 5) * 2
         # self.total_obs = self.n_obs_vehicles * 2 + 2 + \
         #                  int(self.roundabout_length // 5) * 2
-
-        if 1:
-            self.total_obs = 2*2 + len(ALL_EDGES)
                          
         box = Box(low=0.,
                   high=1,
@@ -193,7 +189,7 @@ class UDSSCMergeEnv(Env):
         # return vel_reward + headway_reward
         if np.isnan(vel_reward):
             vel_reward = 0
-        return vel_reward + penalty
+        return vel_reward
         # return total_vel
         # return avg_vel_reward + penalty
 
@@ -275,9 +271,6 @@ class UDSSCMergeEnv(Env):
         * max_speed = 15 
 
         """
-        if 1:
-            return self.get_state_test()
-        # import ipdb; ipdb.set_trace()
         # for v in self.rl_stack: 
         #     if v in self.rl_stack_2:
         #         import ipdb; ipdb.set_trace()
