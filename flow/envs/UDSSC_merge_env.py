@@ -330,7 +330,7 @@ class UDSSCMergeEnv(Env):
                                         merge_dists_1, merge_1_vel,
                                         queue_0, queue_1,
                                         roundabout_full]))
-
+        
         return state
 
     def get_state_test(self): 
@@ -380,29 +380,30 @@ class UDSSCMergeEnv(Env):
 
             # tailway_dists, tailway_vel
             # headway_dists, headway_vel
-            tail_id = [self.vehicles.get_follower(rl_id)]
-            head_id = [self.vehicles.get_leader(rl_id)]
+            tail_ids = self.vehicles.get_follower(rl_id)
+            head_ids = self.vehicles.get_leader(rl_id)
+            tail_ids = self.vehicles.get_lane_followers(rl_id) if not tail_ids else [tail_ids]
+            head_ids = self.vehicles.get_lane_leaders(rl_id) if not head_ids else [head_ids]
             
             tailway_vel = []
             tailway_dists = []
             headway_vel = []
             headway_dists = []
-
-            tailway_vel = [x / max_speed if x != -1001 else 0 for x in self.vehicles.get_speed(tail_id)]
-            tailway_dists = self.vehicles.get_lane_tailways(rl_id)
-            tailway_dists = [x / self.scenario_length if x != 1000 else 0 for x in tailway_dists]
+            
+            tailway_vel = [x / max_speed if x != -1001 else 0 for x in self.vehicles.get_speed(tail_ids)]
+            tailway_dists = self.process([x / self.scenario_length for x in self.vehicles.get_lane_tailways(rl_id) \
+                                          if x != 1000], length=1)
             tailway_vel = self.process(tailway_vel, length=1)
             tailway_dists = self.process(tailway_dists, length=1)
 
-            headway_vel = [x / max_speed if x != -1001 else 0 for x in self.vehicles.get_speed(head_id)]
-            headway_dists = self.vehicles.get_lane_headways(rl_id)
-            headway_dists = [x / self.scenario_length if x != 1000 else 0 for x in headway_dists]
+            headway_vel = [x / max_speed if x != -1001 else 0 for x in self.vehicles.get_speed(head_ids)]
+            headway_dists = self.process([x / self.scenario_length for x in self.vehicles.get_lane_headways(rl_id) \
+                                          if x != 1000], length=1)
             headway_vel = self.process(headway_vel, length=1)
             headway_dists = self.process(headway_dists, length=1)
 
             rl_info = np.concatenate([rl_pos, rl_pos_2, rl_vel, tailway_vel,
                         tailway_dists, headway_vel, headway_dists])
-            # state = np.concatenate([state, rl_info])
 
             # Pad
         else:
@@ -419,7 +420,7 @@ class UDSSCMergeEnv(Env):
 
         if self.vehicles.get_edge(v1) == self.vehicles.get_edge(v2): #they're on the same edge
             return self.vehicles.get_position(v1) - self.vehicles.get_position(v2) - self.vehicles.get_length(v1)# might have to add vehicle length
-
+        
         route = self.vehicles.get_route(v1)
         prev = self.scenario.prev_edge(self.vehicles.get_edge(v1), 0)
         if not prev:
