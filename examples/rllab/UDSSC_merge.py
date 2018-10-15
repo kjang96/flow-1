@@ -12,6 +12,7 @@ from rllab.envs.gym_env import GymEnv
 from rllab.envs.normalized_env import normalize
 from rllab.misc.instrument import run_experiment_lite
 from rllab.policies.gaussian_mlp_policy import GaussianMLPPolicy
+from rllab.policies.gaussian_gru_policy import GaussianGRUPolicy
 
 from flow.controllers import RLController, IDMController, \
     SumoLaneChangeController, ContinuousRouter
@@ -27,7 +28,7 @@ HORIZON = 500
 SIM_STEP = 1
 BATCH_SIZE = 20000
 ITR = 100
-exp_tag = "roundabout_82"  # experiment prefix
+exp_tag = "roundabout_83"  # experiment prefix
 
 # Sumo settings
 FLOW_RATE = 350
@@ -216,10 +217,14 @@ def run_task(*_):
     horizon = env.horizon
     env = normalize(env)
 
-    policy = GaussianMLPPolicy(
+    policy = GaussianGRUPolicy(
         env_spec=env.spec,
-        hidden_sizes=(100, 50, 25)
+        hidden_sizes=(64,)
     )
+    # policy = GaussianMLPPolicy(
+    #     env_spec=env.spec,
+    #     hidden_sizes=(100, 50, 25)
+    # )
 
     baseline = LinearFeatureBaseline(env_spec=env.spec)
     algo = TRPO(
