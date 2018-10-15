@@ -332,7 +332,7 @@ class UDSSCMergeEnv(Env):
                                         merge_dists_1, merge_1_vel,
                                         queue_0, queue_1,
                                         roundabout_full]))
-
+                                        
         if "state_noise" in self.env_params.additional_params:
             var = self.env_params.additional_params.get("state_noise")
             for i, st in enumerate(state):
@@ -341,11 +341,10 @@ class UDSSCMergeEnv(Env):
 
             # Reclip
             # if isinstance(self.action_space, Box):
-            # state = np.clip(
-            #     state,
-            #     a_min=self.action_space.low,
-            #     a_max=self.action_space.high)
-
+            state = np.clip(
+                state,
+                a_min=self.observation_space.low,
+                a_max=self.observation_space.high)
             # what happens if you don't clip it
 
         return state

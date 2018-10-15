@@ -27,7 +27,7 @@ HORIZON = 500
 SIM_STEP = 1
 BATCH_SIZE = 20000
 ITR = 100
-exp_tag = "roundabout_79"  # experiment prefix
+exp_tag = "roundabout_80"  # experiment prefix
 
 # Sumo settings
 FLOW_RATE = 350
@@ -39,7 +39,7 @@ RL_FLOW_PROB = RL_FLOW_RATE/3600
 
 # # Local settings
 # N_PARALLEL = 1
-# SUMO_BINARY = "sumo"
+# SUMO_BINARY = "sumo" 
 # MODE = "local"
 # RESTART_INSTANCE = False
 # SEEDS = [1]
@@ -52,7 +52,7 @@ RL_FLOW_PROB = RL_FLOW_RATE/3600
 # SEEDS = [1, 2, 5, 91]
 
 # Autoscaler settings
-N_PARALLEL = 10
+N_PARALLEL = 20
 SUMO_BINARY = "sumo"
 MODE = "local"
 RESTART_INSTANCE = True
@@ -152,7 +152,7 @@ def run_task(*_):
         # rl action noise
         "rl_action_noise": 0.1,
         # noise to add to the state space
-        "state_noise": 0.1
+        "state_noise": 0.05
     }
 
     env_params = EnvParams(horizon=HORIZON,
