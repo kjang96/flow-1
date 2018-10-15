@@ -362,13 +362,13 @@ class RoundaboutEnv(Env):
         "merge_out_1", ":g_0", "outflow_1" ]
         """
         edges_0 = ["merge_in_0", "inflow_0", ":e_0", ":c_0"]
-        edges_1 = ["merge_in_1", "inflow_1", ":g_2", ":a_0"]
+        edges_1 = ["merge_in_1", "inflow_1", ":g_3", ":a_0"]
 
-        close_0 = sorted(self.vehicles.get_ids_by_edge(["merge_in_0", "inflow_0"]), 
+        close_0 = sorted(self.vehicles.get_ids_by_edge(edges_0), 
                          key=lambda veh_id:
                          -self.get_x_by_id(veh_id))
 
-        close_1 = sorted(self.vehicles.get_ids_by_edge(["merge_in_1", "inflow_1"]), 
+        close_1 = sorted(self.vehicles.get_ids_by_edge(edges_1), 
                          key=lambda veh_id:
                          -self.get_x_by_id(veh_id))
 
