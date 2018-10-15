@@ -27,7 +27,7 @@ HORIZON = 500
 SIM_STEP = 1
 BATCH_SIZE = 20000
 ITR = 100
-exp_tag = "roundabout_69"  # experiment prefix
+exp_tag = "roundabout_70"  # experiment prefix
 
 # Sumo settings
 FLOW_RATE = 350
@@ -52,7 +52,7 @@ RL_FLOW_PROB = RL_FLOW_RATE/3600
 # SEEDS = [1, 2, 5, 91]
 
 # Autoscaler settings
-N_PARALLEL = 40
+N_PARALLEL = 20
 SUMO_BINARY = "sumo"
 MODE = "local"
 RESTART_INSTANCE = True
@@ -91,22 +91,11 @@ def run_task(*_):
 
     inflow = InFlows()
     
+    inflow.add(veh_type="idm", edge="inflow_0", name="idm", probability=50/3600)
     inflow.add(veh_type="rl", edge="inflow_0", name="rl", vehs_per_hour=50)
-    inflow.add(veh_type="idm", edge="inflow_0", name="idm", vehs_per_hour=50)
-    inflow.add(veh_type="idm", edge="inflow_0", name="idm", vehs_per_hour=50)
-    # inflow.add(veh_type="rl", edge="inflow_0", name="rl", probability=50/3600)
 
-
-    # inflow.add(veh_type="idm", edge="inflow_1", name="idm", probability=300/3600)
+    inflow.add(veh_type="idm", edge="inflow_1", name="idm", probability=300/3600)
     inflow.add(veh_type="rl", edge="inflow_1", name="rl", vehs_per_hour=50)
-    inflow.add(veh_type="idm", edge="inflow_1", name="idm", vehs_per_hour=50)
-    inflow.add(veh_type="idm", edge="inflow_1", name="idm", vehs_per_hour=50)
-    inflow.add(veh_type="idm", edge="inflow_1", name="idm", vehs_per_hour=50)
-    # inflow.add(veh_type="idm", edge="inflow_1", name="idm", probability=50/3600)
-    # inflow.add(veh_type="idm", edge="inflow_1", name="idm", vehs_per_hour=50)
-    # inflow.add(veh_type="idm", edge="inflow_1", name="idm", vehs_per_hour=50)
-    # inflow.add(veh_type="rl", edge="inflow_1", name="rl", probability=50/3600)
-
     # note that the vehicles are added sequentially by the generator,
     # so place the merging vehicles after the vehicles in the ring
     vehicles = Vehicles()
@@ -142,9 +131,9 @@ def run_task(*_):
 
     additional_env_params = {
         # maximum acceleration for autonomous vehicles, in m/s^2
-        "max_accel": 3,
+        "max_accel": 1,
         # maximum deceleration for autonomous vehicles, in m/s^2
-        "max_decel": 3,
+        "max_decel": 1,
         # desired velocity for all vehicles in the network, in m/s
         "target_velocity": 15,
         # number of observable vehicles preceding the rl vehicle
@@ -162,7 +151,7 @@ def run_task(*_):
         # radius of the loops
         "ring_radius": 15,#15.25,
         # length of the straight edges connected the outer loop to the inner loop
-        "lane_length": 60,
+        "lane_length": 55,
         # length of the merge next to the roundabout
         "merge_length": 15,
         # number of lanes in the inner loop
