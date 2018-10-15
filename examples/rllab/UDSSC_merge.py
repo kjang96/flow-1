@@ -12,6 +12,7 @@ from rllab.envs.gym_env import GymEnv
 from rllab.envs.normalized_env import normalize
 from rllab.misc.instrument import run_experiment_lite
 from rllab.policies.gaussian_mlp_policy import GaussianMLPPolicy
+from rllab.policies.gaussian_gru_policy import GaussianGRUPolicy
 
 from flow.controllers import RLController, IDMController, \
     SumoLaneChangeController, ContinuousRouter
@@ -27,7 +28,7 @@ HORIZON = 500
 SIM_STEP = 1
 BATCH_SIZE = 20000
 ITR = 100
-exp_tag = "roundabout_a21"  # experiment prefix
+exp_tag = "new_0"  # experiment prefix
 
 # Sumo settings
 FLOW_RATE = 350
@@ -37,12 +38,12 @@ FLOW_PROB = FLOW_RATE/3600
 RL_FLOW_RATE = 50
 RL_FLOW_PROB = RL_FLOW_RATE/3600
 
-# Local settings
-N_PARALLEL = 1
-SUMO_BINARY = "sumo-gui"
-MODE = "local"
-RESTART_INSTANCE = False
-SEEDS = [1]
+# # Local settings
+# N_PARALLEL = 1
+# SUMO_BINARY = "sumo-gui" 
+# MODE = "local"
+# RESTART_INSTANCE = False
+# SEEDS = [1]
 
 # # EC2 settings
 # N_PARALLEL = 8
@@ -51,6 +52,12 @@ SEEDS = [1]
 # RESTART_INSTANCE = True
 # SEEDS = [1, 2, 5, 91]
 
+# Autoscaler settings
+N_PARALLEL = 20
+SUMO_BINARY = "sumo"
+MODE = "local"
+RESTART_INSTANCE = True
+SEEDS = [1, 2, 5, 91]
 
 def main():
     for seed in SEEDS:
@@ -84,24 +91,29 @@ def run_task(*_):
     # # -->
 
     inflow = InFlows()
-    inflow.add(veh_type="rl", edge="inflow_0", name="rl", vehs_per_hour=50)
-    # inflow.add(veh_type="rl", edge="inflow_0", name="rl", probability=50/3600)
-    inflow.add(veh_type="idm", edge="inflow_0", name="idm", vehs_per_hour=50)
-    inflow.add(veh_type="idm", edge="inflow_0", name="idm", vehs_per_hour=50)
-    # inflow.add(veh_type="idm", edge="inflow_0", name="idm", probability=50/3600)
-    # inflow.add(veh_type="idm", edge="inflow_0", name="idm", probability=50/3600)
     
+    # inflow.add(veh_type="rl", edge="inflow_1", name="rl", probability=50/3600)
+    inflow.add(veh_type="idm", edge="inflow_0", name="idm", probability=50/3600)
+    # inflow.add(veh_type="rl", edge="inflow_0", name="rl", vehs_per_hour=50)
+    inflow.add(veh_type="rl", edge="inflow_0", name="rl", probability=50/3600)
     # inflow.add(veh_type="idm", edge="inflow_1", name="idm", vehs_per_hour=50)
-    # inflow.add(veh_type="idm", edge="inflow_1", name="idm", vehs_per_hour=50)
-    # inflow.add(veh_type="idm", edge="inflow_1", name="idm", vehs_per_hour=50)
-    # inflow.add(veh_type="idm", edge="inflow_1", name="idm", vehs_per_hour=50)
-    # inflow.add(veh_type="idm", edge="inflow_1", name="idm", vehs_per_hour=50)
-    # inflow.add(veh_type="idm", edge="inflow_1", name="idm", probability=50/3600)
-    # inflow.add(veh_type="idm", edge="inflow_1", name="idm", probability=50/3600)
-    # inflow.add(veh_type="idm", edge="inflow_1", name="idm", probability=50/3600)
-    # inflow.add(veh_type="idm", edge="inflow_1", name="idm", probability=50/3600)
-    # inflow.add(veh_type="idm", edge="inflow_1", name="idm", probability=50/3600)
+
+    # inflow.add(veh_type="rl", edge="inflow_0", name="rl", probability=50/3600)
     inflow.add(veh_type="idm", edge="inflow_1", name="idm", probability=300/3600)
+    # inflow.add(veh_type="rl", edge="inflow_1", name="rl", vehs_per_hour=50)
+    inflow.add(veh_type="rl", edge="inflow_1", name="rl", probability=50/3600)
+
+    # inflow.add(veh_type="idm", edge="inflow_0", name="idm", vehs_per_hour=300)
+
+    # inflow.add(veh_type="idm", edge="inflow_0", name="idm", vehs_per_hour=50)
+    # inflow.add(veh_type="idm", edge="inflow_0", name="idm", vehs_per_hour=50)
+    # inflow.add(veh_type="idm", edge="inflow_0", name="idm", vehs_per_hour=50)
+    # inflow.add(veh_type="idm", edge="inflow_0", name="idm", vehs_per_hour=50)
+    # inflow.add(veh_type="idm", edge="inflow_0", name="idm", vehs_per_hour=50)
+    # inflow.add(veh_type="idm", edge="inflow_0", name="idm", vehs_per_hour=50)
+    # inflow.add(veh_type="idm", edge="inflow_0", name="idm", vehs_per_hour=50)
+    # inflow.add(veh_type="idm", edge="inflow_0", name="idm", vehs_per_hour=50)
+    # inflow.add(veh_type="idm", edge="inflow_0", name="idm", probability=300/3600)
     # note that the vehicles are added sequentially by the generator,
     # so place the merging vehicles after the vehicles in the ring
     vehicles = Vehicles()
@@ -137,9 +149,9 @@ def run_task(*_):
 
     additional_env_params = {
         # maximum acceleration for autonomous vehicles, in m/s^2
-        "max_accel": 3,
+        "max_accel": 1,
         # maximum deceleration for autonomous vehicles, in m/s^2
-        "max_decel": 3,
+        "max_decel": 1,
         # desired velocity for all vehicles in the network, in m/s
         "target_velocity": 15,
         # number of observable vehicles preceding the rl vehicle
@@ -148,6 +160,10 @@ def run_task(*_):
         "n_following": 1, # HAS TO BE 1
         # number of observable merging-in vehicle from the larger loop
         "n_merging_in": 6,
+        # # rl action noise
+        # "rl_action_noise": 0.1,
+        # # noise to add to the state space
+        # "state_noise": 0.05
     }
 
     env_params = EnvParams(horizon=HORIZON,
@@ -157,7 +173,7 @@ def run_task(*_):
         # radius of the loops
         "ring_radius": 15,#15.25,
         # length of the straight edges connected the outer loop to the inner loop
-        "lane_length": 30,
+        "lane_length": 100,
         # length of the merge next to the roundabout
         "merge_length": 15,
         # number of lanes in the inner loop
@@ -194,13 +210,17 @@ def run_task(*_):
         initial_config=initial_config
     )
 
-    env_name = "CartesianEnv"
+    env_name = "UDSSCMergeEnv"
     pass_params = (env_name, sumo_params, vehicles, env_params,
                    net_params, initial_config, scenario)
     env = GymEnv(env_name, record_video=False, register_params=pass_params)
     horizon = env.horizon
     env = normalize(env)
 
+    # policy = GaussianGRUPolicy(
+    #     env_spec=env.spec,
+    #     hidden_sizes=(64,)
+    # )
     policy = GaussianMLPPolicy(
         env_spec=env.spec,
         hidden_sizes=(100, 50, 25)
