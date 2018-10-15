@@ -164,13 +164,14 @@ class RoundaboutEnv(Env):
     def compute_reward(self, state, rl_actions, **kwargs):
         vel_reward = rewards.desired_velocity(self, fail=kwargs["fail"])
         avg_vel_reward = rewards.average_velocity(self, fail=kwargs["fail"])
-        penalty = rewards.penalize_standstill(self, gain=1)
+        penalty = rewards.penalize_standstill(self, gain=1.5)
+        penalty_2 = rewards.penalize_near_standstill(self, thresh=0.3, gain=1)
         total_vel = rewards.total_velocity(self, fail=kwargs["fail"])
 
         if np.isnan(vel_reward):
             vel_reward = 0
         # return vel_reward + headway_reward
-        return vel_reward
+        return vel_reward + penalty + penalty_2
         # return total_vel
         # return avg_vel_reward + penalty
 
