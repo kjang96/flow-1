@@ -139,6 +139,18 @@ class UDSSCMergeEnv(Env):
         Notes: More efficient to keep a removal list than to resize
         continuously
         """
+        # Apply noise
+        if "rl_action_noise" in self.env_params.additional_params:
+            for i, rl_action in enumerate(rl_actions):
+                perturbation = np.random.normal(0, 0.7) # 0.7 is arbitrary. but since accels are capped at +- 1 i don't want thi sto be too big
+                rl_actions[i] = rl_action + perturbation
+
+        # Reclip
+        if isinstance(self.action_space, Box):
+            rl_actions = np.clip(
+                rl_actions,
+                a_min=self.action_space.low,
+                a_max=self.action_space.high)
         # if 1:
             # return
         removal = [] 
@@ -181,8 +193,8 @@ class UDSSCMergeEnv(Env):
         # return vel_reward + headway_reward
         if np.isnan(vel_reward):
             vel_reward = 0
-        # return vel_reward
-        return total_vel
+        return vel_reward + penalty
+        # return total_vel
         # return avg_vel_reward + penalty
 
     def get_state(self, **kwargs):
