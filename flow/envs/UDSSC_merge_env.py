@@ -204,7 +204,8 @@ class UDSSCMergeEnv(Env):
         # return vel_reward + headway_reward
         if np.isnan(vel_reward):
             vel_reward = 0
-        return vel_reward + penalty + penalty_2 + arrived
+        # return vel_reward + penalty + penalty_2 + arrived
+        return vel_reward + arrived
         # return total_vel
         # return avg_vel_reward + penalty
 
