@@ -29,7 +29,7 @@ HORIZON = 500
 SIM_STEP = 1
 BATCH_SIZE = 20000
 ITR = 600
-exp_tag = "complex_22"  # experiment prefix
+exp_tag = "complex_23"  # experiment prefix
 
 # Sumo settings
 FLOW_RATE = 350
@@ -162,7 +162,7 @@ def run_task(*_):
         # radius of the loops
         "ring_radius": 30,#15.25,
         # length of the straight edges connected the outer loop to the inner loop
-        "lane_length": 45,
+        "lane_length": 150,
         # length of the merge next to the roundabout
         "merge_length": 15,
         # number of lanes in the inner loop
