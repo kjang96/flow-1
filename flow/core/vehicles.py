@@ -74,6 +74,9 @@ class Vehicles:
         # initial state of the vehicles class, used for serialization purposes
         self.initial = []
 
+        # dict of time vehicles in the system have spent in the system 
+        self._vehicle_time = {}
+
     def add(self,
             veh_id,
             acceleration_controller=(SumoCarFollowingController, {}),
@@ -294,6 +297,10 @@ class Vehicles:
         env : Environment type
             state of the environment at the current time step
         """
+        try:
+            self._vehicle_time = self._vehicle_time
+        except:
+            self._vehicle_time = {}
         # remove exiting vehicles from the vehicles class
         for veh_id in sim_obs[tc.VAR_ARRIVED_VEHICLES_IDS]:
             if veh_id not in sim_obs[tc.VAR_TELEPORT_STARTING_VEHICLES_IDS]:
@@ -322,6 +329,7 @@ class Vehicles:
                 self.set_state(veh_id, "last_lc", -float("inf"))
             self._num_departed.clear()
             self._num_arrived.clear()
+            self._vehicle_time.clear()
             self.sim_step = env.sim_step
         else:
             # update the "last_lc" variable
@@ -352,6 +360,12 @@ class Vehicles:
                 len(sim_obs[tc.VAR_DEPARTED_VEHICLES_IDS]))
             self._num_arrived.append(len(sim_obs[tc.VAR_ARRIVED_VEHICLES_IDS]))
 
+        # <--
+        # record time of the vehicle in the system 
+        for veh_id in sim_obs[tc.VAR_DEPARTED_VEHICLES_IDS]:
+            self._vehicle_time[veh_id] = 0
+        # -->
+
         # update the "headway", "leader", and "follower" variables
         for veh_id in self.__ids:
             headway = vehicle_obs.get(veh_id, {}).get(tc.VAR_LEADER, None)
@@ -369,6 +383,10 @@ class Vehicles:
                     self.__vehicles[headway[0]]["follower"] = veh_id
                 except KeyError:
                     pass
+            try:
+                self._vehicle_time[veh_id] += 1
+            except KeyError:
+                self._vehicle_time[veh_id] = 0
 
         for veh_id in self.__ids:
             position = vehicle_obs.get(veh_id, {}).get(tc.VAR_POSITION, None)
@@ -398,6 +416,7 @@ class Vehicles:
         env: Env type
             state of the environment at the current time step
         """
+
         if veh_type not in self.type_parameters:
             raise KeyError("Entering vehicle is not a valid type.")
 
@@ -476,6 +495,7 @@ class Vehicles:
 
         # make sure that the order of rl_ids is kept sorted
         self.__rl_ids.sort()
+
 
     def remove(self, veh_id):
         """Remove a vehicle.
@@ -1072,6 +1092,17 @@ class Vehicles:
                 self.get_state(vehID, state_name, error) for vehID in veh_id
             ]
         return self.__vehicles.get(veh_id, {}).get(state_name, error)
+
+
+    def get_vehicle_time(self, veh_id):
+        """
+        Getter function returns how many time steps the vehicle has been in the
+        system for.
+        """
+        if isinstance(veh_id, list):
+            return [self.get_vehicle_time(v) for v in veh_id]
+        return self._vehicle_time.get(veh_id, -1)
+        
 
     def _multi_lane_headways(self, env):
         """Compute multi-lane data for all vehicles.
