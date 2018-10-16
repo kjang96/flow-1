@@ -29,7 +29,7 @@ HORIZON = 500
 SIM_STEP = 1
 BATCH_SIZE = 20000
 ITR = 600
-exp_tag = "complex_21"  # experiment prefix
+exp_tag = "complex_22"  # experiment prefix
 
 # Sumo settings
 FLOW_RATE = 350
@@ -41,7 +41,7 @@ RL_FLOW_PROB = RL_FLOW_RATE/3600
 
 # # Local settings
 # N_PARALLEL = 1
-# SUMO_BINARY = "sumo"
+# SUMO_BINARY = "sumo-gui"
 # MODE = "local"
 # RESTART_INSTANCE = False
 # SEEDS = [1]
@@ -58,7 +58,7 @@ N_PARALLEL = 20
 SUMO_BINARY = "sumo"
 MODE = "local"
 RESTART_INSTANCE = True
-SEEDS = [1, 7, 91, 104]
+SEEDS = [1, 5, 91, 104]
 
 
 def main():
