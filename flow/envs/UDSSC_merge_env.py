@@ -100,7 +100,7 @@ class UDSSCMergeEnv(Env):
         #                  self.n_merging_in * 4 + \
         #                  2 + \
         #                  int(self.roundabout_length // 5) * 2
-        self.total_obs = 7 * 2 + \
+        self.total_obs = 6 * 2 + \
                          self.n_merging_in * 4 + \
                          int(self.roundabout_length // 5) * 2
         # self.total_obs = self.n_obs_vehicles * 2 + 2 + \
@@ -421,12 +421,14 @@ class UDSSCMergeEnv(Env):
             headway_vel = self.process(headway_vel, length=1)
             headway_dists = self.process(headway_dists, length=1)
 
-            rl_info = np.concatenate([rl_pos, rl_pos_2, rl_vel, tailway_vel,
+            rl_info = np.concatenate([rl_pos, rl_vel, tailway_vel,
                         tailway_dists, headway_vel, headway_dists])
+            # rl_info = np.concatenate([rl_pos, rl_pos_2, rl_vel, tailway_vel,
+            #             tailway_dists, headway_vel, headway_dists])
 
             # Pad
         else:
-            rl_info = rl_info = [0] * 7
+            rl_info = rl_info = [0] * 6
 
         
         return rl_info
