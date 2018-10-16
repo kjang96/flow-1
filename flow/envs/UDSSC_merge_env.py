@@ -186,10 +186,11 @@ class UDSSCMergeEnv(Env):
         """
         vel_reward = rewards.desired_velocity(self, fail=kwargs["fail"])
         avg_vel_reward = rewards.average_velocity(self, fail=kwargs["fail"])
-        penalty = rewards.penalize_standstill(self, gain=1.5)
-        penalty_2 = rewards.penalize_near_standstill(self, thresh=0.2, gain=0.5)
+        penalty = rewards.penalize_standstill(self, gain=1)
+        penalty_2 = rewards.penalize_near_standstill(self, thresh=0.2, gain=0.3)
         
         total_vel = rewards.total_velocity(self, fail=kwargs["fail"])
+        arrived = self.vehicles.get_num_arrived()
 
         # Use a similar weighting of of the headway reward as the velocity
         # reward
@@ -203,7 +204,7 @@ class UDSSCMergeEnv(Env):
         # return vel_reward + headway_reward
         if np.isnan(vel_reward):
             vel_reward = 0
-        return vel_reward + penalty + penalty_2
+        return vel_reward + penalty + penalty_2 + arrived
         # return total_vel
         # return avg_vel_reward + penalty
 
