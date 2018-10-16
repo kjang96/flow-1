@@ -162,17 +162,21 @@ class UDSSCMergeEnv(Env):
         for rl_id in removal_2:
             self.rl_stack_2.remove(rl_id)
         if self.rl_stack:
-            rl_id = self.rl_stack[:1][0]
-        # if the rl is not halfway through the first segment, let it drive normally
-            if not(self.vehicles.get_edge(rl_id) == 'inflow_0' and \
-            self.vehicles.get_position(rl_id) < 0.5 * self.scenario.edge_length('inflow_0')):
-                self.apply_acceleration(self.rl_stack[:1], rl_actions[:1])
+            self.apply_acceleration(self.rl_stack[:1], rl_actions[:1])    
+
+        #     rl_id = self.rl_stack[:1][0]
+        # # if the rl is not halfway through the first segment, let it drive normally
+        #     if not(self.vehicles.get_edge(rl_id) == 'inflow_0' and \
+        #     self.vehicles.get_position(rl_id) < 0.25 * self.scenario.edge_length('inflow_0')):
+        #         self.apply_acceleration(self.rl_stack[:1], rl_actions[:1])
 
         if self.rl_stack_2:
-            rl_id_2 = self.rl_stack_2[:1][0]
-            if not(self.vehicles.get_edge(rl_id_2) == 'inflow_1' and \
-            self.vehicles.get_position(rl_id_2) < 0.5 * self.scenario.edge_length('inflow_1')):
-                self.apply_acceleration(self.rl_stack_2[:1], rl_actions[1:])
+            self.apply_acceleration(self.rl_stack_2[:1], rl_actions[1:])
+
+            # rl_id_2 = self.rl_stack_2[:1][0]
+            # if not(self.vehicles.get_edge(rl_id_2) == 'inflow_1' and \
+            # self.vehicles.get_position(rl_id_2) < 0.25* self.scenario.edge_length('inflow_1')):
+            #     self.apply_acceleration(self.rl_stack_2[:1], rl_actions[1:])
 
     def compute_reward(self, state, rl_actions, **kwargs):
         """
