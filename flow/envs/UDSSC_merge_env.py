@@ -188,7 +188,7 @@ class UDSSCMergeEnv(Env):
         avg_vel_reward = rewards.average_velocity(self, fail=kwargs["fail"])
         penalty = rewards.penalize_standstill(self, gain=1)
         penalty_2 = rewards.penalize_near_standstill(self, thresh=0.2, gain=0.3)
-        min_delay = rewards.min_delay(self)
+        # min_delay = rewards.min_delay(self)
         # import ipdb; ipdb.set_trace()
         
         total_vel = rewards.total_velocity(self, fail=kwargs["fail"])
@@ -204,12 +204,10 @@ class UDSSCMergeEnv(Env):
         # headway_reward = 0.2 * max_cost * rewards.penalize_headway_variance(
             # self.vehicles, self.sorted_extra_data, normalization)
         # return vel_reward + headway_reward
-        time = sum(self.vehicles.get_vehicle_time(self.vehicles.get_ids())) #edge case for if this is empty
         if np.isnan(vel_reward):
             vel_reward = 0
-        return min_delay
-        # return vel_reward + penalty + penalty_2 + arrived
-        # return -time #/ self.vehicles.num_vehicles if self.vehicles.num_vehicles > 0 else 0
+        return vel_reward + penalty + penalty_2 + arrived
+        # return vel_reward + arrived
         # return total_vel
         # return avg_vel_reward + penalty
 
