@@ -28,7 +28,7 @@ HORIZON = 500
 SIM_STEP = 1
 BATCH_SIZE = 20000
 ITR = 100
-exp_tag = "new_11"  # experiment prefix
+exp_tag = "new_12"  # experiment prefix
 
 # Sumo settings
 FLOW_RATE = 350
@@ -38,12 +38,12 @@ FLOW_PROB = FLOW_RATE/3600
 RL_FLOW_RATE = 50
 RL_FLOW_PROB = RL_FLOW_RATE/3600
 
-# Local settings
-N_PARALLEL = 1
-SUMO_BINARY = "sumo" 
-MODE = "local"
-RESTART_INSTANCE = False
-SEEDS = [1]
+# # Local settings
+# N_PARALLEL = 1
+# SUMO_BINARY = "sumo" 
+# MODE = "local"
+# RESTART_INSTANCE = False
+# SEEDS = [1]
 
 # # EC2 settings
 # N_PARALLEL = 8
@@ -52,12 +52,12 @@ SEEDS = [1]
 # RESTART_INSTANCE = True
 # SEEDS = [1, 2, 5, 91]
 
-# # Autoscaler settings
-# N_PARALLEL = 20
-# SUMO_BINARY = "sumo"
-# MODE = "local"
-# RESTART_INSTANCE = True
-# SEEDS = [1, 2, 5, 91]
+# Autoscaler settings
+N_PARALLEL = 20
+SUMO_BINARY = "sumo"
+MODE = "local"
+RESTART_INSTANCE = True
+SEEDS = [1, 2, 5, 91]
 
 def main():
     for seed in SEEDS:
@@ -161,9 +161,9 @@ def run_task(*_):
 
     additional_env_params = {
         # maximum acceleration for autonomous vehicles, in m/s^2
-        "max_accel": 3,
+        "max_accel": 1.5,
         # maximum deceleration for autonomous vehicles, in m/s^2
-        "max_decel": 3,
+        "max_decel": 1,
         # desired velocity for all vehicles in the network, in m/s
         "target_velocity": 15,
         # number of observable vehicles preceding the rl vehicle
