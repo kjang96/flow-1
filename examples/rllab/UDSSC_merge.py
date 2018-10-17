@@ -28,7 +28,7 @@ HORIZON = 500
 SIM_STEP = 1
 BATCH_SIZE = 20000
 ITR = 60
-exp_tag = "new_14"  # experiment prefix
+exp_tag = "new_15"  # experiment prefix
 
 # Sumo settings
 FLOW_RATE = 350
@@ -96,8 +96,8 @@ def run_task(*_):
     # <-- set 1
     inflow.add(veh_type="rl", edge="inflow_0", name="rl", vehs_per_hour=50)
     inflow.add(veh_type="idm", edge="inflow_0", name="idm", vehs_per_hour=50)
-    # inflow.add(veh_type="idm", edge="inflow_0", name="idm", vehs_per_hour=50)
-    # inflow.add(veh_type="idm", edge="inflow_0", name="idm", vehs_per_hour=50)
+    inflow.add(veh_type="idm", edge="inflow_0", name="idm", vehs_per_hour=50)
+    inflow.add(veh_type="idm", edge="inflow_0", name="idm", vehs_per_hour=50)
     
     inflow.add(veh_type="rl", edge="inflow_1", name="rl", vehs_per_hour=50)
     inflow.add(veh_type="idm", edge="inflow_1", name="idm", vehs_per_hour=50)
