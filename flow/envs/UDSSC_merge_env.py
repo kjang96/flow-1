@@ -185,14 +185,9 @@ class UDSSCMergeEnv(Env):
         - penalizing standstill
         """
         vel_reward = rewards.desired_velocity(self, fail=kwargs["fail"])
-        if kwargs["fail"]:
-            vel_reward = -100
-
         avg_vel_reward = rewards.average_velocity(self, fail=kwargs["fail"])
         penalty = rewards.penalize_standstill(self, gain=1)
         penalty_2 = rewards.penalize_near_standstill(self, thresh=0.2, gain=0.3)
-        # min_delay = rewards.min_delay(self)
-        # import ipdb; ipdb.set_trace()
         
         total_vel = rewards.total_velocity(self, fail=kwargs["fail"])
         arrived = self.vehicles.get_num_arrived()
@@ -210,7 +205,6 @@ class UDSSCMergeEnv(Env):
         if np.isnan(vel_reward):
             vel_reward = 0
         return vel_reward + penalty + penalty_2 + arrived
-        # return vel_reward + arrived
         # return total_vel
         # return avg_vel_reward + penalty
 

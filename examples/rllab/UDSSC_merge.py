@@ -27,8 +27,8 @@ from flow.core.params import InFlows
 HORIZON = 500
 SIM_STEP = 1
 BATCH_SIZE = 20000
-ITR = 100
-exp_tag = "new_12"  # experiment prefix
+ITR = 60
+exp_tag = "new_13"  # experiment prefix
 
 # Sumo settings
 FLOW_RATE = 350
@@ -96,6 +96,8 @@ def run_task(*_):
     # <-- set 1
     inflow.add(veh_type="rl", edge="inflow_0", name="rl", vehs_per_hour=50)
     inflow.add(veh_type="idm", edge="inflow_0", name="idm", vehs_per_hour=50)
+    inflow.add(veh_type="idm", edge="inflow_0", name="idm", vehs_per_hour=50)
+    inflow.add(veh_type="idm", edge="inflow_0", name="idm", vehs_per_hour=50)
     
     inflow.add(veh_type="rl", edge="inflow_1", name="rl", vehs_per_hour=50)
     inflow.add(veh_type="idm", edge="inflow_1", name="idm", vehs_per_hour=50)
@@ -161,7 +163,7 @@ def run_task(*_):
 
     additional_env_params = {
         # maximum acceleration for autonomous vehicles, in m/s^2
-        "max_accel": 1.5,
+        "max_accel": 1,
         # maximum deceleration for autonomous vehicles, in m/s^2
         "max_decel": 1,
         # desired velocity for all vehicles in the network, in m/s
