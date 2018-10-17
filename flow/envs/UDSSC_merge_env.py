@@ -341,10 +341,10 @@ class UDSSCMergeEnv(Env):
 
             # Reclip
             if isinstance(self.action_space, Box):
-            state = np.clip(
-                state,
-                a_min=self.action_space.low,
-                a_max=self.action_space.high)
+                state = np.clip(
+                    state,
+                    a_min=self.action_space.low,
+                    a_max=self.action_space.high)
 
             # what happens if you don't clip it
 

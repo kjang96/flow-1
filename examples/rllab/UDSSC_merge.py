@@ -28,7 +28,7 @@ HORIZON = 500
 SIM_STEP = 1
 BATCH_SIZE = 20000
 ITR = 100
-exp_tag = "roundabout_88"  # experiment prefix
+exp_tag = "roundabout_89"  # experiment prefix
 
 # Sumo settings
 FLOW_RATE = 350
@@ -110,7 +110,7 @@ def run_task(*_):
 
     # Inner ring vehicles
     vehicles.add(veh_id="idm",
-                 acceleration_controller=(IDMController, {"noise": 0}),
+                 acceleration_controller=(IDMController, {"noise": 0.1}),
                  lane_change_controller=(SumoLaneChangeController, {}),
                  routing_controller=(ContinuousRouter, {}),
                  speed_mode="all_checks",
