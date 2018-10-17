@@ -28,7 +28,7 @@ HORIZON = 500
 SIM_STEP = 1
 BATCH_SIZE = 20000
 ITR = 100
-exp_tag = "roundabout_87"  # experiment prefix
+exp_tag = "roundabout_88"  # experiment prefix
 
 # Sumo settings
 FLOW_RATE = 350
@@ -38,12 +38,12 @@ FLOW_PROB = FLOW_RATE/3600
 RL_FLOW_RATE = 50
 RL_FLOW_PROB = RL_FLOW_RATE/3600
 
-# Local settings
-N_PARALLEL = 1
-SUMO_BINARY = "sumo"
-MODE = "local"
-RESTART_INSTANCE = False
-SEEDS = [1]
+# # Local settings
+# N_PARALLEL = 1
+# SUMO_BINARY = "sumo"
+# MODE = "local"
+# RESTART_INSTANCE = False
+# SEEDS = [1]
 
 # # EC2 settings
 # N_PARALLEL = 8
@@ -52,12 +52,12 @@ SEEDS = [1]
 # RESTART_INSTANCE = True
 # SEEDS = [1, 2, 5, 91]
 
-# # Autoscaler settings
-# N_PARALLEL = 20
-# SUMO_BINARY = "sumo"
-# MODE = "local"
-# RESTART_INSTANCE = True
-# SEEDS = [1, 2, 5, 91]
+# Autoscaler settings
+N_PARALLEL = 20
+SUMO_BINARY = "sumo"
+MODE = "local"
+RESTART_INSTANCE = True
+SEEDS = [1, 2, 5, 91]
 
 def main():
     for seed in SEEDS:
@@ -110,7 +110,7 @@ def run_task(*_):
 
     # Inner ring vehicles
     vehicles.add(veh_id="idm",
-                 acceleration_controller=(IDMController, {"noise": 0.2}),
+                 acceleration_controller=(IDMController, {"noise": 0}),
                  lane_change_controller=(SumoLaneChangeController, {}),
                  routing_controller=(ContinuousRouter, {}),
                  speed_mode="all_checks",
@@ -151,9 +151,9 @@ def run_task(*_):
         # number of observable merging-in vehicle from the larger loop
         "n_merging_in": 6,
         # rl action noise
-        "rl_action_noise": 0.1,
+        # "rl_action_noise": 0.1,
         # noise to add to the state space
-        "state_noise": 0.1
+        # "state_noise": 0.1
     }
 
     env_params = EnvParams(horizon=HORIZON,
@@ -207,10 +207,6 @@ def run_task(*_):
     horizon = env.horizon
     env = normalize(env)
 
-    # policy = GaussianGRUPolicy(
-    #     env_spec=env.spec,
-    #     hidden_sizes=(64,)
-    # )
     policy = GaussianMLPPolicy(
         env_spec=env.spec,
         hidden_sizes=(100, 50, 25)

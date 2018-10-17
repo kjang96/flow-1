@@ -14,7 +14,7 @@ if __name__ == "__main__":
     parser.add_argument(
         '-n', '--num_rollouts',
         type=int,
-        default=100,
+        default=50,
         help='Number of rollouts we will average over')
     parser.add_argument(
         '--plotname',

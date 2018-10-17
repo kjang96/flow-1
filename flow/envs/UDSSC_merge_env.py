@@ -96,12 +96,9 @@ class UDSSCMergeEnv(Env):
         # Roundabout state = len(MERGE_EDGES) * 3
         # roundabout_full = (ROUNDABOUT_LENGTH // 5) * 2 # 2 cols
         
-        # self.total_obs = 7 * 2 + \
-        #                  self.n_merging_in * 4 + \
-        #                  2 + \
-        #                  int(self.roundabout_length // 5) * 2
-        self.total_obs = 6 * 2 + \
+        self.total_obs = 7 * 2 + \
                          self.n_merging_in * 4 + \
+                         2 + \
                          int(self.roundabout_length // 5) * 2
         # self.total_obs = self.n_obs_vehicles * 2 + 2 + \
         #                  int(self.roundabout_length // 5) * 2
@@ -333,9 +330,9 @@ class UDSSCMergeEnv(Env):
         state = np.array(np.concatenate([rl_info, rl_info_2,
                                         merge_dists_0, merge_0_vel,
                                         merge_dists_1, merge_1_vel,
-                                        #queue_0, queue_1,
+                                        queue_0, queue_1,
                                         roundabout_full]))
-                                        
+
         if "state_noise" in self.env_params.additional_params:
             var = self.env_params.additional_params.get("state_noise")
             for i, st in enumerate(state):
@@ -343,11 +340,12 @@ class UDSSCMergeEnv(Env):
                 state[i] = st + perturbation
 
             # Reclip
-            # if isinstance(self.action_space, Box):
+            if isinstance(self.action_space, Box):
             state = np.clip(
                 state,
-                a_min=self.observation_space.low,
-                a_max=self.observation_space.high)
+                a_min=self.action_space.low,
+                a_max=self.action_space.high)
+
             # what happens if you don't clip it
 
         return state
@@ -421,14 +419,12 @@ class UDSSCMergeEnv(Env):
             headway_vel = self.process(headway_vel, length=1)
             headway_dists = self.process(headway_dists, length=1)
 
-            rl_info = np.concatenate([rl_pos, rl_vel, tailway_vel,
+            rl_info = np.concatenate([rl_pos, rl_pos_2, rl_vel, tailway_vel,
                         tailway_dists, headway_vel, headway_dists])
-            # rl_info = np.concatenate([rl_pos, rl_pos_2, rl_vel, tailway_vel,
-            #             tailway_dists, headway_vel, headway_dists])
 
             # Pad
         else:
-            rl_info = rl_info = [0] * 6
+            rl_info = rl_info = [0] * 7
 
         
         return rl_info
