@@ -167,7 +167,7 @@ class UDSSCMergingGenerator(Generator):
         """
         types = [{"id": "edgeType_hi",
                   "speed": repr(net_params.additional_params.get("roundabout_speed_limit")),
-                  "priority": repr(1)},
+                  "priority": repr(2)},
                  {"id": "edgeType_lo",
                   "speed": repr(net_params.additional_params.get("outside_speed_limit")),
                   "priority": repr(1)}]
