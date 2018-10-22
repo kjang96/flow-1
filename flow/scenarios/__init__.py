@@ -14,6 +14,7 @@ from flow.scenarios.loop.gen import CircleGenerator
 from flow.scenarios.merge.gen import MergeGenerator
 from flow.scenarios.netfile.gen import NetFileGenerator
 from flow.scenarios.loop_merge.gen import TwoLoopOneMergingGenerator
+from flow.scenarios.UDSSC_merge.gen import UDSSCMergingGenerator
 
 # custom scenarios
 from flow.scenarios.bay_bridge.scenario import BayBridgeScenario
@@ -26,13 +27,15 @@ from flow.scenarios.loop.loop_scenario import LoopScenario
 from flow.scenarios.merge.scenario import MergeScenario
 from flow.scenarios.netfile.scenario import NetFileScenario
 from flow.scenarios.loop_merge.scenario import TwoLoopsOneMergingScenario
+from flow.scenarios.UDSSC_merge.scenario import UDSSCMergingScenario
 
 __all__ = [
     "Scenario", "BayBridgeGenerator", "BayBridgeTollGenerator",
     "BottleneckGenerator", "Figure8Generator", "SimpleGridGenerator",
     "HighwayGenerator", "CircleGenerator", "MergeGenerator",
-    "NetFileGenerator", "TwoLoopOneMergingGenerator", "BayBridgeScenario",
-    "BayBridgeTollScenario", "BottleneckScenario", "Figure8Scenario",
-    "SimpleGridScenario", "HighwayScenario", "LoopScenario", "MergeScenario",
-    "NetFileScenario", "TwoLoopsOneMergingScenario"
+    "NetFileGenerator", "TwoLoopOneMergingGenerator", "UDSSCMergingGenerator",
+    "BayBridgeScenario", "BayBridgeTollScenario", "BottleneckScenario",
+    "Figure8Scenario", "SimpleGridScenario", "HighwayScenario", "LoopScenario",
+    "MergeScenario", "NetFileScenario", "TwoLoopsOneMergingScenario",
+    "UDSSCMergingScenario"
 ]
