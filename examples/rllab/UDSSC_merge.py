@@ -28,7 +28,7 @@ HORIZON = 500
 SIM_STEP = 1
 BATCH_SIZE = 20000
 ITR = 100
-exp_tag = "ecc_0"  # experiment prefix
+exp_tag = "ecc_1"  # experiment prefix
 
 # Sumo settings
 FLOW_RATE = 350
@@ -153,7 +153,7 @@ def run_task(*_):
         # rl action noise
         # "rl_action_noise": 0.1,
         # noise to add to the state space
-        # "state_noise": 0.1
+        "state_noise": 0.1
     }
 
     env_params = EnvParams(horizon=HORIZON,
