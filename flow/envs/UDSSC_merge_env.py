@@ -342,11 +342,11 @@ class UDSSCMergeEnv(Env):
                 state[i] = st + perturbation
 
             # Reclip
-            if isinstance(self.action_space, Box):
+            if isinstance(self.observation_space, Box):
                 state = np.clip(
                     state,
-                    a_min=self.action_space.low,
-                    a_max=self.action_space.high)
+                    a_min=self.observation_space.low,
+                    a_max=self.observation_space.high)
 
             # what happens if you don't clip it
 
