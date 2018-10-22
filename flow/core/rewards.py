@@ -59,8 +59,7 @@ def total_velocity(env, fail=False):
     if any(vel < -100) or fail:
         return 0.
     if len(vel) == 0:
-        return 0.
-    return sum(vel)
+        return sum(vel)
 
 
 def reward_density(env):
@@ -142,8 +141,11 @@ def min_delay(env):
     time_step = env.sim_step
 
     max_cost = time_step * sum(vel.shape)
-    cost = time_step * sum((v_top - vel) / v_top)
-    return max((max_cost - cost) / max_cost, 0)
+    try:
+        cost = time_step * sum((v_top - vel) / v_top)
+        return max((max_cost - cost) / max_cost, 0)
+    except ZeroDivisionError:
+        return 0
 
 
 def min_delay_unscaled(env):
