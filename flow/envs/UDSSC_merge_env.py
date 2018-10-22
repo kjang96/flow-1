@@ -208,7 +208,7 @@ class UDSSCMergeEnv(Env):
         # return total_vel
         # return avg_vel_reward + penalty
         # return min_delay + penalty + penalty_2
-        return min_delay + num_arrived
+        return min_delay# + num_arrived
 
     def get_state(self, **kwargs):
         """
