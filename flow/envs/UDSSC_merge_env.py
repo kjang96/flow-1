@@ -39,6 +39,8 @@ ALL_EDGES = ROUNDABOUT_EDGES + \
              , 'inflow_0', ':e_0', 'merge_in_0', ':c_0'
              , ':d_0', 'merge_out_1', ':g_0', 'outflow_1']
 
+RAMP_0 = ["inflow_0", ":e_0", "merge_in_0", ":c_0"]
+RAMP_1 = ["inflow_1", ":g_2", "merge_in_1", ":a_0"]
 
 class UDSSCMergeEnv(Env):
     """
@@ -135,6 +137,7 @@ class UDSSCMergeEnv(Env):
         Notes: More efficient to keep a removal list than to resize
         continuously
         """
+
         # Apply noise
         if "rl_action_noise" in self.env_params.additional_params:
             rl_action_noise = self.env_params.additional_params["rl_action_noise"]
@@ -148,8 +151,8 @@ class UDSSCMergeEnv(Env):
                     rl_actions,
                     a_min=self.action_space.low,
                     a_max=self.action_space.high)
-        # if 1:
-            # return
+
+        # Curation
         removal = [] 
         removal_2 = []
         for rl_id in self.rl_stack:
@@ -162,10 +165,17 @@ class UDSSCMergeEnv(Env):
             self.rl_stack.remove(rl_id)
         for rl_id in removal_2:
             self.rl_stack_2.remove(rl_id)
+
+        # Apply RL Actions
         if self.rl_stack:
-            self.apply_acceleration(self.rl_stack[:1], rl_actions[:1])
+            rl_id = self.rl_stack[0]
+            if self.in_control(rl_id):
+                self.apply_acceleration([rl_id], rl_actions[:1])
+
         if self.rl_stack_2:
-            self.apply_acceleration(self.rl_stack_2[:1], rl_actions[1:])
+            rl_id_2 = self.rl_stack_2[0]
+            if self.in_control(rl_id_2):
+                self.apply_acceleration([rl_id_2], rl_actions[1:])
 
     def compute_reward(self, state, rl_actions, **kwargs):
         """
@@ -284,14 +294,8 @@ class UDSSCMergeEnv(Env):
         # Get normalization factors 
         circ = self.circumference()
         max_speed = self.scenario.max_speed 
-        merge_0_norm = self.scenario.edge_length('inflow_0') + \
-                        self.scenario.edge_length(':e_0') + \
-                        self.scenario.edge_length('merge_in_0') + \
-                        self.scenario.edge_length(':c_0')
-        merge_1_norm = self.scenario.edge_length('inflow_1') + \
-                        self.scenario.edge_length(':g_2') + \
-                        self.scenario.edge_length('merge_in_1') + \
-                        self.scenario.edge_length(':a_0')
+        merge_0_norm = sum([self.scenario.edge_length(e) for e in RAMP_0])
+        merge_1_norm = sum([self.scenario.edge_length(e) for e in RAMP_1])
         queue_0_norm = ceil(merge_0_norm/5 + 1) # 5 is the car length
         queue_1_norm = ceil(merge_1_norm/5 + 1)
 
@@ -709,6 +713,27 @@ class UDSSCMergeEnv(Env):
             curr = curr.get_leader()
             k -= 0
         return leaders
+
+    def in_control(self, veh_id):
+        """
+        Return True if VEH_ID is in the controlled part of the system
+        """
+        if "control_length" not in self.env_params.additional_params:
+            return True 
+        control_length = self.env_params.additional_params["control_length"] # this is a percentage
+        if self.vehicles.get_edge(veh_id) in RAMP_0:
+            merge_position = self.get_x_by_id(veh_id) - \
+                             self.scenario.es[RAMP_0[0]]
+            merge_len = sum([self.scenario.edge_length(e) for e in RAMP_0])
+            return False if merge_position <= control_length * merge_len else True
+        elif self.vehicles.get_edge(veh_id) in RAMP_1:
+            merge_position = self.get_x_by_id(veh_id) - \
+                             self.scenario.es[RAMP_1[0]]
+            merge_len = sum([self.scenario.edge_length(e) for e in RAMP_1])
+            return False if merge_position <= control_length * merge_len else True
+        else:
+            return True
+
 
     @property
     def roundabout_length(self):
