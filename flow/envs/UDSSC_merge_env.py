@@ -137,8 +137,9 @@ class UDSSCMergeEnv(Env):
         """
         # Apply noise
         if "rl_action_noise" in self.env_params.additional_params:
+            rl_action_noise = self.env_params.additional_params["rl_action_noise"]
             for i, rl_action in enumerate(rl_actions):
-                perturbation = np.random.normal(0, 0.7) # 0.7 is arbitrary. but since accels are capped at +- 1 i don't want thi sto be too big
+                perturbation = np.random.normal(0, rl_action_noise) # 0.7 is arbitrary. but since accels are capped at +- 1 i don't want thi sto be too big
                 rl_actions[i] = rl_action + perturbation
 
             # Reclip
