@@ -27,8 +27,8 @@ from flow.core.params import InFlows
 HORIZON = 500
 SIM_STEP = 1
 BATCH_SIZE = 20000
-ITR = 100
-exp_tag = "roundabout_89"  # experiment prefix
+ITR = 50
+exp_tag = "yung_test"  # experiment prefix
 
 # Sumo settings
 FLOW_RATE = 350
@@ -53,7 +53,7 @@ RL_FLOW_PROB = RL_FLOW_RATE/3600
 # SEEDS = [1, 2, 5, 91]
 
 # Autoscaler settings
-N_PARALLEL = 20
+N_PARALLEL = 10
 SUMO_BINARY = "sumo"
 MODE = "local"
 RESTART_INSTANCE = True
