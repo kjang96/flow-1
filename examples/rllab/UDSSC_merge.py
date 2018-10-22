@@ -28,7 +28,7 @@ HORIZON = 500
 SIM_STEP = 1
 BATCH_SIZE = 20000
 ITR = 100
-exp_tag = "ecc_2"  # experiment prefix
+exp_tag = "ecc_3"  # experiment prefix
 
 # Sumo settings
 FLOW_RATE = 350
@@ -38,12 +38,12 @@ FLOW_PROB = FLOW_RATE/3600
 RL_FLOW_RATE = 50
 RL_FLOW_PROB = RL_FLOW_RATE/3600
 
-# # Local settings
-# N_PARALLEL = 1
-# SUMO_BINARY = "sumo"
-# MODE = "local"
-# RESTART_INSTANCE = False
-# SEEDS = [1]
+# Local settings
+N_PARALLEL = 1
+SUMO_BINARY = "sumo"
+MODE = "local"
+RESTART_INSTANCE = False
+SEEDS = [1]
 
 # # EC2 settings
 # N_PARALLEL = 8
@@ -52,12 +52,12 @@ RL_FLOW_PROB = RL_FLOW_RATE/3600
 # RESTART_INSTANCE = True
 # SEEDS = [1, 2, 5, 91]
 
-# Autoscaler settings
-N_PARALLEL = 10
-SUMO_BINARY = "sumo"
-MODE = "local"
-RESTART_INSTANCE = True
-SEEDS = [1, 2, 5, 91]
+# # Autoscaler settings
+# N_PARALLEL = 10
+# SUMO_BINARY = "sumo"
+# MODE = "local"
+# RESTART_INSTANCE = True
+# SEEDS = [1, 2, 5, 91]
 
 def main():
     for seed in SEEDS:
@@ -153,7 +153,7 @@ def run_task(*_):
         # rl action noise
         "rl_action_noise": 0.7,
         # noise to add to the state space
-        # "state_noise": 0.1
+        "state_noise": 0.1
     }
 
     env_params = EnvParams(horizon=HORIZON,
