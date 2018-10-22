@@ -153,7 +153,7 @@ def run_task(*_):
         # rl action noise
         "rl_action_noise": 0.7,
         # noise to add to the state space
-        "state_noise": 0.1
+        # "state_noise": 0.1
     }
 
     env_params = EnvParams(horizon=HORIZON,
