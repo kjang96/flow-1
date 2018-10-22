@@ -187,6 +187,7 @@ class UDSSCMergeEnv(Env):
         avg_vel_reward = rewards.average_velocity(self, fail=kwargs["fail"])
         penalty = rewards.penalize_standstill(self, gain=1.5)
         penalty_2 = rewards.penalize_near_standstill(self, thresh=0.3, gain=1)
+        num_arrived = self.vehicles.get_num_arrived()
     
         total_vel = rewards.total_velocity(self, fail=kwargs["fail"])
         min_delay = rewards.min_delay(self)
@@ -206,7 +207,8 @@ class UDSSCMergeEnv(Env):
         # return vel_reward + penalty + penalty_2
         # return total_vel
         # return avg_vel_reward + penalty
-        return min_delay + penalty + penalty_2
+        # return min_delay + penalty + penalty_2
+        return min_delay + num_arrived
 
     def get_state(self, **kwargs):
         """
