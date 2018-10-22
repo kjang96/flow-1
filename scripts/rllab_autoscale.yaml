@@ -1,7 +1,7 @@
 # cluster.yaml =========================================
 
 # An unique identifier for the head node and workers of this cluster.
-cluster_name: ecc_3 #<YOUR NAME>
+cluster_name: ecc_4 #<YOUR NAME>
 
 # The minimum number of workers nodes to launch in addition to the head
 # node. This number should be >= 0.
@@ -39,7 +39,7 @@ auth:
 # For more documentation on available fields, see:
 # http://boto3.readthedocs.io/en/latest/reference/services/ec2.html#EC2.ServiceResource.create_instances
 head_node:
-    InstanceType: c4.4xlarge
+    InstanceType: m4.10xlarge
     # InstanceType: c4.4xlarge
     ImageId: ami-0a81780b606a8dbb0 # ami-059a97b61ab36e620 # Flow AMI (Ubuntu)
     InstanceMarketOptions:

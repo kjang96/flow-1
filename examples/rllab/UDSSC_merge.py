@@ -28,7 +28,7 @@ HORIZON = 500
 SIM_STEP = 1
 BATCH_SIZE = 20000
 ITR = 100
-exp_tag = "ecc_3"  # experiment prefix
+exp_tag = "ecc_4"  # experiment prefix
 
 # Sumo settings
 FLOW_RATE = 350
@@ -38,12 +38,12 @@ FLOW_PROB = FLOW_RATE/3600
 RL_FLOW_RATE = 50
 RL_FLOW_PROB = RL_FLOW_RATE/3600
 
-# Local settings
-N_PARALLEL = 1
-SUMO_BINARY = "sumo"
-MODE = "local"
-RESTART_INSTANCE = False
-SEEDS = [1]
+# # Local settings
+# N_PARALLEL = 1
+# SUMO_BINARY = "sumo-gui"
+# MODE = "local"
+# RESTART_INSTANCE = False
+# SEEDS = [1]
 
 # # EC2 settings
 # N_PARALLEL = 8
@@ -52,12 +52,12 @@ SEEDS = [1]
 # RESTART_INSTANCE = True
 # SEEDS = [1, 2, 5, 91]
 
-# # Autoscaler settings
-# N_PARALLEL = 10
-# SUMO_BINARY = "sumo"
-# MODE = "local"
-# RESTART_INSTANCE = True
-# SEEDS = [1, 2, 5, 91]
+# Autoscaler settings
+N_PARALLEL = 10
+SUMO_BINARY = "sumo"
+MODE = "local"
+RESTART_INSTANCE = True
+SEEDS = [1, 2, 5, 91]
 
 def main():
     for seed in SEEDS:
@@ -143,7 +143,7 @@ def run_task(*_):
         # maximum deceleration for autonomous vehicles, in m/s^2
         "max_decel": 1,
         # desired velocity for all vehicles in the network, in m/s
-        "target_velocity": 15,
+        "target_velocity": 8,
         # number of observable vehicles preceding the rl vehicle
         "n_preceding": 1, # HAS TO BE 1
         # number of observable vehicles following the rl vehicle
@@ -153,7 +153,9 @@ def run_task(*_):
         # rl action noise
         # "rl_action_noise": 0.7,
         # noise to add to the state space
-        # "state_noise": 0.1
+        # "state_noise": 0.1,
+        # what portion of the ramp the RL vehicle isn't controlled for 
+        "control_length": 0.5,
     }
 
     env_params = EnvParams(horizon=HORIZON,
