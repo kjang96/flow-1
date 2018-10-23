@@ -32,9 +32,9 @@ os.environ['MULTIAGENT'] = 'True'
 # time horizon of a single rollout
 HORIZON = 1500
 # number of rollouts per training iteration
-N_ROLLOUTS = 8
+N_ROLLOUTS = 1
 # number of parallel workers
-N_CPUS = 4
+N_CPUS = 1
 
 # We place one autonomous vehicle and 13 human-driven vehicles in the network
 vehicles = Vehicles()
@@ -153,7 +153,7 @@ if __name__ == '__main__':
             'env': env_name,
             'checkpoint_freq': 1,
             'stop': {
-                'training_iteration': 3
+                'training_iteration': 1
             },
             'config': config,
         },
