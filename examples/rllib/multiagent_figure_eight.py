@@ -153,7 +153,7 @@ if __name__ == '__main__':
             'env': env_name,
             'checkpoint_freq': 1,
             'stop': {
-                'training_iteration': 1
+                'training_iteration': 3
             },
             'config': config,
         },
