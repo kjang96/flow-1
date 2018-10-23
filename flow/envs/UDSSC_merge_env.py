@@ -784,3 +784,86 @@ class UDSSCMergeEnv(Env):
         except:
             pass
 
+
+class MultiAgentUDSSCMergeEnv(UDSSCMergeEnv):
+    """Adversarial multi-agent env.
+
+    Multi-agent env for UDSSC with an adversarial agent perturbing
+    the accelerations of the autonomous vehicle
+    """
+    def _apply_rl_actions(self, rl_actions):
+        """See class definition."""
+        av_action = rl_actions['av']
+        adv_action = rl_actions['adversary']
+        perturb_weight = self.env_params.additional_params['perturb_weight']
+        # Apply noise
+        if "rl_action_noise" in self.env_params.additional_params:
+            rl_action_noise = self.env_params.additional_params["rl_action_noise"]
+            for i, rl_action in enumerate(av_action):
+                perturbation = np.random.normal(0, rl_action_noise) # 0.7 is arbitrary. but since accels are capped at +- 1 i don't want thi sto be too big
+                av_action[i] = av_action + perturbation
+
+            # Reclip
+            if isinstance(self.action_space, Box):
+                av_action = np.clip(
+                    av_action,
+                    a_min=self.action_space.low,
+                    a_max=self.action_space.high)
+
+        # Curation
+        removal = [] 
+        removal_2 = []
+        for rl_id in self.rl_stack:
+            if rl_id not in self.vehicles.get_rl_ids():
+                removal.append(rl_id)
+        for rl_id in self.rl_stack_2:
+            if rl_id not in self.vehicles.get_rl_ids():
+                removal_2.append(rl_id)
+        for rl_id in removal:
+            self.rl_stack.remove(rl_id)
+        for rl_id in removal_2:
+            self.rl_stack_2.remove(rl_id)
+
+        # Apply RL Actions
+        if self.rl_stack:
+            rl_id = self.rl_stack[0]
+            if self.in_control(rl_id):
+                rl_action = av_action[0] + perturb_weight * adv_action[0]
+                self.apply_acceleration([rl_id], [rl_action])
+
+        if self.rl_stack_2:
+            rl_id_2 = self.rl_stack_2[0]
+            if self.in_control(rl_id_2):
+                rl_action = av_action[1] + perturb_weight * adv_action[1]
+                self.apply_acceleration([rl_id_2], [rl_action])
+
+    def compute_reward(self, state, rl_actions, **kwargs):
+        """The agent receives the class definition reward,
+        the adversary recieves the negative of the agent reward
+        """
+        if self.env_params.evaluate:
+            reward = np.mean(self.vehicles.get_speed(self.vehicles.get_ids()))
+            return {'av': reward, 'adversary': -reward}
+        else:
+            reward = rewards.desired_velocity(self, fail=kwargs['fail'])
+            return {'av': reward, 'adversary': -reward}
+
+        vel_reward = rewards.desired_velocity(self, fail=kwargs["fail"])
+        avg_vel_reward = rewards.average_velocity(self, fail=kwargs["fail"])
+        penalty = rewards.penalize_standstill(self, gain=1.5)
+        penalty_2 = rewards.penalize_near_standstill(self, thresh=0.3, gain=1)
+        num_arrived = self.vehicles.get_num_arrived()
+        total_vel = rewards.total_velocity(self, fail=kwargs["fail"])
+        min_delay = rewards.min_delay(self)
+        if np.isnan(vel_reward):
+            vel_reward = 0
+        reward = min_delay + penalty + penalty_2
+        return {'av': reward, 'adversary': -reward}
+
+    def get_state(self, **kwargs):
+        """See class definition for the state. Both adversary and
+        agent receive the same state
+        """
+        
+        state = super().get_state(**kwargs)
+        return {'av': state, 'adversary': state}

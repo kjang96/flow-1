@@ -14,7 +14,7 @@ from flow.envs.loop.wave_attenuation import WaveAttenuationEnv, \
     WaveAttenuationPOEnv
 from flow.envs.merge import WaveAttenuationMergePOEnv
 from flow.envs.straight_env import StraightEnv
-from flow.envs.UDSSC_merge_env import UDSSCMergeEnv
+from flow.envs.UDSSC_merge_env import UDSSCMergeEnv, MultiAgentUDSSCMergeEnv
 from flow.envs.test import TestEnv
 
 __all__ = [
@@ -23,5 +23,5 @@ __all__ = [
     "TwoLoopsMergePOEnv", "BottleneckEnv", "BottleNeckAccelEnv",
     "WaveAttenuationEnv", "WaveAttenuationPOEnv", "TrafficLightGridEnv",
     "PO_TrafficLightGridEnv", "DesiredVelocityEnv", "TestEnv", "BayBridgeEnv",
-    "StraightEnv", "UDSSCMergeEnv",
+    "StraightEnv", "UDSSCMergeEnv", "MultiAgentUDSSCMergeEnv"
 ]

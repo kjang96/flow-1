@@ -38,12 +38,12 @@ FLOW_PROB = FLOW_RATE/3600
 RL_FLOW_RATE = 50
 RL_FLOW_PROB = RL_FLOW_RATE/3600
 
-# # Local settings
-# N_PARALLEL = 1
-# SUMO_BINARY = "sumo"
-# MODE = "local"
-# RESTART_INSTANCE = False
-# SEEDS = [1]
+# Local settings
+N_PARALLEL = 1
+SUMO_BINARY = "sumo"
+MODE = "local"
+RESTART_INSTANCE = False
+SEEDS = [1]
 
 # # EC2 settings
 # N_PARALLEL = 8
