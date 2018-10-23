@@ -27,8 +27,8 @@ from flow.core.params import InFlows
 HORIZON = 500
 SIM_STEP = 1
 BATCH_SIZE = 20000
-ITR = 200
-exp_tag = "ecc_9"  # experiment prefix
+ITR = 100
+exp_tag = "ecc_11"  # experiment prefix
 
 # Sumo settings
 FLOW_RATE = 350
@@ -40,7 +40,7 @@ RL_FLOW_PROB = RL_FLOW_RATE/3600
 
 # # Local settings
 # N_PARALLEL = 1
-# SUMO_BINARY = "sumo-gui"
+# SUMO_BINARY = "sumo"
 # MODE = "local"
 # RESTART_INSTANCE = False
 # SEEDS = [1]
@@ -91,27 +91,27 @@ def run_task(*_):
     # # -->
 
     # <-- deterministic setting
-    # inflow = InFlows()
-    
-    # inflow.add(veh_type="rl", edge="inflow_0", name="rl", vehs_per_hour=50)
-    # inflow.add(veh_type="idm", edge="inflow_0", name="idm", vehs_per_hour=50)
-    # inflow.add(veh_type="idm", edge="inflow_0", name="idm", vehs_per_hour=50)
-
-    # inflow.add(veh_type="rl", edge="inflow_1", name="rl", vehs_per_hour=50)
-    # inflow.add(veh_type="idm", edge="inflow_1", name="idm", vehs_per_hour=50)
-    # inflow.add(veh_type="idm", edge="inflow_1", name="idm", vehs_per_hour=50)
-    # inflow.add(veh_type="idm", edge="inflow_1", name="idm", vehs_per_hour=50)
-    # -->
-
-    # <-- stochastic setting
     inflow = InFlows()
     
-    inflow.add(veh_type="idm", edge="inflow_0", name="idm", probability=50/3600)
     inflow.add(veh_type="rl", edge="inflow_0", name="rl", vehs_per_hour=50)
+    inflow.add(veh_type="idm", edge="inflow_0", name="idm", vehs_per_hour=50)
+    inflow.add(veh_type="idm", edge="inflow_0", name="idm", vehs_per_hour=50)
 
-    inflow.add(veh_type="idm", edge="inflow_1", name="idm", probability=300/3600)
     inflow.add(veh_type="rl", edge="inflow_1", name="rl", vehs_per_hour=50)
+    inflow.add(veh_type="idm", edge="inflow_1", name="idm", vehs_per_hour=50)
+    inflow.add(veh_type="idm", edge="inflow_1", name="idm", vehs_per_hour=50)
+    inflow.add(veh_type="idm", edge="inflow_1", name="idm", vehs_per_hour=50)
     # -->
+
+    # # <-- stochastic setting
+    # inflow = InFlows()
+    
+    # inflow.add(veh_type="idm", edge="inflow_0", name="idm", probability=50/3600)
+    # inflow.add(veh_type="rl", edge="inflow_0", name="rl", vehs_per_hour=50)
+
+    # inflow.add(veh_type="idm", edge="inflow_1", name="idm", probability=300/3600)
+    # inflow.add(veh_type="rl", edge="inflow_1", name="rl", vehs_per_hour=50)
+    # # -->
 
     # note that the vehicles are added sequentially by the generator,
     # so place the merging vehicles after the vehicles in the ring
@@ -126,6 +126,7 @@ def run_task(*_):
                  num_vehicles=1,
                  sumo_car_following_params=SumoCarFollowingParams(
                      tau=1.1,
+                     impatience=0.05
                  ),
                 #  lane_change_mode=1621,
                  lane_change_mode=0,
@@ -164,7 +165,7 @@ def run_task(*_):
         # noise to add to the state space
         # "state_noise": 0.1,
         # what portion of the ramp the RL vehicle isn't controlled for 
-        # "control_length": 0.5,
+        "control_length": 0.5,
     }
 
     env_params = EnvParams(horizon=HORIZON,

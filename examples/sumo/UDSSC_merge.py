@@ -24,21 +24,32 @@ SIM_STEP = 1
 ITR = 50
 
 def merge_example(sumo_binary=None):
-    sumo_params = SumoParams(sim_step=SIM_STEP, sumo_binary="sumo", restart_instance=False)
+    sumo_params = SumoParams(sim_step=SIM_STEP, sumo_binary="sumo-gui", restart_instance=False)
 
+    # <-- deterministic setting
     inflow = InFlows()
-    # inflow.add(veh_type="idm", edge="inflow_1", vehs_per_hour=FLOW_RATE)
-    # inflow.add(veh_type="idm", edge="inflow_0", vehs_per_hour=FLOW_RATE)
-    # inflow.add(veh_type="idm", edge="inflow_1", probability=FLOW_PROB)
-    # inflow.add(veh_type="idm", edge="inflow_0", probability=FLOW_PROB)
-
-    inflow.add(veh_type="idm", edge="inflow_0", name="idm", probability=50/3600)
+    
     inflow.add(veh_type="idm", edge="inflow_0", name="idm", vehs_per_hour=50)
-    # inflow.add(veh_type="idm", edge="inflow_1", name="idm", vehs_per_hour=50)
+    inflow.add(veh_type="idm", edge="inflow_0", name="idm", vehs_per_hour=50)
+    inflow.add(veh_type="idm", edge="inflow_0", name="idm", vehs_per_hour=50)
+    # inflow.add(veh_type="idm", edge="inflow_0", name="idm", vehs_per_hour=50)
 
-    # inflow.add(veh_type="rl", edge="inflow_0", name="rl", probability=50/3600)
-    inflow.add(veh_type="idm", edge="inflow_1", name="idm", probability=300/3600)
     inflow.add(veh_type="idm", edge="inflow_1", name="idm", vehs_per_hour=50)
+    inflow.add(veh_type="idm", edge="inflow_1", name="idm", vehs_per_hour=50)
+    inflow.add(veh_type="idm", edge="inflow_1", name="idm", vehs_per_hour=50)
+    inflow.add(veh_type="idm", edge="inflow_1", name="idm", vehs_per_hour=50)
+    # inflow.add(veh_type="idm", edge="inflow_1", name="idm", vehs_per_hour=50)
+    # -->
+
+    # # <-- stochastic setting
+    # inflow = InFlows()
+    
+    # inflow.add(veh_type="idm", edge="inflow_0", name="idm", probability=50/3600)
+    # inflow.add(veh_type="idm", edge="inflow_0", name="idm", vehs_per_hour=50)
+
+    # inflow.add(veh_type="idm", edge="inflow_1", name="idm", probability=300/3600)
+    # inflow.add(veh_type="idm", edge="inflow_1", name="idm", vehs_per_hour=50)
+    # # -->
 
 
     # note that the vehicles are added sequentially by the generator,
@@ -54,6 +65,7 @@ def merge_example(sumo_binary=None):
                  num_vehicles=1,
                  sumo_car_following_params=SumoCarFollowingParams(
                      tau=1.1,
+                     impatience=0,
                  ),
                  lane_change_mode=1621,
                 #  lane_change_mode=0,
@@ -61,17 +73,23 @@ def merge_example(sumo_binary=None):
 
     additional_env_params = {
         # maximum acceleration for autonomous vehicles, in m/s^2
-        "max_accel": 3,
+        "max_accel": 1,
         # maximum deceleration for autonomous vehicles, in m/s^2
-        "max_decel": 3,
+        "max_decel": 1,
         # desired velocity for all vehicles in the network, in m/s
-        "target_velocity": 15,
+        "target_velocity": 8,
         # number of observable vehicles preceding the rl vehicle
-        "n_preceding": 3,
+        "n_preceding": 1, # HAS TO BE 1
         # number of observable vehicles following the rl vehicle
-        "n_following": 3,
+        "n_following": 1, # HAS TO BE 1
         # number of observable merging-in vehicle from the larger loop
-        "n_merging_in": 4,
+        "n_merging_in": 6,
+        # rl action noise
+        # "rl_action_noise": 0.7,
+        # noise to add to the state space
+        # "state_noise": 0.1,
+        # what portion of the ramp the RL vehicle isn't controlled for 
+        # "control_length": 0.5,
     }
 
     env_params = EnvParams(horizon=HORIZON,
@@ -79,9 +97,9 @@ def merge_example(sumo_binary=None):
 
     additional_net_params = {
         # radius of the loops
-        "ring_radius": 15,
+        "ring_radius": 15,#15.25,
         # length of the straight edges connected the outer loop to the inner loop
-        "lane_length": 30,
+        "lane_length": 55,
         # length of the merge next to the roundabout
         "merge_length": 15,
         # number of lanes in the inner loop
@@ -91,7 +109,7 @@ def merge_example(sumo_binary=None):
         # max speed limit in the roundabout
         "roundabout_speed_limit": 8,
         # max speed limit in the rest of the roundabout
-        "outside_speed_limit": 15,
+        "outside_speed_limit": 8,
         # resolution of the curved portions
         "resolution": 100,
         # num lanes
