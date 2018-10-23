@@ -28,7 +28,7 @@ HORIZON = 500
 SIM_STEP = 1
 BATCH_SIZE = 20000
 ITR = 100
-exp_tag = "ecc_15"  # experiment prefix
+exp_tag = "ecc_16"  # experiment prefix
 
 # Sumo settings
 FLOW_RATE = 350
@@ -38,12 +38,12 @@ FLOW_PROB = FLOW_RATE/3600
 RL_FLOW_RATE = 50
 RL_FLOW_PROB = RL_FLOW_RATE/3600
 
-# Local settings
-N_PARALLEL = 1
-SUMO_BINARY = "sumo"
-MODE = "local"
-RESTART_INSTANCE = False
-SEEDS = [1]
+# # Local settings
+# N_PARALLEL = 1
+# SUMO_BINARY = "sumo"
+# MODE = "local"
+# RESTART_INSTANCE = False
+# SEEDS = [1]
 
 # # EC2 settings
 # N_PARALLEL = 8
@@ -161,11 +161,11 @@ def run_task(*_):
         # number of observable merging-in vehicle from the larger loop
         "n_merging_in": 6,
         # rl action noise
-        "rl_action_noise": 0.7,
+        # "rl_action_noise": 0.7,
         # noise to add to the state space
-        "state_noise": 0.1,
+        # "state_noise": 0.1,
         # what portion of the ramp the RL vehicle isn't controlled for 
-        # "control_length": 0.5,
+        "control_length": 0.25,
     }
 
     env_params = EnvParams(horizon=HORIZON,
