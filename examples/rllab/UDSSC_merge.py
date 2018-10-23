@@ -165,7 +165,7 @@ def run_task(*_):
         # noise to add to the state space
         # "state_noise": 0.1,
         # what portion of the ramp the RL vehicle isn't controlled for 
-        "control_length": 0.5,
+        # "control_length": 0.5,
     }
 
     env_params = EnvParams(horizon=HORIZON,
