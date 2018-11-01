@@ -28,7 +28,7 @@ HORIZON = 500
 SIM_STEP = 1
 BATCH_SIZE = 20000
 ITR = 100
-exp_tag = "ecc_16"  # experiment prefix
+exp_tag = "ecc_17"  # experiment prefix
 
 # Sumo settings
 FLOW_RATE = 350
@@ -40,7 +40,7 @@ RL_FLOW_PROB = RL_FLOW_RATE/3600
 
 # # Local settings
 # N_PARALLEL = 1
-# SUMO_BINARY = "sumo"
+# SUMO_BINARY = "sumo-gui"
 # MODE = "local"
 # RESTART_INSTANCE = False
 # SEEDS = [1]
@@ -125,8 +125,10 @@ def run_task(*_):
                  speed_mode="all_checks",
                  num_vehicles=1,
                  sumo_car_following_params=SumoCarFollowingParams(
+                     accel=1,
+                     decel=1, 
                      tau=1.1,
-                     impatience=0.05
+                     impatience=0
                  ),
                 #  lane_change_mode=1621,
                  lane_change_mode=0,
@@ -142,6 +144,7 @@ def run_task(*_):
                  num_vehicles=1,
                  sumo_car_following_params=SumoCarFollowingParams(
                      tau=1.1,
+                     impatience=0
                  ),
                 #  lane_change_mode="no_lat_collide",
                  lane_change_mode="aggressive",
@@ -165,7 +168,7 @@ def run_task(*_):
         # noise to add to the state space
         # "state_noise": 0.1,
         # what portion of the ramp the RL vehicle isn't controlled for 
-        "control_length": 0.25,
+        "control_length": 0.2,
     }
 
     env_params = EnvParams(horizon=HORIZON,
