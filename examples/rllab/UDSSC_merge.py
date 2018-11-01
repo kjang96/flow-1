@@ -28,7 +28,7 @@ HORIZON = 500
 SIM_STEP = 1
 BATCH_SIZE = 20000
 ITR = 100
-exp_tag = "ecc_19"  # experiment prefix
+exp_tag = "ecc_20"  # experiment prefix
 
 # Sumo settings
 FLOW_RATE = 350
@@ -38,9 +38,9 @@ FLOW_PROB = FLOW_RATE/3600
 RL_FLOW_RATE = 50
 RL_FLOW_PROB = RL_FLOW_RATE/3600
 
-# Local settings
+# # Local settings
 # N_PARALLEL = 1
-# SUMO_BINARY = "sumo-gui"
+# SUMO_BINARY = "sumo"
 # MODE = "local"
 # RESTART_INSTANCE = False
 # SEEDS = [1]
@@ -168,7 +168,7 @@ def run_task(*_):
         # noise to add to the state space
         # "state_noise": 0.1,
         # what portion of the ramp the RL vehicle isn't controlled for 
-        # "control_length": 0.2,
+        "control_length": 0.2,
     }
 
     env_params = EnvParams(horizon=HORIZON,
@@ -178,7 +178,7 @@ def run_task(*_):
         # radius of the loops
         "ring_radius": 15,#15.25,
         # length of the straight edges connected the outer loop to the inner loop
-        "lane_length": 55,
+        "lane_length": 70,
         # length of the merge next to the roundabout
         "merge_length": 15,
         # number of lanes in the inner loop
