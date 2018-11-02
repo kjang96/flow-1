@@ -98,7 +98,7 @@ class UDSSCMergeEnv(Env):
         # Roundabout state = len(MERGE_EDGES) * 3
         # roundabout_full = (ROUNDABOUT_LENGTH // 5) * 2 # 2 cols
         
-        self.total_obs = 7 + \
+        self.total_obs = 7 * 2 + \
                          self.n_merging_in * 4 + \
                          2 + \
                          int(self.roundabout_length // 5) * 2
@@ -153,24 +153,24 @@ class UDSSCMergeEnv(Env):
                     a_max=self.action_space.high)
 
         # Curation
-        # removal = [] 
+        removal = [] 
         removal_2 = []
-        # for rl_id in self.rl_stack:
-        #     if rl_id not in self.vehicles.get_rl_ids():
-        #         removal.append(rl_id)
+        for rl_id in self.rl_stack:
+            if rl_id not in self.vehicles.get_rl_ids():
+                removal.append(rl_id)
         for rl_id in self.rl_stack_2:
             if rl_id not in self.vehicles.get_rl_ids():
                 removal_2.append(rl_id)
-        # for rl_id in removal:
-        #     self.rl_stack.remove(rl_id)
+        for rl_id in removal:
+            self.rl_stack.remove(rl_id)
         for rl_id in removal_2:
             self.rl_stack_2.remove(rl_id)
 
         # Apply RL Actions
-        # if self.rl_stack:
-        #     rl_id = self.rl_stack[0]
-        #     if self.in_control(rl_id):
-        #         self.apply_acceleration([rl_id], rl_actions[:1])
+        if self.rl_stack:
+            rl_id = self.rl_stack[0]
+            if self.in_control(rl_id):
+                self.apply_acceleration([rl_id], rl_actions[:1])
 
         if self.rl_stack_2:
             rl_id_2 = self.rl_stack_2[0]
@@ -288,6 +288,7 @@ class UDSSCMergeEnv(Env):
         * max_speed = 15 
 
         """
+        # import ipdb; ipdb.set_trace()
         # for v in self.rl_stack: 
         #     if v in self.rl_stack_2:
         #         import ipdb; ipdb.set_trace()
@@ -301,7 +302,7 @@ class UDSSCMergeEnv(Env):
         queue_0_norm = ceil(merge_0_norm/5 + 1) # 5 is the car length
         queue_1_norm = ceil(merge_1_norm/5 + 1)
 
-        # rl_info = self.rl_info(self.rl_stack)
+        rl_info = self.rl_info(self.rl_stack)
         rl_info_2 = self.rl_info(self.rl_stack_2)
 
         # DISTANCES
@@ -336,7 +337,7 @@ class UDSSCMergeEnv(Env):
         roundabout_full[:,1] = roundabout_full[:,1]/max_speed
         roundabout_full = roundabout_full.flatten().tolist()
         
-        state = np.array(np.concatenate([rl_info_2,
+        state = np.array(np.concatenate([rl_info, rl_info_2,
                                         merge_dists_0, merge_0_vel,
                                         merge_dists_1, merge_1_vel,
                                         queue_0, queue_1,
@@ -756,9 +757,9 @@ class UDSSCMergeEnv(Env):
         
         # Curate rl_stack
         for veh_id in self.vehicles.get_rl_ids():
-            # if veh_id not in self.rl_stack and self.vehicles.get_edge(veh_id) == "inflow_0":
-            #     self.rl_stack.append(veh_id)
-            if veh_id not in self.rl_stack_2 and self.vehicles.get_edge(veh_id) == "inflow_1":
+            if veh_id not in self.rl_stack and self.vehicles.get_edge(veh_id) == "inflow_0":
+                self.rl_stack.append(veh_id)
+            elif veh_id not in self.rl_stack_2 and self.vehicles.get_edge(veh_id) == "inflow_1":
                 self.rl_stack_2.append(veh_id)
         # Curate second rl_stack
         removal = [] 
