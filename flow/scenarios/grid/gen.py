@@ -2,6 +2,7 @@
 
 from flow.core.generator import Generator
 from collections import defaultdict
+from flow.core.routes import Routes
 
 from lxml import etree
 
@@ -43,6 +44,7 @@ class SimpleGridGenerator(Generator):
 
     def specify_routes(self, net_params):
         """See parent class."""
+
         rts = {}
         row_num = self.grid_array["row_num"]
         col_num = self.grid_array["col_num"]
@@ -390,3 +392,19 @@ class SimpleGridGenerator(Generator):
                 elif 'left' in e:
                     adj_edges[3] = e
             self.node_mapping[node] = adj_edges
+
+class UDSSCGridGenerator(SimpleGridGenerator):
+    def __init__(self, net_params, base):
+        super().__init__(net_params, base)
+
+    def specify_routes(self, net_params):
+        routes = Routes()
+        routes.add("bot0_0", ["bot0_0", "bot0_1"])
+        routes.add("top0_1", ["top0_1", "top0_0"])
+        routes.add("left1_0", ["left1_0", "left0_0"])
+        routes.add("right0_0", ["right0_0", "right1_0" ])
+        routes.add("bot0_1", ["bot0_1"])
+        routes.add("top0_0", ["top0_0"])
+        routes.add("left0_0", ["left0_0"])
+        routes.add("right1_0", ["right1_0"])
+        return routes
