@@ -11,6 +11,7 @@ import time
 from lxml import etree
 import xml.etree.ElementTree as ElementTree
 
+
 try:
     # Import serializable if rllab is installed
     from rllab.core.serializable import Serializable
@@ -244,14 +245,23 @@ class Generator(Serializable):
         # for (edge, route) in self.rts.items():
         #     add.append(E("route", id="route%s" % edge, edges=" ".join(route)))
         if isinstance(self.rts, object):
-            for (dist_id, routes) in self.rts.generate_routes().items():
-                e = E("routeDistribution", id="route%s" % dist_id)
-                for route in routes:
-                    e.append(E("route", 
-                               id=route["route_id"], 
-                               edges=" ".join(route["route"]), 
-                               probability=repr(route["prob"])))
-                add.append(e)
+            try:
+                for (dist_id, routes) in self.rts.generate_routes().items():
+                    e = E("routeDistribution", id="route%s" % dist_id)
+                    for route in routes:
+                        e.append(E("route", 
+                                id=route["route_id"], 
+                                edges=" ".join(route["route"]), 
+                                probability=repr(route["prob"])))
+                    add.append(e)
+            except:
+                print('###################################################')
+                print('POTENTIALLY CARELESS HARDCODING. CHECK THIS, KATHY')
+                print('###################################################')
+                # ORIGINAL VERSION
+                # add the routes to the .add.xml file
+                for (edge, route) in self.rts.items():
+                    add.append(E("route", id="route%s" % edge, edges=" ".join(route)))
 
         elif any(isinstance(x, dict) for x in list(self.rts.values())):
         # CURRENT WORKING VERSION FOR UDSSC_MERGE
@@ -424,6 +434,7 @@ class Generator(Serializable):
             random.shuffle(self.vehicle_ids)
 
         # add the initial positions of vehicles to the xml file
+        # import ipdb; ipdb.set_trace()
         for i, veh_id in enumerate(self.vehicle_ids):
             veh_type = vehicles.get_state(veh_id, "type")
             edge, pos = positions[i]

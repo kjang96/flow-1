@@ -122,6 +122,7 @@ class Env(*classdef):
         # vehicles can traverse; to be used when routes need to be chosen
         # dynamically
         self.available_routes = self.scenario.generator.rts.generate_routes()
+        # self.available_routes = self.scenario.generator.rts#.generate_routes()
 
         # TraCI connection used to communicate with sumo
         self.traci_connection = None
