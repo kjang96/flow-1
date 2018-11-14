@@ -5,6 +5,7 @@ from gym.spaces.box import Box
 from gym.spaces.tuple_space import Tuple
 
 from math import ceil
+from collections import deque
 
 import numpy as np
 
@@ -81,6 +82,11 @@ class UDSSCMergeEnv(Env):
         # Maintained as a stack, only apply_rl_actions to the top 1
         self.rl_stack = []
         self.rl_stack_2 = []
+        
+        # Maintain an array of actions to aid penalizing jerkiness
+        self.past_actions = deque(maxlen=5)
+        self.past_actions_2 = deque(maxlen=5)
+
         super().__init__(env_params, sumo_params, scenario)
 
     @property
@@ -137,7 +143,6 @@ class UDSSCMergeEnv(Env):
         Notes: More efficient to keep a removal list than to resize
         continuously
         """
-
         # Apply noise
         if "rl_action_noise" in self.env_params.additional_params:
             rl_action_noise = self.env_params.additional_params["rl_action_noise"]
@@ -171,11 +176,13 @@ class UDSSCMergeEnv(Env):
             rl_id = self.rl_stack[0]
             if self.in_control(rl_id):
                 self.apply_acceleration([rl_id], rl_actions[:1])
+                self.past_actions.append(rl_actions[0])
 
         if self.rl_stack_2:
             rl_id_2 = self.rl_stack_2[0]
             if self.in_control(rl_id_2):
                 self.apply_acceleration([rl_id_2], rl_actions[1:])
+                self.past_actions_2.append(rl_actions[1])
 
     def compute_reward(self, state, rl_actions, **kwargs):
         """
@@ -187,6 +194,7 @@ class UDSSCMergeEnv(Env):
         avg_vel_reward = rewards.average_velocity(self, fail=kwargs["fail"])
         penalty = rewards.penalize_standstill(self, gain=1.5)
         penalty_2 = rewards.penalize_near_standstill(self, thresh=0.3, gain=1)
+        penalty_jerk = rewards.penalize_jerkiness(self, gain=0.2)
         num_arrived = self.vehicles.get_num_arrived()
     
         total_vel = rewards.total_velocity(self, fail=kwargs["fail"])
@@ -208,7 +216,7 @@ class UDSSCMergeEnv(Env):
         # return total_vel
         # return avg_vel_reward + penalty
         # return min_delay + penalty + penalty_2
-        return min_delay
+        return min_delay + penalty_jerk
 
     def get_state(self, **kwargs):
         """
@@ -784,6 +792,7 @@ class UDSSCMergeEnv(Env):
                             vehID=veh_id, color=(0, 255, 255, 255))
         except:
             pass
+
 
 
 class MultiAgentUDSSCMergeEnv(UDSSCMergeEnv):
