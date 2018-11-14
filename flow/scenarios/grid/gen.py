@@ -408,3 +408,174 @@ class UDSSCGridGenerator(SimpleGridGenerator):
         routes.add("left0_0", ["left0_0"])
         routes.add("right1_0", ["right1_0"])
         return routes
+
+    def specify_types(self, net_params):
+        """See parent class."""
+
+        types = [{"id": "default",
+                  "speed": repr(net_params.additional_params["speed_limit"]),
+                  "priority": repr(2)},]
+
+        return types
+
+    def _build_inner_edges(self):
+        """Build the inner edges.
+
+        First we build all of the column edges. For the upper edge, it would be
+        called right_i_j or left_i_j where i is the row number and j is the
+        column to the right of it.
+
+        For the vertical edges the notation would be bot_i_j or top_i_j where
+        i is the row above it, and j is the column number.
+
+        INDEXED FROM ZERO.
+        """
+        row_num = self.grid_array["row_num"]
+        col_num = self.grid_array["col_num"]
+        inner_length = self.grid_array["inner_length"]
+        edges = []
+
+        # Build the horizontal edges
+        for i in range(row_num):
+            for j in range(col_num - 1):
+                node_index = i * col_num + j
+                index = "{}_{}".format(i, j + 1)
+                self.node_mapping["center{}".format(node_index +
+                                                    1)].append("bot" + index)
+                self.node_mapping["center{}".format(node_index)].append("top" +
+                                                                        index)
+
+                edges += [{
+                    "id": "top" + index,
+                    "type": "default",
+                    "from": "center" + str(node_index + 1),
+                    "to": "center" + str(node_index),
+                    "length": repr(inner_length)
+                }, {
+                    "id": "bot" + index,
+                    "type": "default",
+                    "from": "center" + str(node_index),
+                    "to": "center" + str(node_index + 1),
+                    "length": repr(inner_length)
+                }]
+
+        # Build the vertical edges
+        for i in range(row_num - 1):
+            for j in range(col_num):
+                node_index_bot = i * col_num + j
+                node_index_top = (i + 1) * col_num + j
+                index = str(i + 1) + '_' + str(j)
+                self.node_mapping["center{}".format(node_index_top)].append(
+                    "right" + index)
+                self.node_mapping["center{}".format(node_index_bot)].append(
+                    "left" + index)
+
+                edges += [{
+                    "id": "right" + index,
+                    "type": "default",
+                    "from": "center" + str(node_index_bot),
+                    "to": "center" + str(node_index_top),
+                    "length": repr(inner_length)
+                }, {
+                    "id": "left" + index,
+                    "type": "default",
+                    "from": "center" + str(node_index_top),
+                    "to": "center" + str(node_index_bot),
+                    "length": repr(inner_length)
+                }]
+
+        return edges
+
+    def _build_outer_edges(self):
+        """Build the outer edges.
+
+        Starts with the bottom edges, then the top edges, then the left edges,
+        then the right.
+
+        Yields
+        ------
+        list <dict>
+            List of outer edges
+        """
+        row_num = self.grid_array["row_num"]
+        col_num = self.grid_array["col_num"]
+        short_length = self.grid_array["short_length"]
+        long_length = self.grid_array["long_length"]
+        edges = []
+
+        # create dictionary of node to edges that go to it
+        for i in range(col_num):
+            index = '0_' + str(i)
+            # bottom edges
+            self.node_mapping["center" + str(i)].append("right" + index)
+            edges += [{
+                "id": "right" + index,
+                "type": "default",
+                "from": "bot_col_short" + str(i),
+                "to": "center" + str(i),
+                "length": repr(short_length)
+            }, {
+                "id": "left" + index,
+                "type": "default",
+                "from": "center" + str(i),
+                "to": "bot_col_long" + str(i),
+                "length": repr(long_length)
+            }]
+            # top edges
+            index = str(row_num) + '_' + str(i)
+            center_start = (row_num - 1) * col_num
+            self.node_mapping["center" + str(center_start + i)].append("left" +
+                                                                       index)
+            edges += [{
+                "id": "left" + index,
+                "type": "default",
+                "from": "top_col_short" + str(i),
+                "to": "center" + str(center_start + i),
+                "length": repr(short_length)
+            }, {
+                "id": "right" + index,
+                "type": "default",
+                "from": "center" + str(center_start + i),
+                "to": "top_col_long" + str(i),
+                "length": repr(long_length)
+            }]
+
+        # build the left and then the right edges
+        for j in range(row_num):
+            index = str(j) + '_0'
+            # left edges
+            self.node_mapping["center" + str(j * col_num)].append("bot" +
+                                                                  index)
+            edges += [{
+                "id": "bot" + index,
+                "type": "default",
+                "from": "left_row_short" + str(j),
+                "to": "center" + str(j * col_num),
+                "length": repr(short_length)
+            }, {
+                "id": "top" + index,
+                "type": "default",
+                "from": "center" + str(j * col_num),
+                "to": "left_row_long" + str(j),
+                "length": repr(long_length)
+            }]
+            # right edges
+            index = str(j) + '_' + str(col_num)
+            center_index = (j * col_num) + col_num - 1
+            self.node_mapping["center" + str(center_index)].append("top" +
+                                                                   index)
+            edges += [{
+                "id": "top" + index,
+                "type": "default",
+                "from": "right_row_short" + str(j),
+                "to": "center" + str(center_index),
+                "length": repr(short_length)
+            }, {
+                "id": "bot" + index,
+                "type": "default",
+                "from": "center" + str(center_index),
+                "to": "right_row_long" + str(j),
+                "length": repr(long_length)
+            }]
+
+        return edges
