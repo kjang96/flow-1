@@ -28,7 +28,7 @@ HORIZON = 500
 SIM_STEP = 1
 BATCH_SIZE = 20000
 ITR = 100
-exp_tag = "ecc_27"  # experiment prefix
+exp_tag = "ecc_28"  # experiment prefix
 
 # Sumo settings
 FLOW_RATE = 350
@@ -40,7 +40,7 @@ RL_FLOW_PROB = RL_FLOW_RATE/3600
 
 # # Local settings
 # N_PARALLEL = 1
-# SUMO_BINARY = "sumo"
+# SUMO_BINARY = "sumo-gui"
 # MODE = "local"
 # RESTART_INSTANCE = False
 # SEEDS = [1]
@@ -215,7 +215,7 @@ def run_task(*_):
         initial_config=initial_config
     )
 
-    env_name = "UDSSCMergeEnv"
+    env_name = "UDSSCMergeEnvReset"
     pass_params = (env_name, sumo_params, vehicles, env_params,
                    net_params, initial_config, scenario)
     env = GymEnv(env_name, record_video=False, register_params=pass_params)
