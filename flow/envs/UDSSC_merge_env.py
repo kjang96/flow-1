@@ -1,9 +1,11 @@
 from flow.envs.base_env import Env
 from flow.core import rewards
+from flow.core.params import InitialConfig, NetParams, InFlows
 
 from gym.spaces.box import Box
 from gym.spaces.tuple_space import Tuple
 
+from copy import deepcopy
 from math import ceil
 from collections import deque
 
@@ -793,7 +795,110 @@ class UDSSCMergeEnv(Env):
         except:
             pass
 
+class UDSSCMergeEnvReset(UDSSCMergeEnv):
+    """
+    Creating this class for the purpose of having an experimental
+    reset function.
+    """
+    def __init__(self, env_params, sumo_params, scenario):
+        try:
+            self.max_inflow = env_params.additional_params["max_inflow"]
+        except:
+            self.max_inflow = 7
+        self.len_inflow_0 = 0
+        self.len_inflow_0 = 1
+        super().__init__(env_params, sumo_params, scenario)
 
+    @property
+    def observation_space(self):
+        # state = np.array(np.concatenate([rl_info, rl_info_2,
+        #                                 merge_dists_0, merge_0_vel,
+        #                                 merge_dists_1, merge_1_vel,
+        #                                 queue_0, queue_1,
+        #                                 roundabout_full,
+        #                                 len_inflow_0, len_inflow_1]))
+
+        # rl_info = rl_pos, rl_pos_2, rl_vel, tailway_vel, tailway_dists, headway_vel, headway_dists = 7
+        # rl_info_2 = rl_pos, rl_pos_2, rl_vel, tailway_vel, tailway_dists, headway_vel, headway_dists = 7
+        # merge_info = self.n_merging_in * 4 # 4 variables
+        # queues = 2 # 2 queues
+        # Roundabout state = len(MERGE_EDGES) * 3
+        # roundabout_full = (ROUNDABOUT_LENGTH // 5) * 2 # 2 cols
+        # len_inflow_0 + len_inflow_1 = 2
+        
+        self.total_obs = 7 * 2 + \
+                         self.n_merging_in * 4 + \
+                         2 + \
+                         int(self.roundabout_length // 5) * 2 + \
+                         2
+        # self.total_obs = self.n_obs_vehicles * 2 + 2 + \
+        #                  int(self.roundabout_length // 5) * 2
+                         
+        box = Box(low=0.,
+                  high=1,
+                  shape=(self.total_obs,),
+                  dtype=np.float32)          
+        return box
+
+    def get_state(self, **kwargs):
+        state = super().get_state()
+        len_inflow_0 = self.len_inflow_0 / self.max_inflow
+        len_inflow_1 = self.len_inflow_1 / self.max_inflow
+        state = np.concatenate([state, [len_inflow_0, len_inflow_1]])
+        return state 
+
+    def reset(self):
+        """See parent class.
+
+        The sumo instance is reset with a new ring length, and a number of
+        steps are performed with the rl vehicle acting as a human vehicle.
+        """
+        self.time_counter = 0   
+        # Add variable number of inflows here.
+        inflow = InFlows()
+        inflow.add(veh_type="rl", edge="inflow_0", name="rl", vehs_per_hour=50)
+        inflow.add(veh_type="rl", edge="inflow_1", name="rl", vehs_per_hour=50)
+        self.len_inflow_0 = np.random.randint(1, 4)
+        self.len_inflow_1 = np.random.randint(1, 7)
+        print(self.len_inflow_0)
+        print(self.len_inflow_1)
+        for i in range(self.len_inflow_0+1):
+            inflow.add(veh_type="idm", edge="inflow_0", name="idm", vehs_per_hour=50)
+        for i in range(self.len_inflow_1+1):
+            inflow.add(veh_type="idm", edge="inflow_1", name="idm", vehs_per_hour=50)
+
+        # update the scenario
+        # initial_config = InitialConfig(bunching=50, min_gap=0)
+        initial_config = InitialConfig(
+            x0=50,
+            spacing="custom", # TODO make this custom? 
+            additional_params={"merge_bunching": 0}
+        )
+        additional_net_params = self.scenario.net_params.additional_params
+        net_params = NetParams(inflows=inflow,
+                                no_internal_links=False,
+                                additional_params=additional_net_params)
+
+        self.scenario = self.scenario.__class__(
+            self.scenario.orig_name, self.scenario.generator_class,
+            self.scenario.vehicles, net_params, initial_config)
+
+        self.step_counter = 0
+        # issue a random seed to induce randomness into the next rollout
+        self.sumo_params.seed = np.random.randint(0, 1e5)
+        # modify the vehicles class to match initial data
+        self.vehicles = deepcopy(self.initial_vehicles)
+        # restart the sumo instance
+        self.restart_sumo(self.sumo_params)
+
+        # perform the generic reset function
+        # import ipdb; ipdb.set_trace()
+        observation = super().reset()
+
+        # reset the timer to zero
+        # self.time_counter = 0
+
+        return observation
 
 class MultiAgentUDSSCMergeEnv(UDSSCMergeEnv):
     """Adversarial multi-agent env.

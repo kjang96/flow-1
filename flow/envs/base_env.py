@@ -570,8 +570,11 @@ class Env(*classdef):
         """
         # reset the time counter
         self.time_counter = 0
+        from flow.envs.UDSSC_merge_env import UDSSCMergeEnvReset
 
-        if self.sumo_params.restart_instance or self.step_counter > 2e6:
+        if not isinstance(self, UDSSCMergeEnvReset) and \
+            (self.sumo_params.restart_instance or self.step_counter > 2e6):
+
             self.step_counter = 0
             # issue a random seed to induce randomness into the next rollout
             self.sumo_params.seed = random.randint(0, 1e5)
