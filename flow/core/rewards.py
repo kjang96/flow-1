@@ -215,7 +215,7 @@ def penalize_jerkiness(env, gain=0.2):
         pen += np.var(env.past_actions)
     if env.past_actions_2: 
         pen += np.var(env.past_actions_2)
-    return -pen
+    return -pen * gain
 
 
 
