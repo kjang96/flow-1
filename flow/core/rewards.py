@@ -206,6 +206,17 @@ def penalize_near_standstill(env, thresh=0.3, gain=1):
     penalty = gain * penalize
     return -penalty
 
+def penalize_jerkiness(env, gain=0.2):
+    """
+    A penalty function the penalizes jerky driving 
+    """
+    pen = 0
+    if env.past_actions: # not empty
+        pen += np.var(env.past_actions)
+    if env.past_actions_2: 
+        pen += np.var(env.past_actions_2)
+    return -pen * gain
+
 
 def penalize_jerkiness(env, gain=1):
     """A penalty function the penalizes jerky driving"""
