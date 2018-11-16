@@ -217,12 +217,6 @@ def penalize_jerkiness(env, gain=0.2):
         pen += np.var(env.past_actions_2)
     return -pen * gain
 
-
-def penalize_jerkiness(env, gain=1):
-    """A penalty function the penalizes jerky driving"""
-    pass
-
-
 def penalize_headway_variance(vehicles,
                               vids,
                               normalization=1,

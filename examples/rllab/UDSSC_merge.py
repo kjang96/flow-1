@@ -27,7 +27,7 @@ HORIZON = 500
 SIM_STEP = 1
 BATCH_SIZE = 20000
 ITR = 100
-exp_tag = "ecc_36"  # experiment prefix
+exp_tag = "ecc_37"  # experiment prefix
 
 # Sumo settings
 FLOW_RATE = 350
