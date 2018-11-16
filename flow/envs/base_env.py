@@ -21,8 +21,10 @@ import sumolib
 try:
     # Import serializable if rllab is installed
     from rllab.core.serializable import Serializable
+    serializable_flag = True
 except ImportError:
     Serializable = object
+    serializable_flag = False
 
 try:
     # Load user config if exists, else load default config
