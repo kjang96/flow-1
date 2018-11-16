@@ -14,6 +14,7 @@ from flow.envs.loop.wave_attenuation import WaveAttenuationEnv, \
     WaveAttenuationPOEnv
 from flow.envs.merge import WaveAttenuationMergePOEnv
 from flow.envs.test import TestEnv
+from flow.envs.UDSSC_merge_env import UDSSCMergeEnv
 
 __all__ = [
     "Env", "AccelEnv", "LaneChangeAccelEnv", "LaneChangeAccelPOEnv",

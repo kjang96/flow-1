@@ -19,8 +19,7 @@ from flow.controllers import RLController, IDMController, \
 from flow.core.params import SumoParams, EnvParams, NetParams, InitialConfig, \
     SumoCarFollowingParams, SumoLaneChangeParams
 from flow.core.vehicles import Vehicles
-from flow.scenarios.UDSSC_merge.gen import UDSSCMergingGenerator
-from flow.scenarios.UDSSC_merge.scenario import UDSSCMergingScenario
+from flow.scenarios.UDSSC_scenario import UDSSCMergingScenario
 from flow.core.params import InFlows
 
 # Training settings
@@ -38,12 +37,12 @@ FLOW_PROB = FLOW_RATE/3600
 RL_FLOW_RATE = 50
 RL_FLOW_PROB = RL_FLOW_RATE/3600
 
-# # Local settings
-# N_PARALLEL = 1
-# SUMO_BINARY = "sumo-gui"
-# MODE = "local"
-# RESTART_INSTANCE = False
-# SEEDS = [1]
+# Local settings
+N_PARALLEL = 1
+SUMO_BINARY = "sumo-gui"
+MODE = "local"
+RESTART_INSTANCE = False
+SEEDS = [1]
 
 # # EC2 settings
 # N_PARALLEL = 8
@@ -52,12 +51,12 @@ RL_FLOW_PROB = RL_FLOW_RATE/3600
 # RESTART_INSTANCE = True
 # SEEDS = [1, 2, 5, 91]
 
-# Autoscaler settings
-N_PARALLEL = 10
-SUMO_BINARY = "sumo"
-MODE = "local"
-RESTART_INSTANCE = True
-SEEDS = [1, 2, 5, 91, 104, 32] 
+# # Autoscaler settings
+# N_PARALLEL = 10
+# SUMO_BINARY = "sumo"
+# MODE = "local"
+# RESTART_INSTANCE = True
+# SEEDS = [1, 2, 5, 91, 104, 32] 
 
 def main():
     for seed in SEEDS:
@@ -209,7 +208,6 @@ def run_task(*_):
 
     scenario = UDSSCMergingScenario(
         name=exp_tag,
-        generator_class=UDSSCMergingGenerator,
         vehicles=vehicles,
         net_params=net_params,
         initial_config=initial_config

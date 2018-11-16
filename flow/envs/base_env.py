@@ -130,6 +130,21 @@ class Env(gym.Env, Serializable):
         self.start_sumo()
         self.setup_initial_state()
 
+        # warn about not using restart_instance when using inflows
+        if len(self.scenario.net_params.inflows.get()) > 0 and \
+                not self.sumo_params.restart_instance:
+            print(
+                "**********************************************************\n"
+                "**********************************************************\n"
+                "**********************************************************\n"
+                "WARNING: Inflows will cause computational performance to\n"
+                "significantly decrease after large number of rollouts. In \n"
+                "order to avoid this, set SumoParams(restart_instance=True).\n"
+                "**********************************************************\n"
+                "**********************************************************\n"
+                "**********************************************************"
+            )
+
     def restart_sumo(self, sumo_params, render=None):
         """Restart an already initialized sumo instance.
 
@@ -488,21 +503,6 @@ class Env(gym.Env, Serializable):
         """
         # reset the time counter
         self.time_counter = 0
-
-        # warn about not using restart_instance when using inflows
-        if len(self.scenario.net_params.inflows.get()) > 0 and \
-                not self.sumo_params.restart_instance:
-            print(
-                "**********************************************************\n"
-                "**********************************************************\n"
-                "**********************************************************\n"
-                "WARNING: Inflows will cause computational performance to\n"
-                "significantly decrease after large number of rollouts. In \n"
-                "order to avoid this, set SumoParams(restart_instance=True).\n"
-                "**********************************************************\n"
-                "**********************************************************\n"
-                "**********************************************************"
-            )
 
         if self.sumo_params.restart_instance or self.step_counter > 2e6:
             self.step_counter = 0
