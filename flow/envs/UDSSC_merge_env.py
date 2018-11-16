@@ -1,6 +1,11 @@
 from flow.envs.base_env import Env
 from flow.core import rewards
 from flow.core.params import InitialConfig, NetParams, InFlows
+from flow.controllers import RLController, IDMController, \
+    SumoLaneChangeController, ContinuousRouter
+from flow.core.params import SumoParams, EnvParams, NetParams, InitialConfig, \
+    SumoCarFollowingParams, SumoLaneChangeParams    
+from flow.core.vehicles import Vehicles
 
 from gym.spaces.box import Box
 from gym.spaces.tuple_space import Tuple
@@ -807,7 +812,7 @@ class UDSSCMergeEnvReset(UDSSCMergeEnv):
         except:
             self.max_inflow = 7
         self.len_inflow_0 = 0
-        self.len_inflow_0 = 1
+        self.len_inflow_1 = 0
         super().__init__(env_params, sumo_params, scenario)
 
     @property
@@ -866,21 +871,13 @@ class UDSSCMergeEnvReset(UDSSCMergeEnv):
         for i in range(self.len_inflow_1+1):
             inflow.add(veh_type="idm", edge="inflow_1", name="idm", vehs_per_hour=50)
 
-        # update the scenario
-        # initial_config = InitialConfig(bunching=50, min_gap=0)
-        initial_config = InitialConfig(
-            x0=50,
-            spacing="custom", # TODO make this custom? 
-            additional_params={"merge_bunching": 0}
-        )
-        additional_net_params = self.scenario.net_params.additional_params
-        net_params = NetParams(inflows=inflow,
-                                no_internal_links=False,
-                                additional_params=additional_net_params)
+        # update the scenario\
+        net_params = self.scenario.net_params
+        net_params.inflows = inflow
 
         self.scenario = self.scenario.__class__(
-            self.scenario.orig_name, self.scenario.generator_class,
-            self.scenario.vehicles, net_params, initial_config)
+            self.scenario.orig_name, self.scenario.vehicles, 
+            net_params, self.scenario.initial_config)
 
         self.step_counter = 0
         # issue a random seed to induce randomness into the next rollout
@@ -891,11 +888,7 @@ class UDSSCMergeEnvReset(UDSSCMergeEnv):
         self.restart_sumo(self.sumo_params)
 
         # perform the generic reset function
-        # import ipdb; ipdb.set_trace()
         observation = super().reset()
-
-        # reset the timer to zero
-        # self.time_counter = 0
 
         return observation
 
