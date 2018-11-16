@@ -12,7 +12,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('file', type=str, help='path to the snapshot file')
     parser.add_argument(
-        '--num_rollouts',
+        '-n', '--num_rollouts',
         type=int,
         default=100,
         help='Number of rollouts we will average over')
@@ -25,6 +25,10 @@ if __name__ == "__main__":
         type=str,
         default="traffic_plot",
         help='Prefix for all generated plots')
+    parser.add_argument(
+        '-s', '--sumo',
+         action='store_true',
+         help='Specifies whether to use sumo-gui or not')
     parser.add_argument(
         '--emission_to_csv',
         action='store_true',
@@ -55,6 +59,7 @@ if __name__ == "__main__":
 
     # Set sumo to make a video
     sumo_params = unwrapped_env.sumo_params
+    sumo_params.restart_instance = False
     sumo_params.emission_path = "./test_time_rollout/"
     if args.no_render:
         sumo_params.render = False
@@ -67,6 +72,7 @@ if __name__ == "__main__":
     all_obs = np.zeros((args.num_rollouts, max_path_length, flat_obs))
     all_rewards = np.zeros((args.num_rollouts, max_path_length))
     rew = []
+    vels = []
     for j in range(args.num_rollouts):
         # run a single rollout of the experiment
         path = rollout(env=env, agent=policy)
@@ -76,10 +82,20 @@ if __name__ == "__main__":
         all_obs[j, :new_obs.shape[0], :new_obs.shape[1]] = new_obs
         new_rewards = path['rewards']
         all_rewards[j, :len(new_rewards)] = new_rewards
+        # <--
+        vels.append(np.nanmean(unwrapped_env.velocities))
+        # -->
 
         # print the cumulative reward of the most recent rollout
         print("Round {}, return: {}".format(j, sum(new_rewards)))
         rew.append(sum(new_rewards))
+
+    kathy = unwrapped_env
+    for v in kathy.velocities:
+        if v is np.nan:
+            import ipdb; ipdb.set_trace()
+    avg_vel = np.mean(vels)
+    import ipdb; ipdb.set_trace()
 
     # print the average cumulative reward across rollouts
     print("Average, std return: {}, {}".format(np.mean(rew), np.std(rew)))

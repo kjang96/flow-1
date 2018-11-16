@@ -1,7 +1,7 @@
-# cluster.yaml ========================================= 
+# cluster.yaml =========================================
 
 # An unique identifier for the head node and workers of this cluster.
-cluster_name: kathy #<YOUR NAME>
+cluster_name: ecc_31 #<YOUR NAME>
 
 # The minimum number of workers nodes to launch in addition to the head
 # node. This number should be >= 0.
@@ -39,8 +39,9 @@ auth:
 # For more documentation on available fields, see:
 # http://boto3.readthedocs.io/en/latest/reference/services/ec2.html#EC2.ServiceResource.create_instances
 head_node:
-    InstanceType: m4.10xlarge #c4.4xlarge
-    ImageId: ami-04b53bf506e95394f # Flow AMI (Ubuntu)
+    # InstanceType: m4.10xlarge
+    InstanceType: c4.4xlarge
+    ImageId: ami-0a81780b606a8dbb0 # ami-059a97b61ab36e620 # Flow AMI (Ubuntu)
     InstanceMarketOptions:
         MarketType: spot
          #Additional options can be found in the boto docs, e.g.
@@ -54,8 +55,8 @@ head_node:
 # For more documentation on available fields, see:
 # http://boto3.readthedocs.io/en/latest/reference/services/ec2.html#EC2.ServiceResource.create_instances
 worker_nodes:
-    InstanceType: m4.10xlarge #c4.4xlarge
-    ImageId: ami-04b53bf506e95394f # Flow AMI (Ubuntu)
+    InstanceType: c4.4xlarge
+    ImageId: ami-0a81780b606a8dbb0 # ami-059a97b61ab36e620 # Flow AMI (Ubuntu)
 
     #Run workers on spot by default. Comment this out to use on-demand.
     InstanceMarketOptions:
@@ -68,16 +69,13 @@ worker_nodes:
 
 file_mounts: {
 # path to your repo and the desired branch name
-"/tmp/path": "<PATH TO FLOW>.git/refs/heads/<BRANCH NAME>",
+"/tmp/path": "/Users/kathyjang/research/rllab-multiagent/learning-traffic/.git/refs/heads/roundabout_inflows",
 }
 
 setup_commands:
     # checkout your desired branch on all worker nodes
-    - cd flow && git fetch && git checkout `cat /tmp/path`
-    - cd ray && git fetch eugene_upstream && git checkout eugene_upstream/master && git pull eugene_upstream master
-    - echo 'export PATH="/home/ubuntu/sumo/bin:$PATH"' >> ~/.bashrc
-    - echo 'export SUMO_HOME="/home/ubuntu/sumo"' >> ~/.bashrc
-    - echo 'export PYTHONPATH="/home/ubuntu/sumo/tools:$PYTHONPATH"' >> ~/.bashrc
+    - cd flow && git remote add kathy https://github.com/kjang96/flow-1 && git fetch && git fetch kathy && git checkout `cat /tmp/path`
+    # - git fetch && git fetch kathy && git checkout `cat /tmp/path`
     - echo 'export PATH="/home/ubuntu/anaconda3/bin:$PATH"' >> ~/.bashrc
 # Custom commands that will be run on the head node after common setup.
 head_setup_commands:
@@ -88,19 +86,21 @@ worker_setup_commands: []
 
 # Command to start ray on the head node. You don't need to change this.
 head_start_ray_commands:
-    - ray stop
-    - >-
-      ulimit -n 65536;
-      ray start
-      --head
-      --redis-port=6379
-      --object-manager-port=8076
-      --autoscaling-config=~/ray_bootstrap_config.yaml
-# Command to start ray on worker nodes. You don't need to change this.
+    - ls
+#     - ray stop
+#     - >-
+#       ulimit -n 65536;
+#       ray start
+#       --head
+#       --redis-port=6379
+#       --object-manager-port=8076
+#       --autoscaling-config=~/ray_bootstrap_config.yaml
+# # Command to start ray on worker nodes. You don't need to change this.
 worker_start_ray_commands:
-    - ray stop
-    - >-
-      ulimit -n 65536;
-      ray start
-      --redis-address=$RAY_HEAD_IP:6379
-      --object-manager-port=8076
+    - ls
+#     - ray stop
+#     - >-
+#       ulimit -n 65536;
+#       ray start
+#       --redis-address=$RAY_HEAD_IP:6379
+#       --object-manager-port=8076
