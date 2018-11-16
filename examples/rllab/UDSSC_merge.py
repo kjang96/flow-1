@@ -27,7 +27,7 @@ HORIZON = 500
 SIM_STEP = 1
 BATCH_SIZE = 20000
 ITR = 100
-exp_tag = "ecc_35"  # experiment prefix
+exp_tag = "ecc_36"  # experiment prefix
 
 # Sumo settings
 FLOW_RATE = 350
@@ -163,9 +163,9 @@ def run_task(*_):
         # number of observable merging-in vehicle from the larger loop
         "n_merging_in": 6,
         # rl action noise
-        "rl_action_noise": 0.5,
+        # "rl_action_noise": 0.5,
         # noise to add to the state space
-        "state_noise": 0.1,
+        # "state_noise": 0.1,
         # what portion of the ramp the RL vehicle isn't controlled for 
         "control_length": 0.2,
     }
@@ -213,7 +213,7 @@ def run_task(*_):
         initial_config=initial_config
     )
 
-    env_name = "UDSSCMergeEnv"
+    env_name = "UDSSCMergeEnvReset"
     pass_params = (env_name, sumo_params, vehicles, env_params,
                    net_params, initial_config, scenario)
     env = GymEnv(env_name, record_video=False, register_params=pass_params)
