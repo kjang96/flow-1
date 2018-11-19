@@ -14,10 +14,11 @@ from flow.scenarios.loop import LoopScenario
 from flow.scenarios.merge import MergeScenario
 from flow.scenarios.netfile import NetFileScenario
 from flow.scenarios.loop_merge import TwoLoopsOneMergingScenario
+from flow.scenarios.UDSSC_scenario import UDSSCMergingScenario
 
 __all__ = [
     "Scenario", "BayBridgeScenario", "BayBridgeTollScenario",
     "BottleneckScenario", "Figure8Scenario", "SimpleGridScenario",
     "HighwayScenario", "LoopScenario", "MergeScenario", "NetFileScenario",
-    "TwoLoopsOneMergingScenario"
+    "TwoLoopsOneMergingScenario", "UDSSCMergingScenario"
 ]
