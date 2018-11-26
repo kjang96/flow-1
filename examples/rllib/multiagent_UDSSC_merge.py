@@ -39,12 +39,12 @@ N_ROLLOUTS = 40
 ITR = 100
 exp_tag = "ecc_7"  # experiment prefix
 
-# # Local settings
-# N_CPUS = 1
-# RENDER = True
-# MODE = "local"
-# RESTART_INSTANCE = False
-# SEEDS = [1]
+# Local settings
+N_CPUS = 1
+RENDER = False
+MODE = "local"
+RESTART_INSTANCE = True
+SEEDS = [1]
 
 # # EC2 settings
 # N_CPUS = 8
@@ -53,12 +53,12 @@ exp_tag = "ecc_7"  # experiment prefix
 # RESTART_INSTANCE = True
 # SEEDS = [1, 2, 5, 91]
 
-# Autoscaler settings
-N_CPUS = 20
-RENDER = False
-MODE = "local"
-RESTART_INSTANCE = True
-SEEDS = [1, 2, 5, 91, 104, 32] 
+# # Autoscaler settings
+# N_CPUS = 20
+# RENDER = False
+# MODE = "local"
+# RESTART_INSTANCE = True
+# SEEDS = [1, 2, 5, 91, 104, 32] 
 
 os.environ['MULTIAGENT'] = 'True'
 
@@ -105,10 +105,10 @@ vehicles.add(veh_id="rl",
 
 flow_params = dict(
     # name of the experiment
-    exp_tag='adv_0',
+    exp_tag=exp_tag,
 
     # name of the flow environment the experiment is running on
-    env_name='UDSSCMergeEnv',
+    env_name='MultiAgentUDSSCMergeEnv',
 
     # name of the scenario class the experiment is running on
     scenario='UDSSCMergingScenario',
@@ -209,7 +209,7 @@ if __name__ == '__main__':
     config['lr'] = 0.01
     config['vf_loss_coeff'] = 1.0
     config['num_sgd_iter'] = 30
-    config['vf_clip_param'] = 10.0,
+    config['vf_clip_param'] = 10.0
     # -->
 
     # save the flow params for replay

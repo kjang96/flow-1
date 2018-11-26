@@ -88,7 +88,7 @@ inflow.add(veh_type="idm", edge="inflow_1", name="idm", vehs_per_hour=50)
 
 flow_params = dict(
     # name of the experiment
-    exp_tag='UDSSC_exp',
+    exp_tag=exp_tag,
 
     # name of the flow environment the experiment is running on
     env_name='UDSSCMergeEnv',
