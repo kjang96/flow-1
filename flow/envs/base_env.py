@@ -514,7 +514,7 @@ class Env(*classdef):
                 infos[key] = {}
 
             reward = self.compute_reward(self.state, rl_actions, fail=crash)
-            return next_observation, reward, done, {}
+            return next_observation, reward, done, infos
 
         else:
             # collect information of the state of the network based on the
