@@ -1,6 +1,7 @@
 """Utility method for registering environments with OpenAI gym."""
 
 import gym
+import os
 from gym.envs.registration import register
 
 from copy import deepcopy
@@ -62,11 +63,14 @@ def make_create_env(params, version=0, render=None):
 
     env_params = params['env']
     net_params = params['net']
-    vehicles = params['veh']
+    # vehicles = params['veh']
     initial_config = params.get('initial', InitialConfig())
     traffic_lights = params.get("tls", TrafficLights())
 
     def create_env(*_):
+        sumo_params = deepcopy(params['sumo'])
+        vehicles = deepcopy(params['veh'])
+
         scenario = scenario_class(
             name=exp_tag,
             vehicles=vehicles,
@@ -75,20 +79,32 @@ def make_create_env(params, version=0, render=None):
             traffic_lights=traffic_lights,
         )
 
-        sumo_params = deepcopy(params['sumo'])
-
         if render is not None:
             sumo_params.render = render
 
-        register(
-            id=env_name,
-            entry_point='flow.envs:' + params["env_name"],
-            max_episode_steps=env_params.horizon,
-            kwargs={
-                "env_params": env_params,
-                "sumo_params": sumo_params,
-                "scenario": scenario
-            })
+        multiagent_flag = True and os.environ.get('MULTIAGENT', 0)
+        
+        if multiagent_flag:
+            register(
+                id=env_name,
+                entry_point='flow.envs:' + params["env_name"],
+                # max_episode_steps=env_params.horizon,
+                kwargs={
+                    "env_params": env_params,
+                    "sumo_params": sumo_params,
+                    "scenario": scenario
+                })
+        else:
+            register(
+                id=env_name,
+                entry_point='flow.envs:' + params["env_name"],
+                max_episode_steps=env_params.horizon,
+                kwargs={
+                    "env_params": env_params,
+                    "sumo_params": sumo_params,
+                    "scenario": scenario
+                })
+
         return gym.envs.make(env_name)
 
     return create_env, env_name

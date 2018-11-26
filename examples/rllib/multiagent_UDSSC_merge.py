@@ -34,10 +34,10 @@ from flow.utils.rllib import FlowParamsEncoder
 # Training settings
 HORIZON = 500
 SIM_STEP = 1
-# BATCH_SIZE = 20000
-N_ROLLOUTS = 40
+BATCH_SIZE = 20000
 ITR = 100
-exp_tag = "ecc_7"  # experiment prefix
+N_ROLLOUTS = 40
+exp_tag = "kathy_rllib"  # experiment prefix
 
 # Local settings
 N_CPUS = 1
@@ -46,19 +46,12 @@ MODE = "local"
 RESTART_INSTANCE = True
 SEEDS = [1]
 
-# # EC2 settings
-# N_CPUS = 8
-# RENDER = False
-# MODE = "ec2"
-# RESTART_INSTANCE = True
-# SEEDS = [1, 2, 5, 91]
-
 # # Autoscaler settings
-# N_CPUS = 20
+# N_CPUS = 10
 # RENDER = False
 # MODE = "local"
 # RESTART_INSTANCE = True
-# SEEDS = [1, 2, 5, 91, 104, 32] 
+# SEEDS = [1, 2, 5, 91, 104, 32]  
 
 os.environ['MULTIAGENT'] = 'True'
 

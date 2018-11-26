@@ -58,8 +58,8 @@ WHITE = (255, 255, 255, 255)
 CYAN = (0, 255, 255, 255)
 RED = (255, 0, 0, 255)
 
-
-class Env(gym.Env, Serializable):
+class Env(*classdef):
+    # class Env(gym.Env, Serializable):
     """Base environment class.
 
     Provides the interface for controlling a SUMO simulation. Using this
@@ -514,6 +514,7 @@ class Env(gym.Env, Serializable):
                 infos[key] = {}
 
             reward = self.compute_reward(self.state, rl_actions, fail=crash)
+            return next_observation, reward, done, {}
 
         else:
             # collect information of the state of the network based on the
