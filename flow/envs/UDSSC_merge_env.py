@@ -847,10 +847,74 @@ class UDSSCMergeEnvReset(UDSSCMergeEnv):
         return box
 
     def get_state(self, **kwargs):
-        state = super().get_state()
+        rl_id = None
+        
+        # Get normalization factors 
+        circ = self.circumference()
+        max_speed = self.scenario.max_speed 
+        merge_0_norm = sum([self.scenario.edge_length(e) for e in RAMP_0])
+        merge_1_norm = sum([self.scenario.edge_length(e) for e in RAMP_1])
+        queue_0_norm = ceil(merge_0_norm/5 + 1) # 5 is the car length
+        queue_1_norm = ceil(merge_1_norm/5 + 1)
+
+        rl_info = self.rl_info(self.rl_stack)
+        rl_info_2 = self.rl_info(self.rl_stack_2)
+
+        # DISTANCES
+        # sorted by closest to farthest
+        merge_id_0, merge_id_1 = self.k_closest_to_merge(self.n_merging_in)
+        merge_dists_0 = self.process(self._dist_to_merge_0(merge_id_0),
+                                    length=self.n_merging_in,
+                                    normalizer=merge_0_norm)
+        merge_dists_1 = self.process(self._dist_to_merge_1(merge_id_1),
+                                    length=self.n_merging_in,
+                                    normalizer=merge_1_norm)
+
+
+        # VELOCITIES
+        merge_0_vel = self.process(self.vehicles.get_speed(merge_id_0),
+                                length=self.n_merging_in,
+                                normalizer=max_speed)
+        merge_1_vel = self.process(self.vehicles.get_speed(merge_id_1),
+                                length=self.n_merging_in,
+                                normalizer=max_speed)
+
+        queue_0, queue_1 = self.queue_length()
+        queue_0 = [queue_0 / queue_0_norm]
+        queue_1 = [queue_1 / queue_1_norm]
+        
+        roundabout_full = self.roundabout_full()
+        
+        # Normalize the 0th column containing absolute position
+        roundabout_full[:,0] = roundabout_full[:,0]/self.roundabout_length
+
+        # Normalize the 1st column containing velocities
+        roundabout_full[:,1] = roundabout_full[:,1]/max_speed
+        roundabout_full = roundabout_full.flatten().tolist()
+        
+        state = np.array(np.concatenate([rl_info, rl_info_2,
+                                        merge_dists_0, merge_0_vel,
+                                        merge_dists_1, merge_1_vel,
+                                        queue_0, queue_1,
+                                        roundabout_full]))
+
         len_inflow_0 = self.len_inflow_0 / self.max_inflow
         len_inflow_1 = self.len_inflow_1 / self.max_inflow
         state = np.concatenate([state, [len_inflow_0, len_inflow_1]])
+
+        if "state_noise" in self.env_params.additional_params:
+            var = self.env_params.additional_params.get("state_noise")
+            for i, st in enumerate(state):
+                perturbation = np.random.normal(0, var) 
+                state[i] = st + perturbation
+
+            # Reclip
+            if isinstance(self.observation_space, Box):
+                state = np.clip(
+                    state,
+                    a_min=self.observation_space.low,
+                    a_max=self.observation_space.high)
+
         return state 
 
     def reset(self):
