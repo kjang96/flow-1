@@ -1,7 +1,7 @@
 # cluster.yaml ========================================= 
 
 # An unique identifier for the head node and workers of this cluster.
-cluster_name: kathy #<YOUR NAME>
+cluster_name: ma_0 #<YOUR NAME>
 
 # The minimum number of workers nodes to launch in addition to the head
 # node. This number should be >= 0.
@@ -68,14 +68,15 @@ worker_nodes:
 
 file_mounts: {
 # path to your repo and the desired branch name
-"/tmp/path": "/Users/kathyjang/research/rllab-multiagent/learning-traffic/.git/refs/heads/roundabout",
+"/tmp/path": "/Users/kathyjang/research/rllab-multiagent/learning-traffic/.git/refs/heads/ma_roundabout",
 }
 
 setup_commands:
     # checkout your desired branch on all worker nodes
     #- cd flow && git fetch && git checkout `cat /tmp/path`
     - cd flow && git remote add kathy https://github.com/kjang96/flow-1 && git fetch && git fetch kathy && git checkout `cat /tmp/path`
-    - cd ray && git fetch eugene_upstream && git checkout eugene_upstream/master && git pull eugene_upstream master
+    # - cd ray && git fetch eugene_upstream && git checkout eugene_upstream/master && git pull eugene_upstream master
+    - cd ray && git fetch eugene_upstream && git checkout ea06420d925f82c58edd98a6ebb9bb5c3acbc3bc
     - echo 'export PATH="/home/ubuntu/sumo/bin:$PATH"' >> ~/.bashrc
     - echo 'export SUMO_HOME="/home/ubuntu/sumo"' >> ~/.bashrc
     - echo 'export PYTHONPATH="/home/ubuntu/sumo/tools:$PYTHONPATH"' >> ~/.bashrc
