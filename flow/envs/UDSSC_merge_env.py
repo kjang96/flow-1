@@ -866,6 +866,12 @@ class UDSSCMergeEnvReset(UDSSCMergeEnv):
         inflow.add(veh_type="rl", edge="inflow_1", name="rl", vehs_per_hour=50)
         self.len_inflow_0 = np.random.randint(1, 4)
         self.len_inflow_1 = np.random.randint(1, 7)
+        
+        # Forcing the default
+        if np.random.random() < 0.2:
+            self.len_inflow_0 = 2
+            self.len_inflow_1 = 3
+
         for i in range(self.len_inflow_0+1):
             inflow.add(veh_type="idm", edge="inflow_0", name="idm", vehs_per_hour=50)
         for i in range(self.len_inflow_1+1):
