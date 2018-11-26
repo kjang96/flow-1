@@ -240,7 +240,7 @@ if __name__ == '__main__':
         flow_params['exp_tag']: {
             'run': 'PPO',
             'env': env_name,
-            'checkpoint_freq': 1,
+            'checkpoint_freq': 20,
             'stop': {
                 'training_iteration': ITR
             },
