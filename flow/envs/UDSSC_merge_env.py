@@ -957,23 +957,13 @@ class MultiAgentUDSSCMergeEnv(MultiEnv, UDSSCMergeEnv):
         """The agent receives the class definition reward,
         the adversary recieves the negative of the agent reward
         """
-        if self.env_params.evaluate:
-            reward = np.mean(self.vehicles.get_speed(self.vehicles.get_ids()))
-            return {'av': reward, 'adversary': -reward}
-        else:
-            reward = rewards.desired_velocity(self, fail=kwargs['fail'])
-            return {'av': reward, 'adversary': -reward}
-
-        vel_reward = rewards.desired_velocity(self, fail=kwargs["fail"])
-        avg_vel_reward = rewards.average_velocity(self, fail=kwargs["fail"])
-        penalty = rewards.penalize_standstill(self, gain=1.5)
-        penalty_2 = rewards.penalize_near_standstill(self, thresh=0.3, gain=1)
-        num_arrived = self.vehicles.get_num_arrived()
-        total_vel = rewards.total_velocity(self, fail=kwargs["fail"])
-        min_delay = rewards.min_delay(self)
-        if np.isnan(vel_reward):
-            vel_reward = 0
-        reward = min_delay + penalty + penalty_2
+        # if self.env_params.evaluate:
+        #     reward = np.mean(self.vehicles.get_speed(self.vehicles.get_ids()))
+        #     return {'av': reward, 'adversary': -reward}
+        # else:
+        #     reward = rewards.desired_velocity(self, fail=kwargs['fail'])
+        #     return {'av': reward, 'adversary': -reward}
+        reward = super().compute_reward(rl_actions, kwargs)
         return {'av': reward, 'adversary': -reward}
 
     def get_state(self, **kwargs):
