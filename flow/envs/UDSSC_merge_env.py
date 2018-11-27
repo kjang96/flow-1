@@ -917,7 +917,7 @@ class MultiAgentUDSSCMergeEnv(MultiEnv, UDSSCMergeEnv):
             rl_action_noise = self.env_params.additional_params["rl_action_noise"]
             for i, rl_action in enumerate(av_action):
                 perturbation = np.random.normal(0, rl_action_noise) # 0.7 is arbitrary. but since accels are capped at +- 1 i don't want thi sto be too big
-                av_action[i] = av_action + perturbation
+                av_action[i] = rl_action + perturbation
 
             # Reclip
             if isinstance(self.action_space, Box):
