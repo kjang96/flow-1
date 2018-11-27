@@ -6,7 +6,6 @@ the accelerations of figure eight."""
 # the negative of the AV reward
 
 import json
-import os
 
 import ray
 import ray.rllib.agents.ppo as ppo
@@ -34,10 +33,9 @@ from flow.utils.rllib import FlowParamsEncoder
 # Training settings
 HORIZON = 500
 SIM_STEP = 1
-BATCH_SIZE = 20000
 ITR = 100
 N_ROLLOUTS = 40
-exp_tag = "ma_0"  # experiment prefix
+exp_tag = "ma_1"  # experiment prefix
 
 # # Local settings
 # N_CPUS = 1
@@ -53,7 +51,6 @@ MODE = "local"
 RESTART_INSTANCE = True
 SEEDS = [1, 2, 5, 91, 104, 32]  
 
-os.environ['MULTIAGENT'] = 'True'
 
 inflow = InFlows()
     

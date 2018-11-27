@@ -1,4 +1,5 @@
 from flow.envs.base_env import Env
+from flow.envs.multiagent_env import MultiEnv
 from flow.core import rewards
 from flow.core.params import InitialConfig, NetParams, InFlows
 from flow.controllers import RLController, IDMController, \
@@ -15,6 +16,8 @@ from math import ceil
 from collections import deque
 
 import numpy as np
+
+
 
 ADDITIONAL_ENV_PARAMS = {
     # maximum acceleration for autonomous vehicles, in m/s^2
@@ -898,7 +901,7 @@ class UDSSCMergeEnvReset(UDSSCMergeEnv):
 
         return observation
 
-class MultiAgentUDSSCMergeEnv(UDSSCMergeEnv):
+class MultiAgentUDSSCMergeEnv(MultiEnv, UDSSCMergeEnv):
     """Adversarial multi-agent env.
 
     Multi-agent env for UDSSC with an adversarial agent perturbing
@@ -950,7 +953,7 @@ class MultiAgentUDSSCMergeEnv(UDSSCMergeEnv):
                 rl_action = av_action[1] + perturb_weight * adv_action[1]
                 self.apply_acceleration([rl_id_2], [rl_action])
 
-    def compute_reward(self, state, rl_actions, **kwargs):
+    def compute_reward(self, rl_actions, **kwargs):
         """The agent receives the class definition reward,
         the adversary recieves the negative of the agent reward
         """
