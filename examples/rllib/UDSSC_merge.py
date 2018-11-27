@@ -22,7 +22,7 @@ SIM_STEP = 1
 BATCH_SIZE = 20000
 ITR = 100
 N_ROLLOUTS = 40
-exp_tag = "kathy_rllib"  # experiment prefix
+exp_tag = "ma_12"  # experiment prefix
 
 # # Local settings
 # N_CPUS = 1
@@ -124,7 +124,7 @@ flow_params = dict(
             # noise to add to the state space
             # "state_noise": 0.1,
             # what portion of the ramp the RL vehicle isn't controlled for 
-            "control_length": 0.1,
+            # "control_length": 0.1,
         }
     ),
 
