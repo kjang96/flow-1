@@ -17,7 +17,7 @@ from flow.scenarios.figure_eight import ADDITIONAL_NET_PARAMS
 # time horizon of a single rollout
 HORIZON = 1500
 # number of rollouts per training iteration
-N_ROLLOUTS = 20
+N_ROLLOUTS = 2
 # number of parallel workers
 N_CPUS = 2
 
@@ -40,7 +40,7 @@ vehicles.add(
 
 flow_params = dict(
     # name of the experiment
-    exp_tag='figure_eight_intersection_control',
+    exp_tag='KATHY_TEST',
 
     # name of the flow environment the experiment is running on
     env_name='AccelEnv',
@@ -119,10 +119,11 @@ if __name__ == '__main__':
             'config': {
                 **config
             },
-            'checkpoint_freq': 20,
+            'checkpoint_freq': 1,
             'max_failures': 999,
             'stop': {
-                'training_iteration': 200,
+                'training_iteration': 2,
             },
+            'upload_dir': 's3://kathy.experiments/rllib/experiments',
         }
     })

@@ -1,7 +1,7 @@
 # cluster.yaml ========================================= 
 
 # An unique identifier for the head node and workers of this cluster.
-cluster_name: ma_1 #<YOUR NAME>
+cluster_name: KATHY_TEST #<YOUR NAME>
 
 # The minimum number of workers nodes to launch in addition to the head
 # node. This number should be >= 0.
@@ -40,7 +40,7 @@ auth:
 # http://boto3.readthedocs.io/en/latest/reference/services/ec2.html#EC2.ServiceResource.create_instances
 head_node:
     InstanceType: c4.4xlarge #m4.10xlarge
-    ImageId: ami-03f80ac11fbac7395 # Flow AMI (Ubuntu)
+    ImageId: ami-07f4c196b2dc1ad23 # Flow AMI (Ubuntu)
     InstanceMarketOptions:
         MarketType: spot
          #Additional options can be found in the boto docs, e.g.
@@ -55,7 +55,7 @@ head_node:
 # http://boto3.readthedocs.io/en/latest/reference/services/ec2.html#EC2.ServiceResource.create_instances
 worker_nodes:
     InstanceType: c4.4xlarge #m4.10xlarge
-    ImageId: ami-03f80ac11fbac7395 # Flow AMI (Ubuntu)
+    ImageId: ami-07f4c196b2dc1ad23 # Flow AMI (Ubuntu)
 
     #Run workers on spot by default. Comment this out to use on-demand.
     InstanceMarketOptions:
@@ -74,9 +74,9 @@ file_mounts: {
 setup_commands:
     # checkout your desired branch on all worker nodes
     #- cd flow && git fetch && git checkout `cat /tmp/path`
-    - cd flow && git remote add kathy https://github.com/kjang96/flow-1 && git fetch && git fetch kathy && git checkout `cat /tmp/path`
-    # - cd ray && git fetch eugene_upstream && git checkout eugene_upstream/master && git pull eugene_upstream master
-    - cd ray && git fetch eugene_upstream && git checkout ea06420d925f82c58edd98a6ebb9bb5c3acbc3bc
+    # - cd flow && git remote add kathy https://github.com/kjang96/flow-1 && git fetch && git fetch kathy && git checkout `cat /tmp/path`
+    - cd flow && git fetch kathy && git checkout `cat /tmp/path`
+    - cd ray && git fetch origin && git checkout origin/master && git pull origin master
     - echo 'export PATH="/home/ubuntu/sumo/bin:$PATH"' >> ~/.bashrc
     - echo 'export SUMO_HOME="/home/ubuntu/sumo"' >> ~/.bashrc
     - echo 'export PYTHONPATH="/home/ubuntu/sumo/tools:$PYTHONPATH"' >> ~/.bashrc
