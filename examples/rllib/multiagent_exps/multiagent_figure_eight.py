@@ -32,7 +32,7 @@ HORIZON = 1500
 # number of rollouts per training iteration
 N_ROLLOUTS = 4
 # number of parallel workers
-N_CPUS = 2
+N_CPUS = 10
 
 # We place one autonomous vehicle and 13 human-driven vehicles in the network
 vehicles = Vehicles()
@@ -53,7 +53,7 @@ vehicles.add(
 
 flow_params = dict(
     # name of the experiment
-    exp_tag='multiagent_figure_eight',
+    exp_tag='kathy_multiagent_figure_eight',
 
     # name of the flow environment the experiment is running on
     env_name='MultiAgentAccelEnv',
@@ -155,9 +155,9 @@ if __name__ == '__main__':
         flow_params['exp_tag']: {
             'run': alg_run,
             'env': env_name,
-            'checkpoint_freq': 1,
+            'checkpoint_freq': 20,
             'stop': {
-                'training_iteration': 1
+                'training_iteration': 100
             },
             'config': config,
             # 'upload_dir': 's3://<BUCKET NAME>'
