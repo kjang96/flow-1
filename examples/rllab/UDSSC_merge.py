@@ -27,7 +27,7 @@ HORIZON = 500
 SIM_STEP = 1
 BATCH_SIZE = 20000
 ITR = 100
-exp_tag = "ecc_50"  # experiment prefix
+exp_tag = "ecc_51"  # experiment prefix
 
 # Sumo settings
 FLOW_RATE = 350
@@ -156,9 +156,9 @@ def run_task(*_):
         # number of observable merging-in vehicle from the larger loop
         "n_merging_in": 6,
         # rl action noise
-        # "rl_action_noise": 0.5,
+        "rl_action_noise": 0.5,
         # noise to add to the state space
-        "state_noise": 0.1,
+        # "state_noise": 0.1,
         # what portion of the ramp the RL vehicle isn't controlled for 
         # "control_length": 0.1,
     }
