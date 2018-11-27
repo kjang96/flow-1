@@ -1,7 +1,7 @@
 # cluster.yaml ========================================= 
 
 # An unique identifier for the head node and workers of this cluster.
-cluster_name: ma_8 #<YOUR NAME>
+cluster_name: ma_9 #<YOUR NAME>
 
 # The minimum number of workers nodes to launch in addition to the head
 # node. This number should be >= 0.
@@ -76,7 +76,7 @@ setup_commands:
     #- cd flow && git fetch && git checkout `cat /tmp/path`
     # - cd flow && git remote add kathy https://github.com/kjang96/flow-1 && git fetch && git fetch kathy && git checkout `cat /tmp/path`
     - cd flow && git fetch kathy && git checkout `cat /tmp/path`
-    - cd ray && git fetch origin && git checkout origin/master && git pull origin master
+    - cd ray && git fetch origin && git checkout origin/ray_merge && git pull origin ray_merge
     - echo 'export PATH="/home/ubuntu/sumo/bin:$PATH"' >> ~/.bashrc
     - echo 'export SUMO_HOME="/home/ubuntu/sumo"' >> ~/.bashrc
     - echo 'export PYTHONPATH="/home/ubuntu/sumo/tools:$PYTHONPATH"' >> ~/.bashrc
