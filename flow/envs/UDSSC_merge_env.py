@@ -963,7 +963,7 @@ class MultiAgentUDSSCMergeEnv(MultiEnv, UDSSCMergeEnv):
         # else:
         #     reward = rewards.desired_velocity(self, fail=kwargs['fail'])
         #     return {'av': reward, 'adversary': -reward}
-        reward = super().compute_reward(rl_actions, kwargs)
+        reward = super().compute_reward(rl_actions, **kwargs)
         return {'av': reward, 'adversary': -reward}
 
     def get_state(self, **kwargs):
