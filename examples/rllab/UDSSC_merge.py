@@ -27,7 +27,7 @@ HORIZON = 500
 SIM_STEP = 1
 BATCH_SIZE = 20000
 ITR = 100
-exp_tag = "ecc_52"  # experiment prefix
+exp_tag = "sa_fixed_1"  # experiment prefix
 
 # Sumo settings
 FLOW_RATE = 350
@@ -49,7 +49,7 @@ N_PARALLEL = 10
 SUMO_BINARY = "sumo"
 MODE = "local"
 RESTART_INSTANCE = True
-SEEDS = [1, 2, 5, 91, 104, 32] 
+SEEDS = [1, 5, 91, 104] 
 
 def main():
     for seed in SEEDS:
@@ -156,9 +156,9 @@ def run_task(*_):
         # number of observable merging-in vehicle from the larger loop
         "n_merging_in": 6,
         # rl action noise
-        "rl_action_noise": 0.5,
+        # "rl_action_noise": 0.5,
         # noise to add to the state space
-        "state_noise": 0.1,
+        # "state_noise": 0.1,
         # what portion of the ramp the RL vehicle isn't controlled for 
         # "control_length": 0.1,
     }
@@ -206,7 +206,7 @@ def run_task(*_):
         initial_config=initial_config
     )
 
-    env_name = "UDSSCMergeEnvReset"
+    env_name = "UDSSCMergeEnv"
     pass_params = (env_name, sumo_params, vehicles, env_params,
                    net_params, initial_config, scenario)
     env = GymEnv(env_name, record_video=False, register_params=pass_params)
