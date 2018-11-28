@@ -35,11 +35,11 @@ HORIZON = 500
 SIM_STEP = 1
 ITR = 100
 N_ROLLOUTS = 40
-exp_tag = "ma_16"  # experiment prefix
+exp_tag = "ma_17"  # experiment prefix
 
 # # Local settings
 # N_CPUS = 1
-# RENDER = False
+# RENDER = True
 # MODE = "local"
 # RESTART_INSTANCE = True
 # # SEEDS = [1]
@@ -65,33 +65,38 @@ inflow.add(veh_type="idm", edge="inflow_1", name="idm", vehs_per_hour=50)
 
 # We place one autonomous vehicle and 13 human-driven vehicles in the network
 vehicles = Vehicles()
+# Inner ring vehicles
 vehicles.add(veh_id="idm",
-                 acceleration_controller=(IDMController, {"noise": 0.1}),
-                 lane_change_controller=(SumoLaneChangeController, {}),
-                 routing_controller=(ContinuousRouter, {}),
-                 speed_mode="all_checks",
-                 num_vehicles=1,
-                 sumo_car_following_params=SumoCarFollowingParams(
-                     tau=1.1,
-                 ),
-                #  lane_change_mode=1621,
-                 lane_change_mode=0,
-                 sumo_lc_params=SumoLaneChangeParams())
+             acceleration_controller=(IDMController, {"noise": 0.1}),
+             lane_change_controller=(SumoLaneChangeController, {}),
+             routing_controller=(ContinuousRouter, {}),
+             speed_mode="all_checks",
+             num_vehicles=1,
+             sumo_car_following_params=SumoCarFollowingParams(
+                 accel=1,
+                 decel=1, 
+                 tau=1.1,
+                 impatience=0.05
+             ),
+         #  lane_change_mode=1621,
+             lane_change_mode=0,
+             sumo_lc_params=SumoLaneChangeParams())
 
 # A single learning agent in the inner ring
 vehicles.add(veh_id="rl",
-                acceleration_controller=(RLController, {}),
-            # acceleration_controller=(IDMController, {}),
-                lane_change_controller=(SumoLaneChangeController, {}),
-                routing_controller=(ContinuousRouter, {}),
-                speed_mode="no_collide",
-                num_vehicles=1,
-                sumo_car_following_params=SumoCarFollowingParams(
-                    tau=1.1,
-                ),
-            #  lane_change_mode="no_lat_collide",
-                lane_change_mode="aggressive",
-                sumo_lc_params=SumoLaneChangeParams())
+             acceleration_controller=(RLController, {}),
+         # acceleration_controller=(IDMController, {}),
+             lane_change_controller=(SumoLaneChangeController, {}),
+             routing_controller=(ContinuousRouter, {}),
+             speed_mode="no_collide",
+             num_vehicles=1,
+             sumo_car_following_params=SumoCarFollowingParams(
+                 tau=1.1,
+                 impatience=0.05
+             ),
+         #  lane_change_mode="no_lat_collide",
+             lane_change_mode="aggressive",
+             sumo_lc_params=SumoLaneChangeParams())
 
 flow_params = dict(
     # name of the experiment
@@ -130,9 +135,9 @@ flow_params = dict(
             # number of observable merging-in vehicle from the larger loop
             "n_merging_in": 6,
             # rl action noise
-            "rl_action_noise": 0.5,
+            # "rl_action_noise": 0.5,
             # noise to add to the state space
-            "state_noise": 0.1,
+            # "state_noise": 0.1,
             # what portion of the ramp the RL vehicle isn't controlled for 
             # "control_length": 0.1,
             'perturb_weight': 0.03
