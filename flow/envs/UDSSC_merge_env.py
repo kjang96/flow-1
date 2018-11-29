@@ -850,10 +850,75 @@ class UDSSCMergeEnvReset(UDSSCMergeEnv):
         return box
 
     def get_state(self, **kwargs):
-        state = super().get_state()
+        
+        rl_id = None
+        
+        # Get normalization factors 
+        circ = self.circumference()
+        max_speed = self.scenario.max_speed 
+        merge_0_norm = sum([self.scenario.edge_length(e) for e in RAMP_0])
+        merge_1_norm = sum([self.scenario.edge_length(e) for e in RAMP_1])
+        queue_0_norm = ceil(merge_0_norm/5 + 1) # 5 is the car length
+        queue_1_norm = ceil(merge_1_norm/5 + 1)
+
+        rl_info = self.rl_info(self.rl_stack)
+        rl_info_2 = self.rl_info(self.rl_stack_2)
+
+        # DISTANCES
+        # sorted by closest to farthest
+        merge_id_0, merge_id_1 = self.k_closest_to_merge(self.n_merging_in)
+        merge_dists_0 = self.process(self._dist_to_merge_0(merge_id_0),
+                                    length=self.n_merging_in,
+                                    normalizer=merge_0_norm)
+        merge_dists_1 = self.process(self._dist_to_merge_1(merge_id_1),
+                                    length=self.n_merging_in,
+                                    normalizer=merge_1_norm)
+
+
+        # VELOCITIES
+        merge_0_vel = self.process(self.vehicles.get_speed(merge_id_0),
+                                length=self.n_merging_in,
+                                normalizer=max_speed)
+        merge_1_vel = self.process(self.vehicles.get_speed(merge_id_1),
+                                length=self.n_merging_in,
+                                normalizer=max_speed)
+
+        queue_0, queue_1 = self.queue_length()
+        queue_0 = [queue_0 / queue_0_norm]
+        queue_1 = [queue_1 / queue_1_norm]
+        
+        roundabout_full = self.roundabout_full()
+        
+        # Normalize the 0th column containing absolute position
+        roundabout_full[:,0] = roundabout_full[:,0]/self.roundabout_length
+
+        # Normalize the 1st column containing velocities
+        roundabout_full[:,1] = roundabout_full[:,1]/max_speed
+        roundabout_full = roundabout_full.flatten().tolist()
+        
+        state = np.array(np.concatenate([rl_info, rl_info_2,
+                                        merge_dists_0, merge_0_vel,
+                                        merge_dists_1, merge_1_vel,
+                                        queue_0, queue_1,
+                                        roundabout_full]))
+
         len_inflow_0 = self.len_inflow_0 / self.max_inflow
         len_inflow_1 = self.len_inflow_1 / self.max_inflow
         state = np.concatenate([state, [len_inflow_0, len_inflow_1]])
+
+        if "state_noise" in self.env_params.additional_params:
+            var = self.env_params.additional_params.get("state_noise")
+            for i, st in enumerate(state):
+                perturbation = np.random.normal(0, var) 
+                state[i] = st + perturbation
+
+            # Reclip
+            if isinstance(self.observation_space, Box):
+                state = np.clip(
+                    state,
+                    a_min=self.observation_space.low,
+                    a_max=self.observation_space.high)
+
         return state 
 
     def reset(self):
@@ -902,6 +967,80 @@ class UDSSCMergeEnvReset(UDSSCMergeEnv):
         return observation
 
 class MultiAgentUDSSCMergeEnv(MultiEnv, UDSSCMergeEnv):
+    """Adversarial multi-agent env.
+
+    Multi-agent env for UDSSC with an adversarial agent perturbing
+    the accelerations of the autonomous vehicle
+    """
+    def _apply_rl_actions(self, rl_actions):
+        """See class definition."""
+        av_action = rl_actions['av']
+        adv_action = rl_actions['adversary']
+        perturb_weight = self.env_params.additional_params['perturb_weight']
+        # Apply noise
+        if "rl_action_noise" in self.env_params.additional_params:
+            rl_action_noise = self.env_params.additional_params["rl_action_noise"]
+            for i, rl_action in enumerate(av_action):
+                perturbation = np.random.normal(0, rl_action_noise) # 0.7 is arbitrary. but since accels are capped at +- 1 i don't want thi sto be too big
+                av_action[i] = rl_action + perturbation
+
+            # Reclip
+            if isinstance(self.action_space, Box):
+                av_action = np.clip(
+                    av_action,
+                    a_min=self.action_space.low,
+                    a_max=self.action_space.high)
+
+        # Curation
+        removal = [] 
+        removal_2 = []
+        for rl_id in self.rl_stack:
+            if rl_id not in self.vehicles.get_rl_ids():
+                removal.append(rl_id)
+        for rl_id in self.rl_stack_2:
+            if rl_id not in self.vehicles.get_rl_ids():
+                removal_2.append(rl_id)
+        for rl_id in removal:
+            self.rl_stack.remove(rl_id)
+        for rl_id in removal_2:
+            self.rl_stack_2.remove(rl_id)
+
+        # Apply RL Actions
+        if self.rl_stack:
+            rl_id = self.rl_stack[0]
+            if self.in_control(rl_id):
+                rl_action = av_action[0] + perturb_weight * adv_action[0]
+                self.apply_acceleration([rl_id], [rl_action])
+
+        if self.rl_stack_2:
+            rl_id_2 = self.rl_stack_2[0]
+            if self.in_control(rl_id_2):
+                rl_action = av_action[1] + perturb_weight * adv_action[1]
+                self.apply_acceleration([rl_id_2], [rl_action])
+
+    def compute_reward(self, rl_actions, **kwargs):
+        """The agent receives the class definition reward,
+        the adversary recieves the negative of the agent reward
+        """
+        # if self.env_params.evaluate:
+        #     reward = np.mean(self.vehicles.get_speed(self.vehicles.get_ids()))
+        #     return {'av': reward, 'adversary': -reward}
+        # else:
+        #     reward = rewards.desired_velocity(self, fail=kwargs['fail'])
+        #     return {'av': reward, 'adversary': -reward}
+        reward = super().compute_reward(rl_actions, **kwargs)
+        return {'av': reward, 'adversary': -reward}
+
+    def get_state(self, **kwargs):
+        """See class definition for the state. Both adversary and
+        agent receive the same state
+        """
+        
+        state = super().get_state(**kwargs)
+        return {'av': state, 'adversary': state}
+
+
+class MultiAgentUDSSCMergeEnvReset(MultiEnv, UDSSCMergeEnvReset):
     """Adversarial multi-agent env.
 
     Multi-agent env for UDSSC with an adversarial agent perturbing
