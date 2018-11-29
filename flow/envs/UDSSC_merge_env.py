@@ -808,12 +808,10 @@ class UDSSCMergeEnvReset(UDSSCMergeEnv):
     reset function.
     """
     def __init__(self, env_params, sumo_params, scenario):
-        try:
-            self.max_inflow = env_params.additional_params["max_inflow"]
-        except:
-            self.max_inflow = 7
-        self.len_inflow_0 = 0
-        self.len_inflow_1 = 0
+        self.range_inflow_0 = env_params.additional_params['range_inflow_0']
+        self.range_inflow_1 = env_params.additional_params['range_inflow_1']
+        self.max_inflow = max(self.range_inflow_0 + self.range_inflow_1)
+
         super().__init__(env_params, sumo_params, scenario)
 
     @property
@@ -929,17 +927,17 @@ class UDSSCMergeEnvReset(UDSSCMergeEnv):
         inflow = InFlows()
         inflow.add(veh_type="rl", edge="inflow_0", name="rl", vehs_per_hour=50)
         inflow.add(veh_type="rl", edge="inflow_1", name="rl", vehs_per_hour=50)
-        self.len_inflow_0 = np.random.randint(1, 4)
-        self.len_inflow_1 = np.random.randint(1, 7)
+        self.len_inflow_0 = np.random.randint(self.range_inflow_0[0], self.range_inflow_0[1]+1)
+        self.len_inflow_1 = np.random.randint(self.range_inflow_1[0], self.range_inflow_1[1]+1)
         
         # Forcing the default
         if np.random.random() < 0.2:
             self.len_inflow_0 = 2
             self.len_inflow_1 = 3
 
-        for i in range(self.len_inflow_0+1):
+        for i in range(self.len_inflow_0):
             inflow.add(veh_type="idm", edge="inflow_0", name="idm", vehs_per_hour=50)
-        for i in range(self.len_inflow_1+1):
+        for i in range(self.len_inflow_1):
             inflow.add(veh_type="idm", edge="inflow_1", name="idm", vehs_per_hour=50)
 
         # update the scenario\
