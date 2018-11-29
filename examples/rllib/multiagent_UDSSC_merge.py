@@ -35,21 +35,21 @@ HORIZON = 500
 SIM_STEP = 1
 ITR = 100
 N_ROLLOUTS = 40
-exp_tag = "ma_28"  # experiment prefix
+exp_tag = "ma_29"  # experiment prefix
 
-# Local settings
-N_CPUS = 1
-RENDER = True
-MODE = "local"
-RESTART_INSTANCE = True
-# SEEDS = [1]
-
-# # Autoscaler settings
-# N_CPUS = 10
-# RENDER = False
+# # Local settings
+# N_CPUS = 1
+# RENDER = True
 # MODE = "local"
 # RESTART_INSTANCE = True
-# SEEDS = [1, 2, 5, 91, 104, 32]  
+# # SEEDS = [1]
+
+# Autoscaler settings
+N_CPUS = 10
+RENDER = False
+MODE = "local"
+RESTART_INSTANCE = True
+SEEDS = [1, 2, 5, 91, 104, 32]  
 
 
 inflow = InFlows()
@@ -135,9 +135,9 @@ flow_params = dict(
             # number of observable merging-in vehicle from the larger loop
             "n_merging_in": 6,
             # rl action noise
-            "rl_action_noise": 0.5,
+            # "rl_action_noise": 0.5,
             # noise to add to the state space
-            "state_noise": 0.1,
+            # "state_noise": 0.1,
             # what portion of the ramp the RL vehicle isn't controlled for 
             # "control_length": 0.1,
             'perturb_weight': 0.03,
