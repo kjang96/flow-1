@@ -200,14 +200,14 @@ class UDSSCMergeEnv(Env):
         - average velocity
         - penalizing standstill
         """
-        vel_reward = rewards.desired_velocity(self, fail=kwargs["fail"])
-        avg_vel_reward = rewards.average_velocity(self, fail=kwargs["fail"])
+        # vel_reward = rewards.desired_velocity(self, fail=kwargs["fail"])
+        # avg_vel_reward = rewards.average_velocity(self, fail=kwargs["fail"])
         penalty = rewards.penalize_standstill(self, gain=1)
         penalty_2 = rewards.penalize_near_standstill(self, thresh=0.2, gain=1)
         penalty_jerk = rewards.penalize_jerkiness(self, gain=0.05)
-        num_arrived = self.vehicles.get_num_arrived()
+        # num_arrived = self.vehicles.get_num_arrived()
     
-        total_vel = rewards.total_velocity(self, fail=kwargs["fail"])
+        # total_vel = rewards.total_velocity(self, fail=kwargs["fail"])
         min_delay = rewards.min_delay(self)
 
         # Use a similar weighting of of the headway reward as the velocity
@@ -220,8 +220,8 @@ class UDSSCMergeEnv(Env):
         # headway_reward = 0.2 * max_cost * rewards.penalize_headway_variance(
             # self.vehicles, self.sorted_extra_data, normalization)
         # return vel_reward + headway_reward
-        if np.isnan(vel_reward):
-            vel_reward = 0
+        # if np.isnan(vel_reward):
+        #     vel_reward = 0
         # return vel_reward + penalty + penalty_2
         # return total_vel
         # return avg_vel_reward + penalty
@@ -850,7 +850,7 @@ class UDSSCMergeEnvReset(UDSSCMergeEnv):
         return box
 
     def get_state(self, **kwargs):
-        
+
         rl_id = None
         
         # Get normalization factors 
