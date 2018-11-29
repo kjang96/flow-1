@@ -35,7 +35,7 @@ HORIZON = 500
 SIM_STEP = 1
 ITR = 100
 N_ROLLOUTS = 40
-exp_tag = "ma_29"  # experiment prefix
+exp_tag = "ma_30"  # experiment prefix
 
 # # Local settings
 # N_CPUS = 1
@@ -137,7 +137,7 @@ flow_params = dict(
             # rl action noise
             # "rl_action_noise": 0.5,
             # noise to add to the state space
-            # "state_noise": 0.1,
+            "state_noise": 0.1,
             # what portion of the ramp the RL vehicle isn't controlled for 
             # "control_length": 0.1,
             'perturb_weight': 0.03,
