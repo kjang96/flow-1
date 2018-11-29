@@ -37,19 +37,19 @@ ITR = 100
 N_ROLLOUTS = 40
 exp_tag = "ma_28"  # experiment prefix
 
-# # Local settings
-# N_CPUS = 1
-# RENDER = True
-# MODE = "local"
-# RESTART_INSTANCE = True
-# # SEEDS = [1]
-
-# Autoscaler settings
-N_CPUS = 10
-RENDER = False
+# Local settings
+N_CPUS = 1
+RENDER = True
 MODE = "local"
 RESTART_INSTANCE = True
-SEEDS = [1, 2, 5, 91, 104, 32]  
+# SEEDS = [1]
+
+# # Autoscaler settings
+# N_CPUS = 10
+# RENDER = False
+# MODE = "local"
+# RESTART_INSTANCE = True
+# SEEDS = [1, 2, 5, 91, 104, 32]  
 
 
 inflow = InFlows()
@@ -140,7 +140,11 @@ flow_params = dict(
             "state_noise": 0.1,
             # what portion of the ramp the RL vehicle isn't controlled for 
             # "control_length": 0.1,
-            'perturb_weight': 0.03
+            'perturb_weight': 0.03,
+            # range of inflow lengths for inflow_0, inclusive
+            "range_inflow_0": [1, 4],
+            # range of inflow lengths for inflow_1, inclusive
+            "range_inflow_1": [1, 7],
         },
     ),
 

@@ -307,10 +307,6 @@ class UDSSCMergeEnv(Env):
         * max_speed = 15 
 
         """
-        # import ipdb; ipdb.set_trace()
-        # for v in self.rl_stack: 
-        #     if v in self.rl_stack_2:
-        #         import ipdb; ipdb.set_trace()
         rl_id = None
         
         # Get normalization factors 
@@ -810,12 +806,10 @@ class UDSSCMergeEnvReset(UDSSCMergeEnv):
     reset function.
     """
     def __init__(self, env_params, sumo_params, scenario):
-        try:
-            self.max_inflow = env_params.additional_params["max_inflow"]
-        except:
-            self.max_inflow = 7
-        self.len_inflow_0 = 0
-        self.len_inflow_1 = 0
+        self.range_inflow_0 = env_params.additional_params['range_inflow_0']
+        self.range_inflow_1 = env_params.additional_params['range_inflow_1']
+        self.max_inflow = max(self.range_inflow_0 + self.range_inflow_1)
+
         super().__init__(env_params, sumo_params, scenario)
 
     @property
@@ -840,8 +834,6 @@ class UDSSCMergeEnvReset(UDSSCMergeEnv):
                          2 + \
                          int(self.roundabout_length // 5) * 2 + \
                          2
-        # self.total_obs = self.n_obs_vehicles * 2 + 2 + \
-        #                  int(self.roundabout_length // 5) * 2
                          
         box = Box(low=0.,
                   high=1,
@@ -932,17 +924,17 @@ class UDSSCMergeEnvReset(UDSSCMergeEnv):
         inflow = InFlows()
         inflow.add(veh_type="rl", edge="inflow_0", name="rl", vehs_per_hour=50)
         inflow.add(veh_type="rl", edge="inflow_1", name="rl", vehs_per_hour=50)
-        self.len_inflow_0 = np.random.randint(1, 4)
-        self.len_inflow_1 = np.random.randint(1, 7)
-        
+        self.len_inflow_0 = np.random.randint(self.range_inflow_0[0], self.range_inflow_0[1]+1)
+        self.len_inflow_1 = np.random.randint(self.range_inflow_1[0], self.range_inflow_1[1]+1)
+
         # Forcing the default
         if np.random.random() < 0.2:
             self.len_inflow_0 = 2
             self.len_inflow_1 = 3
 
-        for i in range(self.len_inflow_0+1):
+        for i in range(self.len_inflow_0):
             inflow.add(veh_type="idm", edge="inflow_0", name="idm", vehs_per_hour=50)
-        for i in range(self.len_inflow_1+1):
+        for i in range(self.len_inflow_1):
             inflow.add(veh_type="idm", edge="inflow_1", name="idm", vehs_per_hour=50)
 
         # update the scenario\
@@ -972,6 +964,7 @@ class MultiAgentUDSSCMergeEnv(MultiEnv, UDSSCMergeEnv):
     Multi-agent env for UDSSC with an adversarial agent perturbing
     the accelerations of the autonomous vehicle
     """
+
     def _apply_rl_actions(self, rl_actions):
         """See class definition."""
         av_action = rl_actions['av']
@@ -1046,6 +1039,7 @@ class MultiAgentUDSSCMergeEnvReset(MultiEnv, UDSSCMergeEnvReset):
     Multi-agent env for UDSSC with an adversarial agent perturbing
     the accelerations of the autonomous vehicle
     """
+
     def _apply_rl_actions(self, rl_actions):
         """See class definition."""
         av_action = rl_actions['av']
@@ -1096,12 +1090,6 @@ class MultiAgentUDSSCMergeEnvReset(MultiEnv, UDSSCMergeEnvReset):
         """The agent receives the class definition reward,
         the adversary recieves the negative of the agent reward
         """
-        # if self.env_params.evaluate:
-        #     reward = np.mean(self.vehicles.get_speed(self.vehicles.get_ids()))
-        #     return {'av': reward, 'adversary': -reward}
-        # else:
-        #     reward = rewards.desired_velocity(self, fail=kwargs['fail'])
-        #     return {'av': reward, 'adversary': -reward}
         reward = super().compute_reward(rl_actions, **kwargs)
         return {'av': reward, 'adversary': -reward}
 
@@ -1109,6 +1097,50 @@ class MultiAgentUDSSCMergeEnvReset(MultiEnv, UDSSCMergeEnvReset):
         """See class definition for the state. Both adversary and
         agent receive the same state
         """
-        
         state = super().get_state(**kwargs)
         return {'av': state, 'adversary': state}
+
+    def reset(self):
+        """See parent class.
+
+        The sumo instance is reset with a new ring length, and a number of
+        steps are performed with the rl vehicle acting as a human vehicle.
+        """
+        self.time_counter = 0   
+        # Add variable number of inflows here.
+        inflow = InFlows()
+        inflow.add(veh_type="rl", edge="inflow_0", name="rl", vehs_per_hour=50)
+        inflow.add(veh_type="rl", edge="inflow_1", name="rl", vehs_per_hour=50)
+        self.len_inflow_0 = np.random.randint(self.range_inflow_0[0], self.range_inflow_0[1]+1)
+        self.len_inflow_1 = np.random.randint(self.range_inflow_1[0], self.range_inflow_1[1]+1)
+        
+        # Forcing the default
+        if np.random.random() < 0.2:
+            self.len_inflow_0 = 2
+            self.len_inflow_1 = 3
+
+        for i in range(self.len_inflow_0):
+            inflow.add(veh_type="idm", edge="inflow_0", name="idm", vehs_per_hour=50)
+        for i in range(self.len_inflow_1):
+            inflow.add(veh_type="idm", edge="inflow_1", name="idm", vehs_per_hour=50)
+
+        # update the scenario\
+        net_params = self.scenario.net_params
+        net_params.inflows = inflow
+
+        self.scenario = self.scenario.__class__(
+            self.scenario.orig_name, self.scenario.vehicles, 
+            net_params, self.scenario.initial_config)
+
+        self.step_counter = 0
+        # issue a random seed to induce randomness into the next rollout
+        self.sumo_params.seed = np.random.randint(0, 1e5)
+        # modify the vehicles class to match initial data
+        self.vehicles = deepcopy(self.initial_vehicles)
+        # restart the sumo instance
+        self.restart_sumo(self.sumo_params)
+
+        # perform the generic reset function
+        observation = super().reset()
+
+        return observation

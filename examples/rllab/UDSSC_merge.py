@@ -37,12 +37,12 @@ FLOW_PROB = FLOW_RATE/3600
 RL_FLOW_RATE = 50
 RL_FLOW_PROB = RL_FLOW_RATE/3600
 
-# # # Local settings
-# N_PARALLEL = 1
-# SUMO_BINARY = "sumo-gui"
-# MODE = "local"
-# RESTART_INSTANCE = False
-# SEEDS = [1]
+# # Local settings
+N_PARALLEL = 1
+SUMO_BINARY = "sumo-gui"
+MODE = "local"
+RESTART_INSTANCE = True
+SEEDS = [1]
 
 # # EC2 settings
 # N_PARALLEL = 8
@@ -51,12 +51,12 @@ RL_FLOW_PROB = RL_FLOW_RATE/3600
 # RESTART_INSTANCE = True
 # SEEDS = [1, 2, 5, 91]
 
-# Autoscaler settings
-N_PARALLEL = 10
-SUMO_BINARY = "sumo"
-MODE = "local"
-RESTART_INSTANCE = True
-SEEDS = [1, 2, 5, 91, 104, 32] 
+# # Autoscaler settings
+# N_PARALLEL = 10
+# SUMO_BINARY = "sumo"
+# MODE = "local"
+# RESTART_INSTANCE = True
+# SEEDS = [1, 2, 5, 91, 104, 32] 
 
 def main():
     for seed in SEEDS:
@@ -168,6 +168,10 @@ def run_task(*_):
         # "state_noise": 0.1,
         # what portion of the ramp the RL vehicle isn't controlled for 
         # "control_length": 0.1,
+        # range of inflow lengths for inflow_0, inclusive
+        "range_inflow_0": [1, 4],
+        # range of inflow lengths for inflow_1, inclusive
+        "range_inflow_1": [1, 7],
     }
 
     env_params = EnvParams(horizon=HORIZON,
