@@ -184,8 +184,13 @@ class MultiEnv(MultiAgentEnv, Env):
         #         "**********************************************************\n"
         #         "**********************************************************"
         #     )
-
-        if self.sumo_params.restart_instance or self.step_counter > 2e6:
+        from flow.envs.UDSSC_merge_env import UDSSCMergeEnvReset
+        from flow.envs.UDSSC_merge_env import MultiAgentUDSSCMergeEnvReset
+        
+        if not isinstance(self, UDSSCMergeEnvReset) and \
+           not isinstance(self, MultiAgentUDSSCMergeEnvReset) and \
+            (self.sumo_params.restart_instance or self.step_counter > 2e6):
+            
             self.step_counter = 0
             # issue a random seed to induce randomness into the next rollout
             self.sumo_params.seed = random.randint(0, 1e5)
