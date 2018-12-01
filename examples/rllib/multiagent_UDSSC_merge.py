@@ -35,11 +35,11 @@ HORIZON = 500
 SIM_STEP = 1
 ITR = 100
 N_ROLLOUTS = 40
-exp_tag = "ma_34"  # experiment prefix
+exp_tag = "ma_33"  # experiment prefix
 
 # # Local settings
-# N_CPUS = 1
-# RENDER = True
+# N_CPUS = 2
+# RENDER = False
 # MODE = "local"
 # RESTART_INSTANCE = True
 # # SEEDS = [1]
@@ -190,7 +190,7 @@ flow_params = dict(
 )
 
 if __name__ == '__main__':
-    ray.init()
+    ray.init(num_cpus=N_CPUS + 1, redirect_output=False)
 
     config = ppo.DEFAULT_CONFIG.copy()
     config['num_workers'] = N_CPUS
