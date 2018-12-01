@@ -35,7 +35,7 @@ HORIZON = 500
 SIM_STEP = 1
 ITR = 100
 N_ROLLOUTS = 40
-exp_tag = "ma_33"  # experiment prefix
+exp_tag = "ma_34"  # experiment prefix
 
 # # Local settings
 # N_CPUS = 1
@@ -140,7 +140,8 @@ flow_params = dict(
             # "state_noise": 0.1,
             # what portion of the ramp the RL vehicle isn't controlled for 
             # "control_length": 0.1,
-            'perturb_weight': 0.03,
+            # 'perturb_weight': 0.03,
+            'perturb_weight': 0,
             # range of inflow lengths for inflow_0, inclusive
             "range_inflow_0": [1, 4],
             # range of inflow lengths for inflow_1, inclusive
