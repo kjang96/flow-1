@@ -53,7 +53,7 @@ vehicles.add(
 
 flow_params = dict(
     # name of the experiment
-    exp_tag='ma_f8_1',
+    exp_tag='ma_f8_2',
 
     # name of the flow environment the experiment is running on
     env_name='MultiAgentAccelEnv',
@@ -96,22 +96,36 @@ flow_params = dict(
 
 
 def setup_exps():
-
     alg_run = 'PPO'
     agent_cls = get_agent_class(alg_run)
     config = agent_cls._default_config.copy()
     config['num_workers'] = N_CPUS
     config['train_batch_size'] = HORIZON * N_ROLLOUTS
-    config['simple_optimizer'] = True
     config['gamma'] = 0.999  # discount rate
-    config['model'].update({'fcnet_hiddens': [100, 50, 25]})
+    config['model'].update({'fcnet_hiddens': [32, 32]}) #DIFF
     config['use_gae'] = True
     config['lambda'] = 0.97
-    config['sgd_minibatch_size'] = 128
     config['kl_target'] = 0.02
     config['num_sgd_iter'] = 10
     config['horizon'] = HORIZON
-    config['observation_filter'] = 'NoFilter'
+
+    ### <-- old params
+    # alg_run = 'PPO'
+    # agent_cls = get_agent_class(alg_run)
+    # config = agent_cls._default_config.copy()
+    # config['num_workers'] = N_CPUS
+    # config['train_batch_size'] = HORIZON * N_ROLLOUTS
+    # config['simple_optimizer'] = True
+    # config['gamma'] = 0.999  # discount rate
+    # config['model'].update({'fcnet_hiddens': [100, 50, 25]})
+    # config['use_gae'] = True
+    # config['lambda'] = 0.97
+    # config['sgd_minibatch_size'] = 128
+    # config['kl_target'] = 0.02
+    # config['num_sgd_iter'] = 10
+    # config['horizon'] = HORIZON
+    # config['observation_filter'] = 'NoFilter'
+    ### -->
 
     # save the flow params for replay
     flow_json = json.dumps(

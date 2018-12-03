@@ -52,7 +52,7 @@ for i in range(NUM_RINGS):
 
 flow_params = dict(
     # name of the experiment
-    exp_tag='ma_ring_1',
+    exp_tag='ma_ring_2',
 
     # name of the flow environment the experiment is running on
     env_name='MultiWaveAttenuationPOEnv',
@@ -105,12 +105,24 @@ def setup_exps():
     config = agent_cls._default_config.copy()
     config['num_workers'] = N_CPUS
     config['train_batch_size'] = HORIZON * N_ROLLOUTS
-    config['simple_optimizer'] = True
     config['gamma'] = 0.999  # discount rate
-    config['model'].update({'fcnet_hiddens': [32, 32]})
-    config['lr'] = tune.grid_search([1e-5])
+    config['model'].update({'fcnet_hiddens': [32, 32]}) #DIFF
+    config['use_gae'] = True
+    config['lambda'] = 0.97
+    config['kl_target'] = 0.02
+    config['num_sgd_iter'] = 10
     config['horizon'] = HORIZON
-    config['observation_filter'] = 'NoFilter'
+    # alg_run = 'PPO'
+    # agent_cls = get_agent_class(alg_run)
+    # config = agent_cls._default_config.copy()
+    # config['num_workers'] = N_CPUS
+    # config['train_batch_size'] = HORIZON * N_ROLLOUTS
+    # config['simple_optimizer'] = True
+    # config['gamma'] = 0.999  # discount rate
+    # config['model'].update({'fcnet_hiddens': [32, 32]})
+    # config['lr'] = tune.grid_search([1e-5])
+    # config['horizon'] = HORIZON
+    # config['observation_filter'] = 'NoFilter'
 
     # save the flow params for replay
     flow_json = json.dumps(
