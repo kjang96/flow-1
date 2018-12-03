@@ -22,7 +22,7 @@ SIM_STEP = 1
 # BATCH_SIZE = 20000
 ITR = 100
 N_ROLLOUTS = 40
-exp_tag = "ma_35"  # experiment prefix
+exp_tag = "ma_41"  # experiment prefix
 
 # # Local settings
 # N_CPUS = 1
@@ -91,7 +91,7 @@ flow_params = dict(
     exp_tag=exp_tag,
 
     # name of the flow environment the experiment is running on
-    env_name='UDSSCMergeEnvReset',
+    env_name='UDSSCMergeEnv',
 
     # name of the scenario class the experiment is running on
     scenario='UDSSCMergingScenario',
