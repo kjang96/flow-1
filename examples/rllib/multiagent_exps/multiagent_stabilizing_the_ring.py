@@ -26,13 +26,13 @@ from flow.utils.rllib import FlowParamsEncoder
 
 # make sure (sample_batch_size * num_workers ~= train_batch_size)
 # time horizon of a single rollout
-HORIZON = 3000
+HORIZON = 1500
 # Number of rings
 NUM_RINGS = 1
 # number of rollouts per training iteration
 N_ROLLOUTS = 20  # int(20/NUM_RINGS)
 # number of parallel workers
-N_CPUS = 2  # int(20/NUM_RINGS)
+N_CPUS = 10 # int(20/NUM_RINGS)
 
 # We place one autonomous vehicle and 21 human-driven vehicles in the network
 vehicles = Vehicles()
@@ -52,7 +52,7 @@ for i in range(NUM_RINGS):
 
 flow_params = dict(
     # name of the experiment
-    exp_tag='lord_of_numrings{}'.format(NUM_RINGS),
+    exp_tag='ma_ring_0',
 
     # name of the flow environment the experiment is running on
     env_name='MultiWaveAttenuationPOEnv',
@@ -157,7 +157,7 @@ if __name__ == '__main__':
             'env': env_name,
             'checkpoint_freq': 1,
             'stop': {
-                'training_iteration': 1
+                'training_iteration': 80
             },
             'config': config,
             # 'upload_dir': 's3://<BUCKET NAME>'

@@ -30,7 +30,7 @@ from flow.utils.rllib import FlowParamsEncoder
 # time horizon of a single rollout
 HORIZON = 1500
 # number of rollouts per training iteration
-N_ROLLOUTS = 4
+N_ROLLOUTS = 20
 # number of parallel workers
 N_CPUS = 10
 
@@ -53,7 +53,7 @@ vehicles.add(
 
 flow_params = dict(
     # name of the experiment
-    exp_tag='kathy_multiagent_figure_eight',
+    exp_tag='ma_f8_0',
 
     # name of the flow environment the experiment is running on
     env_name='MultiAgentAccelEnv',
@@ -157,7 +157,7 @@ if __name__ == '__main__':
             'env': env_name,
             'checkpoint_freq': 20,
             'stop': {
-                'training_iteration': 100
+                'training_iteration': 80
             },
             'config': config,
             # 'upload_dir': 's3://<BUCKET NAME>'
