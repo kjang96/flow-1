@@ -26,11 +26,11 @@ from flow.utils.rllib import FlowParamsEncoder
 
 # make sure (sample_batch_size * num_workers ~= train_batch_size)
 # time horizon of a single rollout
-HORIZON = 1500
+HORIZON = 500
 # Number of rings
 NUM_RINGS = 1
 # number of rollouts per training iteration
-N_ROLLOUTS = 20  # int(20/NUM_RINGS)
+N_ROLLOUTS = 40  # int(20/NUM_RINGS)
 # number of parallel workers
 N_CPUS = 10 # int(20/NUM_RINGS)
 
@@ -52,7 +52,7 @@ for i in range(NUM_RINGS):
 
 flow_params = dict(
     # name of the experiment
-    exp_tag='ma_ring_2',
+    exp_tag='ma_ring_3',
 
     # name of the flow environment the experiment is running on
     env_name='MultiWaveAttenuationPOEnv',
@@ -62,7 +62,7 @@ flow_params = dict(
 
     # sumo-related parameters (see flow.core.params.SumoParams)
     sumo=SumoParams(
-        sim_step=0.1,
+        sim_step=1,
         render=False,
     ),
 

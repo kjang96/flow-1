@@ -28,9 +28,9 @@ from flow.utils.registry import make_create_env
 from flow.utils.rllib import FlowParamsEncoder
 
 # time horizon of a single rollout
-HORIZON = 1500
+HORIZON = 500
 # number of rollouts per training iteration
-N_ROLLOUTS = 20
+N_ROLLOUTS = 40
 # number of parallel workers
 N_CPUS = 10
 
@@ -53,7 +53,7 @@ vehicles.add(
 
 flow_params = dict(
     # name of the experiment
-    exp_tag='ma_f8_2',
+    exp_tag='ma_f8_3',
 
     # name of the flow environment the experiment is running on
     env_name='MultiAgentAccelEnv',
@@ -63,7 +63,7 @@ flow_params = dict(
 
     # sumo-related parameters (see flow.core.params.SumoParams)
     sumo=SumoParams(
-        sim_step=0.1,
+        sim_step=1,
         render=False,
     ),
 
