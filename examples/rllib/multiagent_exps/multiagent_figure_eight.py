@@ -53,7 +53,7 @@ vehicles.add(
 
 flow_params = dict(
     # name of the experiment
-    exp_tag='ma_f8_3',
+    exp_tag='ma_f8_4',
 
     # name of the flow environment the experiment is running on
     env_name='MultiAgentAccelEnv',
@@ -105,7 +105,7 @@ def setup_exps():
     config['model'].update({'fcnet_hiddens': [32, 32]}) #DIFF
     config['use_gae'] = True
     config['lambda'] = 0.97
-    config['kl_target'] = 0.02
+    config['kl_target'] = 0.002
     config['num_sgd_iter'] = 10
     config['horizon'] = HORIZON
 
