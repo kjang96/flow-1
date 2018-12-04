@@ -198,6 +198,25 @@ def penalize_standstill(env, gain=1):
     penalty = gain * num_standstill
     return -penalty
 
+def penalize_speeding(env, gain=1, fail=False):
+    """
+    Not meant for use with desired_velocity, because
+    that reward function already enforces the speed limit
+    """
+    vel = np.array(env.vehicles.get_speed(env.vehicles.get_ids()))
+    num_vehicles = env.vehicles.num_vehicles
+
+    if any(vel < -100) or fail:
+        return 0.
+
+    target_vel = env.env_params.additional_params['target_velocity']
+    max_cost = np.array([target_vel] * num_vehicles)
+
+    cost = target_vel - vel # if under the speed limit 
+    cost = np.array([0 if x >= 0 else abs(x) for x in cost])
+    cost = sum(cost)
+
+    return min(0, -cost)
 
 def penalize_near_standstill(env, thresh=0.3, gain=1):
     veh_ids = env.vehicles.get_ids()

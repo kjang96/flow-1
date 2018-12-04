@@ -27,7 +27,7 @@ HORIZON = 500
 SIM_STEP = 1
 BATCH_SIZE = 20000
 ITR = 100
-exp_tag = "ecc_56"  # experiment prefix
+exp_tag = "ecc_57"  # experiment prefix
 
 # Sumo settings
 FLOW_RATE = 350
@@ -39,7 +39,7 @@ RL_FLOW_PROB = RL_FLOW_RATE/3600
 
 # # Local settings
 # N_PARALLEL = 1
-# SUMO_BINARY = "sumo-gui"
+# SUMO_BINARY = "sumo"
 # MODE = "local"
 # RESTART_INSTANCE = False
 # SEEDS = [1]
@@ -185,9 +185,9 @@ def run_task(*_):
         # number of lanes in the outer loop
         "outer_lanes": 1,
         # max speed limit in the roundabout
-        "roundabout_speed_limit": 8,
+        "roundabout_speed_limit": 12,
         # max speed limit in the rest of the roundabout
-        "outside_speed_limit": 8,
+        "outside_speed_limit": 12,
         # resolution of the curved portions
         "resolution": 100,
         # num lanes

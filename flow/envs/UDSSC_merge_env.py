@@ -202,6 +202,9 @@ class UDSSCMergeEnv(Env):
         penalty = rewards.penalize_standstill(self, gain=1)
         penalty_2 = rewards.penalize_near_standstill(self, thresh=0.2, gain=1)
         penalty_jerk = rewards.penalize_jerkiness(self, gain=0.1)
+        penalty_speeding = rewards.penalize_speeding(self, fail=kwargs['fail'])
+        # print(penalty_speeding)
+        # import ipdb; ipdb.set_trace()
         # num_arrived = self.vehicles.get_num_arrived()
     
         # total_vel = rewards.total_velocity(self, fail=kwargs["fail"])
@@ -223,7 +226,7 @@ class UDSSCMergeEnv(Env):
         # return total_vel
         # return avg_vel_reward + penalty
         # return min_delay + penalty + penalty_2
-        return min_delay + penalty + penalty_2 + penalty_jerk 
+        return min_delay + penalty + penalty_2 + penalty_jerk + penalty_speeding
         # return min_delay + penalty_jerk
         # return min_delay
 
