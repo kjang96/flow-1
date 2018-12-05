@@ -52,7 +52,7 @@ for i in range(NUM_RINGS):
 
 flow_params = dict(
     # name of the experiment
-    exp_tag='ma_ring_4',
+    exp_tag='ma_ring_5',
 
     # name of the flow environment the experiment is running on
     env_name='MultiWaveAttenuationPOEnv',
@@ -109,7 +109,7 @@ def setup_exps():
     config['model'].update({'fcnet_hiddens': [32, 32]}) #DIFF
     config['use_gae'] = True
     config['lambda'] = 0.97
-    config['kl_target'] = 0.002
+    config['kl_target'] = 0.02
     config['num_sgd_iter'] = 10
     config['horizon'] = HORIZON
     # alg_run = 'PPO'
@@ -169,7 +169,7 @@ if __name__ == '__main__':
             'env': env_name,
             'checkpoint_freq': 20,
             'stop': {
-                'training_iteration': 200
+                'training_iteration': 300
             },
             'config': config,
             # 'upload_dir': 's3://<BUCKET NAME>'
