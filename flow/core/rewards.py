@@ -214,7 +214,8 @@ def penalize_speeding(env, gain=1, fail=False):
 
     cost = target_vel - vel # if under the speed limit 
     cost = np.array([0 if x >= 0 else abs(x) for x in cost])
-    cost = sum(cost)
+    # cost = sum(cost)
+    cost = np.linalg.norm(cost)
 
     return min(0, -cost)
 
