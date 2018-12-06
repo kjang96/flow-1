@@ -199,7 +199,7 @@ class UDSSCMergeEnv(Env):
         """
         penalty = rewards.penalize_standstill(self, gain=0.5)
         penalty_2 = rewards.penalize_near_standstill(self, thresh=0.2, gain=0.5)
-        penalty_jerk = rewards.penalize_jerkiness(self, gain=0.08)
+        penalty_jerk = rewards.penalize_jerkiness(self, gain=0.2)
         penalty_speeding = rewards.penalize_speeding(self, fail=kwargs['fail'])
         # num_arrived = self.vehicles.get_num_arrived()
     

@@ -27,7 +27,7 @@ HORIZON = 500
 SIM_STEP = 1
 BATCH_SIZE = 20000
 ITR = 200
-exp_tag = "ecc_68"  # experiment prefix
+exp_tag = "ecc_69"  # experiment prefix
 
 # Sumo settings
 FLOW_RATE = 350
@@ -185,9 +185,9 @@ def run_task(*_):
         # number of lanes in the outer loop
         "outer_lanes": 1,
         # max speed limit in the roundabout
-        "roundabout_speed_limit": 12,
+        "roundabout_speed_limit": 10,
         # max speed limit in the rest of the roundabout
-        "outside_speed_limit": 12,
+        "outside_speed_limit": 10,
         # resolution of the curved portions
         "resolution": 100,
         # num lanes
