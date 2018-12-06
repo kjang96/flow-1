@@ -1,7 +1,7 @@
 # cluster.yaml ========================================= 
 
 # An unique identifier for the head node and workers of this cluster.
-cluster_name: ma_41 #<YOUR NAME>
+cluster_name: KATHY_TESTO #<YOUR NAME>
 
 # The minimum number of workers nodes to launch in addition to the head
 # node. This number should be >= 0.
@@ -76,11 +76,24 @@ setup_commands:
     #- cd flow && git fetch && git checkout `cat /tmp/path`
     # - cd flow && git remote add kathy https://github.com/kjang96/flow-1 && git fetch && git fetch kathy && git checkout `cat /tmp/path`
     - cd flow && git fetch kathy && git checkout `cat /tmp/path`
-    - cd ray && git fetch origin && git checkout origin/ray_merge && git pull origin ray_merge
+    # - cd ray && git fetch origin && git checkout origin/ray_merge && git pull origin ray_merge
     - echo 'export PATH="/home/ubuntu/sumo/bin:$PATH"' >> ~/.bashrc
     - echo 'export SUMO_HOME="/home/ubuntu/sumo"' >> ~/.bashrc
     - echo 'export PYTHONPATH="/home/ubuntu/sumo/tools:$PYTHONPATH"' >> ~/.bashrc
     - echo 'export PATH="/home/ubuntu/anaconda3/bin:$PATH"' >> ~/.bashrc
+
+    - pip install ray==0.6.0
+    - pip install redis~=2.10.6
+    # Copy over local rllib changes (testing branch)
+    - mkdir $HOME/ray_build
+    - cd $HOME/ray_build && git clone https://github.com/flow-project/ray.git
+    - cd $HOME/ray_build/ray && git fetch && git checkout ray_master
+    - RAY_SITE_DIR=`python -c "import ray; print(ray.__path__[0])"`
+    - echo $RAY_SITE_DIR
+    - rm -rf /home/ubuntu/anaconda3/lib/python3.5/site-packages/ray/rllib
+    - cd $HOME/ray_build/ray && cp -r python/ray/rllib /home/ubuntu/anaconda3/lib/python3.5/site-packages/ray/rllib
+    - rm /home/ubuntu/anaconda3/lib/python3.5/site-packages/ray/tune/logger.py
+    - cd $HOME/ray_build/ray && cp -r python/ray/tune/logger.py /home/ubuntu/anaconda3/lib/python3.5/site-packages/ray/tune
 # Custom commands that will be run on the head node after common setup.
 head_setup_commands:
     - PATH="/home/ubuntu/anaconda3/bin:$PATH" yes | ~/anaconda3/bin/conda install boto3=1.4.8  # 1.4.8 adds InstanceMarketOptions
@@ -106,3 +119,19 @@ worker_start_ray_commands:
       ray start
       --redis-address=$RAY_HEAD_IP:6379
       --object-manager-port=8076
+
+
+
+# trick for copying ray
+    - pip install ray==0.6.0
+    - pip install redis~=2.10.6
+    # Copy over local rllib changes (testing branch)
+    - mkdir $HOME/ray_build
+    - cd $HOME/ray_build && git clone https://github.com/flow-project/ray.git
+    - cd $HOME/ray_build/ray && git fetch && git checkout ray_master
+    - RAY_SITE_DIR=`python -c "import ray; print(ray.__path__[0])"`
+    - echo $RAY_SITE_DIR
+    - rm -rf /home/ubuntu/anaconda3/lib/python3.5/site-packages/ray/rllib
+    - cd $HOME/ray_build/ray && cp -r python/ray/rllib /home/ubuntu/anaconda3/lib/python3.5/site-packages/ray/rllib
+    - rm /home/ubuntu/anaconda3/lib/python3.5/site-packages/ray/tune/logger.py
+    - cd $HOME/ray_build/ray && cp -r python/ray/tune/logger.py /home/ubuntu/anaconda3/lib/python3.5/site-packages/ray/tune
