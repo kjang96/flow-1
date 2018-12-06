@@ -226,7 +226,7 @@ class UDSSCMergeEnv(Env):
         # return total_vel
         # return avg_vel_reward + penalty
         # return min_delay + penalty + penalty_2
-        return min_delay + penalty + penalty_2 + penalty_jerk + penalty_speeding
+        return 3 * min_delay + penalty + penalty_2 + penalty_jerk + penalty_speeding
         # return min_delay + penalty_jerk
         # return min_delay
 
