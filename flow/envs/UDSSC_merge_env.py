@@ -197,14 +197,10 @@ class UDSSCMergeEnv(Env):
         - average velocity
         - penalizing standstill
         """
-        # vel_reward = rewards.desired_velocity(self, fail=kwargs["fail"])
-        # avg_vel_reward = rewards.average_velocity(self, fail=kwargs["fail"])
         penalty = rewards.penalize_standstill(self, gain=0.5)
         penalty_2 = rewards.penalize_near_standstill(self, thresh=0.2, gain=0.5)
-        penalty_jerk = rewards.penalize_jerkiness(self, gain=0.1)
+        penalty_jerk = rewards.penalize_jerkiness(self, gain=0.08)
         penalty_speeding = rewards.penalize_speeding(self, fail=kwargs['fail'])
-        # print(penalty_speeding)
-        # import ipdb; ipdb.set_trace()
         # num_arrived = self.vehicles.get_num_arrived()
     
         # total_vel = rewards.total_velocity(self, fail=kwargs["fail"])
@@ -212,26 +208,11 @@ class UDSSCMergeEnv(Env):
 
         # Use a similar weighting of of the headway reward as the velocity
         # reward
-        # max_cost = np.array([self.env_params.additional_params[
-        #                          "target_velocity"]] *
-        #                     self.vehicles.num_vehicles)
-        # max_cost = np.linalg.norm(max_cost)
-        # normalization = self.scenario.length / self.vehicles.num_vehicles
-        # headway_reward = 0.2 * max_cost * rewards.penalize_headway_variance(
-            # self.vehicles, self.sorted_extra_data, normalization)
-        # return vel_reward + headway_reward
-        # if np.isnan(vel_reward):
-        #     vel_reward = 0
-        # return vel_reward + penalty + penalty_2
-        # return total_vel
-        # return avg_vel_reward + penalty
         # return min_delay + penalty + penalty_2
         # rew = min_delay + penalty + penalty_2 + penalty_jerk + penalty_speeding
-        # print(min_delay)
-        # print('min_delay: %.2f, penalty: %.2f, penalty_2: %.2f, penalty_speed: %.2f' % (min_delay, penalty, penalty_2, penalty_speeding))
+        # print('min_delay: %.2f, penalty: %.2f, penalty_2: %.2f, penalty_jerk: %.2f, penalty_speed: %.2f' % \
+        #       (min_delay, penalty, penalty_2, penalty_jerk, penalty_speeding))
         return 2 * min_delay + penalty + penalty_2 + penalty_jerk + penalty_speeding
-        # return min_delay + penalty_jerk
-        # return min_delay
 
     def get_state(self, **kwargs):
         """
