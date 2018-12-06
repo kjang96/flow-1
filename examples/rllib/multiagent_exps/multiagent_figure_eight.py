@@ -53,7 +53,7 @@ vehicles.add(
 
 flow_params = dict(
     # name of the experiment
-    exp_tag='ma_f8_5',
+    exp_tag='ma_f8_6',
 
     # name of the flow environment the experiment is running on
     env_name='MultiAgentAccelEnv',
@@ -171,7 +171,7 @@ if __name__ == '__main__':
             'env': env_name,
             'checkpoint_freq': 20,
             'stop': {
-                'training_iteration': 300
+                'training_iteration': 200
             },
             'config': config,
             # 'upload_dir': 's3://<BUCKET NAME>'

@@ -52,7 +52,7 @@ for i in range(NUM_RINGS):
 
 flow_params = dict(
     # name of the experiment
-    exp_tag='ma_ring_5',
+    exp_tag='ma_ring_6',
 
     # name of the flow environment the experiment is running on
     env_name='MultiWaveAttenuationPOEnv',
@@ -169,7 +169,7 @@ if __name__ == '__main__':
             'env': env_name,
             'checkpoint_freq': 20,
             'stop': {
-                'training_iteration': 300
+                'training_iteration': 200
             },
             'config': config,
             # 'upload_dir': 's3://<BUCKET NAME>'
