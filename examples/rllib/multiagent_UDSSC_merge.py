@@ -195,7 +195,7 @@ if __name__ == '__main__':
     config = ppo.DEFAULT_CONFIG.copy()
     config['num_workers'] = N_CPUS
     config['train_batch_size'] = HORIZON * N_ROLLOUTS
-    config['simple_optimizer'] = True
+    # config['simple_optimizer'] = True
     config['gamma'] = 0.999  # discount rate
     config['model'].update({'fcnet_hiddens': [100, 50, 25]})
     config['use_gae'] = True
@@ -205,10 +205,10 @@ if __name__ == '__main__':
     config['horizon'] = HORIZON
     config['observation_filter'] = 'NoFilter'
     # <-- Tune
-    config['lr'] = 0.01
-    config['vf_loss_coeff'] = 1.0
-    config['num_sgd_iter'] = 30
-    config['vf_clip_param'] = 10.0
+    # config['lr'] = 0.01 # yikes high
+    # config['vf_loss_coeff'] = 1.0
+    # config['num_sgd_iter'] = 30
+    # config['vf_clip_param'] = 10.0
     # -->
 
     # save the flow params for replay
