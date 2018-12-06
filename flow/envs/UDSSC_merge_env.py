@@ -199,8 +199,8 @@ class UDSSCMergeEnv(Env):
         """
         # vel_reward = rewards.desired_velocity(self, fail=kwargs["fail"])
         # avg_vel_reward = rewards.average_velocity(self, fail=kwargs["fail"])
-        penalty = rewards.penalize_standstill(self, gain=1)
-        penalty_2 = rewards.penalize_near_standstill(self, thresh=0.2, gain=1)
+        penalty = rewards.penalize_standstill(self, gain=0.5)
+        penalty_2 = rewards.penalize_near_standstill(self, thresh=0.2, gain=0.5)
         penalty_jerk = rewards.penalize_jerkiness(self, gain=0.1)
         penalty_speeding = rewards.penalize_speeding(self, fail=kwargs['fail'])
         # print(penalty_speeding)
@@ -226,7 +226,10 @@ class UDSSCMergeEnv(Env):
         # return total_vel
         # return avg_vel_reward + penalty
         # return min_delay + penalty + penalty_2
-        return 3 * min_delay + penalty + penalty_2 + penalty_jerk + penalty_speeding
+        # rew = min_delay + penalty + penalty_2 + penalty_jerk + penalty_speeding
+        # print(min_delay)
+        # print('min_delay: %.2f, penalty: %.2f, penalty_2: %.2f, penalty_speed: %.2f' % (min_delay, penalty, penalty_2, penalty_speeding))
+        return 2 * min_delay + penalty + penalty_2 + penalty_jerk + penalty_speeding
         # return min_delay + penalty_jerk
         # return min_delay
 
