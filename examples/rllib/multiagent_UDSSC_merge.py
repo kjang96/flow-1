@@ -35,7 +35,8 @@ HORIZON = 500
 SIM_STEP = 1
 ITR = 100
 N_ROLLOUTS = 40
-exp_tag = "ma_40"  # experiment prefix
+exp_tag = "kathy_ma_tune"  # experiment prefix
+LOCAL = False
 
 # # # Local settings
 # N_CPUS = 1
@@ -103,7 +104,7 @@ flow_params = dict(
     exp_tag=exp_tag,
 
     # name of the flow environment the experiment is running on
-    env_name='MultiAgentUDSSCMergeEnv',
+    env_name='MultiAgentUDSSCMergeEnvReset',
 
     # name of the scenario class the experiment is running on
     scenario='UDSSCMergingScenario',
@@ -190,12 +191,14 @@ flow_params = dict(
 )
 
 if __name__ == '__main__':
-    ray.init(num_cpus=N_CPUS + 1, redirect_output=False)
+    if LOCAL:
+        ray.init(num_cpus=N_CPUS + 1, redirect_output=False)
+    else:
+        ray.init("localhost:6379")
 
     config = ppo.DEFAULT_CONFIG.copy()
     config['num_workers'] = N_CPUS
     config['train_batch_size'] = HORIZON * N_ROLLOUTS
-    # config['simple_optimizer'] = True
     config['gamma'] = 0.999  # discount rate
     config['model'].update({'fcnet_hiddens': [100, 50, 25]})
     config['use_gae'] = True
@@ -205,10 +208,12 @@ if __name__ == '__main__':
     config['horizon'] = HORIZON
     config['observation_filter'] = 'NoFilter'
     # <-- Tune
-    # config['lr'] = 0.01 # yikes high
-    # config['vf_loss_coeff'] = 1.0
-    # config['num_sgd_iter'] = 30
-    # config['vf_clip_param'] = 10.0
+    if not LOCAL:
+        config['lr'] = tune.grid_search([1e-2, 1e-3, 1e-4, 1e-5])
+        config['num_sgd_iter'] = tune.grid_search([10, 30])
+        config['clip_actions'] = False # check this out
+    config['vf_loss_coeff'] = 1.0
+    config['vf_clip_param'] = 10.0
     # -->
 
     # save the flow params for replay
@@ -246,11 +251,12 @@ if __name__ == '__main__':
         flow_params['exp_tag']: {
             'run': 'PPO',
             'env': env_name,
-            'checkpoint_freq': 20,
+            'checkpoint_freq': 25,
             'stop': {
                 'training_iteration': ITR
             },
             'config': config,
             'upload_dir': 's3://kathy.experiments/rllib/experiments',
+            'num_samples': 3
         },
     })

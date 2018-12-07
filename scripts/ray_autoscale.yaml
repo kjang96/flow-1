@@ -1,15 +1,15 @@
 # cluster.yaml ========================================= 
 
 # An unique identifier for the head node and workers of this cluster.
-cluster_name: ma_ring_6 #<YOUR NAME>
+cluster_name: kj_test #<YOUR NAME>
 
 # The minimum number of workers nodes to launch in addition to the head
 # node. This number should be >= 0.
-min_workers: 0 #<NUM WORKERS IN CLUSTER>
+min_workers: 11 #<NUM WORKERS IN CLUSTER>
 
 # The maximum number of workers nodes to launch in addition to the head
 # node. This takes precedence over min_workers.
-max_workers: 0
+max_workers: 11
 
 # The autoscaler will scale up the cluster to this target fraction of resource
 # usage. For example, if a cluster of 10 nodes is 100% busy and
@@ -39,8 +39,8 @@ auth:
 # For more documentation on available fields, see:
 # http://boto3.readthedocs.io/en/latest/reference/services/ec2.html#EC2.ServiceResource.create_instances
 head_node:
-    InstanceType: c4.4xlarge #m4.10xlarge
-    ImageId: ami-0f665c353d9692b8d # Flow AMI (Ubuntu)
+    InstanceType: c4.4xlarge
+    ImageId: ami-0d361162d5e879ae6 # Flow AMI (Ubuntu)
     InstanceMarketOptions:
         MarketType: spot
          #Additional options can be found in the boto docs, e.g.
@@ -54,8 +54,8 @@ head_node:
 # For more documentation on available fields, see:
 # http://boto3.readthedocs.io/en/latest/reference/services/ec2.html#EC2.ServiceResource.create_instances
 worker_nodes:
-    InstanceType: c4.4xlarge #m4.10xlarge
-    ImageId: ami-0f665c353d9692b8d # Flow AMI (Ubuntu)
+    InstanceType: c4.4xlarge
+    ImageId: ami-0d361162d5e879ae6 # Flow AMI (Ubuntu)
 
     #Run workers on spot by default. Comment this out to use on-demand.
     InstanceMarketOptions:
@@ -66,34 +66,19 @@ worker_nodes:
 
     # Additional options in the boto docs.
 
-file_mounts: {
-# path to your repo and the desired branch name
-"/tmp/path": "/Users/kathyjang/research/rllab-multiagent/learning-traffic/.git/refs/heads/ma_roundabout",
-}
-
 setup_commands:
     # checkout your desired branch on all worker nodes
-    #- cd flow && git fetch && git checkout `cat /tmp/path`
-    # - cd flow && git remote add kathy https://github.com/kjang96/flow-1 && git fetch && git fetch kathy && git checkout `cat /tmp/path`
-    - cd flow && git fetch kathy && git checkout `cat /tmp/path`
-    # - cd ray && git fetch origin && git checkout origin/ray_merge && git pull origin ray_merge
+    - pip install dill
+    - pip install imutils
+    # - cd flow && git fetch && git checkout ray_test && git pull origin ray_test
+    - cd flow && git remote add kathy https://github.com/kjang96/flow-1 && git pull kathy ma_roundabout && git checkout ma_roundabout
     - echo 'export PATH="/home/ubuntu/sumo/bin:$PATH"' >> ~/.bashrc
     - echo 'export SUMO_HOME="/home/ubuntu/sumo"' >> ~/.bashrc
     - echo 'export PYTHONPATH="/home/ubuntu/sumo/tools:$PYTHONPATH"' >> ~/.bashrc
     - echo 'export PATH="/home/ubuntu/anaconda3/bin:$PATH"' >> ~/.bashrc
 
-    - pip install ray==0.6.0
-    - pip install redis~=2.10.6
-    # Copy over local rllib changes (testing branch)
-    - mkdir $HOME/ray_build
-    - cd $HOME/ray_build && git clone https://github.com/flow-project/ray.git
-    - cd $HOME/ray_build/ray && git fetch && git checkout ray_master
-    - RAY_SITE_DIR=`python -c "import ray; print(ray.__path__[0])"`
-    - echo $RAY_SITE_DIR
-    - rm -rf /home/ubuntu/anaconda3/lib/python3.5/site-packages/ray/rllib
-    - cd $HOME/ray_build/ray && cp -r python/ray/rllib /home/ubuntu/anaconda3/lib/python3.5/site-packages/ray/rllib
-    - rm /home/ubuntu/anaconda3/lib/python3.5/site-packages/ray/tune/logger.py
-    - cd $HOME/ray_build/ray && cp -r python/ray/tune/logger.py /home/ubuntu/anaconda3/lib/python3.5/site-packages/ray/tune
+    - pip install matplotlib
+    - pip install imutils
 # Custom commands that will be run on the head node after common setup.
 head_setup_commands:
     - PATH="/home/ubuntu/anaconda3/bin:$PATH" yes | ~/anaconda3/bin/conda install boto3=1.4.8  # 1.4.8 adds InstanceMarketOptions
@@ -119,19 +104,3 @@ worker_start_ray_commands:
       ray start
       --redis-address=$RAY_HEAD_IP:6379
       --object-manager-port=8076
-
-
-
-# trick for copying ray
-    - pip install ray==0.6.0
-    - pip install redis~=2.10.6
-    # Copy over local rllib changes (testing branch)
-    - mkdir $HOME/ray_build
-    - cd $HOME/ray_build && git clone https://github.com/flow-project/ray.git
-    - cd $HOME/ray_build/ray && git fetch && git checkout ray_master
-    - RAY_SITE_DIR=`python -c "import ray; print(ray.__path__[0])"`
-    - echo $RAY_SITE_DIR
-    - rm -rf /home/ubuntu/anaconda3/lib/python3.5/site-packages/ray/rllib
-    - cd $HOME/ray_build/ray && cp -r python/ray/rllib /home/ubuntu/anaconda3/lib/python3.5/site-packages/ray/rllib
-    - rm /home/ubuntu/anaconda3/lib/python3.5/site-packages/ray/tune/logger.py
-    - cd $HOME/ray_build/ray && cp -r python/ray/tune/logger.py /home/ubuntu/anaconda3/lib/python3.5/site-packages/ray/tune
