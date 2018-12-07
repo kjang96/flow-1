@@ -44,13 +44,14 @@ LOCAL = False
 # MODE = "local"
 # RESTART_INSTANCE = True
 # # SEEDS = [1]
+# LOCAL = True
 
 # Autoscaler settings
 N_CPUS = 10
 RENDER = False
 MODE = "local"
 RESTART_INSTANCE = True
-SEEDS = [1, 2, 5, 91, 104, 32]  
+LOCAL = False
 
 
 inflow = InFlows()
