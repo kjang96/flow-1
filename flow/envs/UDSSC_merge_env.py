@@ -212,7 +212,8 @@ class UDSSCMergeEnv(Env):
         # rew = min_delay + penalty + penalty_2 + penalty_jerk + penalty_speeding
         # print('min_delay: %.2f, penalty: %.2f, penalty_2: %.2f, penalty_jerk: %.2f, penalty_speed: %.2f' % \
         #       (min_delay, penalty, penalty_2, penalty_jerk, penalty_speeding))
-        return 2 * min_delay + penalty + penalty_2 + penalty_jerk + penalty_speeding
+        # return 2 * min_delay + penalty + penalty_2 + penalty_jerk + penalty_speeding
+        return 2 * min_delay + penalty + penalty_2 + penalty_speeding
 
     def get_state(self, **kwargs):
         """

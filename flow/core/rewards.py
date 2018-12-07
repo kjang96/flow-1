@@ -221,7 +221,7 @@ def penalize_speeding(env, gain=1, fail=False):
     # cost = sum(cost)
     cost = np.linalg.norm(cost)
 
-    return min(0, -cost)
+    return min(0, -cost*gain)
 
 def penalize_near_standstill(env, thresh=0.3, gain=1):
     veh_ids = env.vehicles.get_ids()
