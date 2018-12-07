@@ -91,8 +91,8 @@ class UDSSCMergeEnv(Env):
         self.rl_stack_2 = []
         
         # Maintain an array of actions to aid penalizing jerkiness
-        self.past_actions = deque(maxlen=3)
-        self.past_actions_2 = deque(maxlen=3)
+        self.past_actions = deque(maxlen=10)
+        self.past_actions_2 = deque(maxlen=10)
 
         super().__init__(env_params, sumo_params, scenario)
 
@@ -197,8 +197,8 @@ class UDSSCMergeEnv(Env):
         - average velocity
         - penalizing standstill
         """
-        penalty = rewards.penalize_standstill(self, gain=0.5)
-        penalty_2 = rewards.penalize_near_standstill(self, thresh=0.2, gain=0.5)
+        penalty = rewards.penalize_standstill(self, gain=1)
+        penalty_2 = rewards.penalize_near_standstill(self, thresh=0.2, gain=1)
         penalty_jerk = rewards.penalize_jerkiness(self, gain=0.1)
         penalty_speeding = rewards.penalize_speeding(self, fail=kwargs['fail'])
         # num_arrived = self.vehicles.get_num_arrived()
@@ -212,8 +212,8 @@ class UDSSCMergeEnv(Env):
         # rew = min_delay + penalty + penalty_2 + penalty_jerk + penalty_speeding
         # print('min_delay: %.2f, penalty: %.2f, penalty_2: %.2f, penalty_jerk: %.2f, penalty_speed: %.2f' % \
         #       (min_delay, penalty, penalty_2, penalty_jerk, penalty_speeding))
-        # return 2 * min_delay + penalty + penalty_2 + penalty_jerk + penalty_speeding
-        return 2 * min_delay + penalty + penalty_2 + penalty_speeding
+        return 2 * min_delay + penalty + penalty_2 + penalty_jerk + penalty_speeding
+        # return 2 * min_delay + penalty + penalty_2 + penalty_speeding
 
     def get_state(self, **kwargs):
         """
