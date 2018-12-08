@@ -35,7 +35,7 @@ HORIZON = 500
 SIM_STEP = 1
 ITR = 100
 N_ROLLOUTS = 40
-exp_tag = "kathy_ma_tune"  # experiment prefix
+exp_tag = "kathy_ma_tune_1"  # experiment prefix
 LOCAL = False
 
 # # # Local settings
