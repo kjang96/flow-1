@@ -52,7 +52,7 @@ for i in range(NUM_RINGS):
 
 flow_params = dict(
     # name of the experiment
-    exp_tag='ma_ring_7',
+    exp_tag='ma_ring_8',
 
     # name of the flow environment the experiment is running on
     env_name='MultiWaveAttenuationPOEnv',
@@ -172,6 +172,7 @@ if __name__ == '__main__':
                 'training_iteration': 5
             },
             'config': config,
+            'upload_dir': 's3://kathy.experiments/rllib/experiments',
             # 'upload_dir': 's3://<BUCKET NAME>'
         },
     })
