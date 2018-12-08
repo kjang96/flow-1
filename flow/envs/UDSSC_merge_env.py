@@ -91,8 +91,8 @@ class UDSSCMergeEnv(Env):
         self.rl_stack_2 = []
         
         # Maintain an array of actions to aid penalizing jerkiness
-        self.past_actions = deque(maxlen=3)
-        self.past_actions_2 = deque(maxlen=3)
+        self.past_actions = deque(maxlen=10)
+        self.past_actions_2 = deque(maxlen=10)
 
         super().__init__(env_params, sumo_params, scenario)
 
