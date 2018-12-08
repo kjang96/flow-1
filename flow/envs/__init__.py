@@ -19,7 +19,7 @@ from flow.envs.test import TestEnv
 from flow.envs.UDSSC_merge_env import UDSSCMergeEnv, \
  UDSSCMergeEnvReset, MultiAgentUDSSCMergeEnv, MultiAgentUDSSCMergeEnvReset
 
-__all__ = [
+env_list = [
     "Env", "MultiEnv", "AccelEnv", "LaneChangeAccelEnv",
     "LaneChangeAccelPOEnv",
     "GreenWaveTestEnv", "GreenWaveTestEnv", "WaveAttenuationMergePOEnv",
