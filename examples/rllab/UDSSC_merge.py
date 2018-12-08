@@ -27,7 +27,7 @@ HORIZON = 500
 SIM_STEP = 1
 BATCH_SIZE = 20000
 ITR = 100
-exp_tag = "ecc_78"  # experiment prefix
+exp_tag = "ecc_79"  # experiment prefix
 
 # Sumo settings
 FLOW_RATE = 350
@@ -123,7 +123,7 @@ def run_task(*_):
                      decel=1, 
                      tau=1.1,
                      impatience=0.05,
-                    #  max_speed=8,
+                     max_speed=8,
                  ),
                 #  lane_change_mode=1621,
                  lane_change_mode=0,
@@ -140,7 +140,7 @@ def run_task(*_):
                  sumo_car_following_params=SumoCarFollowingParams(
                      tau=1.1,
                      impatience=0.05,
-                    #  max_speed=8
+                     max_speed=8
                  ),
                 #  lane_change_mode="no_lat_collide",
                  lane_change_mode="aggressive",
