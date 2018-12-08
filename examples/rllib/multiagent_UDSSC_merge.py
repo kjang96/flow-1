@@ -33,9 +33,9 @@ from flow.utils.rllib import FlowParamsEncoder
 # Training settings
 HORIZON = 500
 SIM_STEP = 1
-ITR = 100
+ITR = 5
 N_ROLLOUTS = 40
-exp_tag = "kathy_ma_tune_1"  # experiment prefix
+exp_tag = "kathy_ma_tune_2"  # experiment prefix
 LOCAL = False
 
 # # # Local settings
@@ -252,7 +252,7 @@ if __name__ == '__main__':
         flow_params['exp_tag']: {
             'run': 'PPO',
             'env': env_name,
-            'checkpoint_freq': 25,
+            'checkpoint_freq': 1,
             'stop': {
                 'training_iteration': ITR
             },
