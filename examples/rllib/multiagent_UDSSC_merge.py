@@ -35,7 +35,7 @@ HORIZON = 500
 SIM_STEP = 1
 ITR = 5
 N_ROLLOUTS = 40
-exp_tag = "kathy_ma_tune_3"  # experiment prefix
+exp_tag = "kathy_ma_tune_4"  # experiment prefix
 LOCAL = False
 
 # # # Local settings
@@ -233,20 +233,44 @@ if __name__ == '__main__':
 
     def gen_policy():
         return (PPOPolicyGraph, obs_space, act_space, {})
+    #<-- old
+    # # Setup PG with an ensemble of `num_policies` different policy graphs
+    # policy_graphs = {'av': gen_policy(), 'adversary': gen_policy()}
 
+    # def policy_mapping_fn(agent_id):
+    #     return agent_id
+
+    # policy_ids = list(policy_graphs.keys())
+    
+    # config.update({
+    #     'multiagent': {
+    #         'policy_graphs': policy_graphs,
+    #         'policy_mapping_fn': tune.function(policy_mapping_fn)
+    #     }
+    # }) 
+    ### old ->
+
+    ### <-- new
     # Setup PG with an ensemble of `num_policies` different policy graphs
-    policy_graphs = {'av': gen_policy(), 'adversary': gen_policy()}
+    policy_graphs = {'av': gen_policy()}
 
-    def policy_mapping_fn(agent_id):
-        return agent_id
+    def policy_mapping_fn(_):
+        return 'av'
 
     policy_ids = list(policy_graphs.keys())
+
     config.update({
         'multiagent': {
             'policy_graphs': policy_graphs,
-            'policy_mapping_fn': tune.function(policy_mapping_fn)
+            'policy_mapping_fn': tune.function(policy_mapping_fn),
+            'policies_to_train': ['av']
         }
     })
+
+
+
+    ### new --> 
+
 
     run_experiments({
         flow_params['exp_tag']: {
