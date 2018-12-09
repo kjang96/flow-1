@@ -35,7 +35,7 @@ HORIZON = 500
 SIM_STEP = 1
 ITR = 150
 N_ROLLOUTS = 40
-exp_tag = "kathy_ma_tune_6"  # experiment prefix
+exp_tag = "kathy_ma_tune_7"  # experiment prefix
 LOCAL = False
 
 # # # Local settings
@@ -105,7 +105,7 @@ flow_params = dict(
     exp_tag=exp_tag,
 
     # name of the flow environment the experiment is running on
-    env_name='MultiAgentUDSSCMergeEnvReset',
+    env_name='MultiAgentUDSSCMergeEnv',
 
     # name of the scenario class the experiment is running on
     scenario='UDSSCMergingScenario',
