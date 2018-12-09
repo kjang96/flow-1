@@ -1,7 +1,7 @@
 # cluster.yaml ========================================= 
 
 # An unique identifier for the head node and workers of this cluster.
-cluster_name: ma_f8_9 #<YOUR NAME>
+cluster_name: kathy_ma_tune_5 #<YOUR NAME>
 
 # The minimum number of workers nodes to launch in addition to the head
 # node. This number should be >= 0.
@@ -40,7 +40,7 @@ auth:
 # http://boto3.readthedocs.io/en/latest/reference/services/ec2.html#EC2.ServiceResource.create_instances
 head_node:
     InstanceType: c4.4xlarge
-    ImageId: ami-0d361162d5e879ae6 # Flow AMI (Ubuntu)
+    ImageId: ami-00e9c953782a09b1e # Flow AMI (Ubuntu)
     InstanceMarketOptions:
         MarketType: spot
          #Additional options can be found in the boto docs, e.g.
@@ -55,7 +55,7 @@ head_node:
 # http://boto3.readthedocs.io/en/latest/reference/services/ec2.html#EC2.ServiceResource.create_instances
 worker_nodes:
     InstanceType: c4.4xlarge
-    ImageId: ami-0d361162d5e879ae6 # Flow AMI (Ubuntu)
+    ImageId: ami-00e9c953782a09b1e # Flow AMI (Ubuntu)
 
     #Run workers on spot by default. Comment this out to use on-demand.
     InstanceMarketOptions:
@@ -80,6 +80,7 @@ setup_commands:
 
     - pip install matplotlib
     - pip install imutils
+    - pip install --upgrade pyzmq notebook
 # Custom commands that will be run on the head node after common setup.
 head_setup_commands:
     - PATH="/home/ubuntu/anaconda3/bin:$PATH" yes | ~/anaconda3/bin/conda install boto3=1.4.8  # 1.4.8 adds InstanceMarketOptions
