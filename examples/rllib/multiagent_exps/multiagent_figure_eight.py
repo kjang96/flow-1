@@ -53,7 +53,7 @@ vehicles.add(
 
 flow_params = dict(
     # name of the experiment
-    exp_tag='ma_f8_8',
+    exp_tag='ma_f8_9',
 
     # name of the flow environment the experiment is running on
     env_name='MultiAgentAccelEnv',
@@ -144,19 +144,37 @@ def setup_exps():
 
     def gen_policy():
         return (PPOPolicyGraph, obs_space, act_space, {})
+    # # <-- old
+    # # Setup PG with an ensemble of `num_policies` different policy graphs
+    # policy_graphs = {'av': gen_policy(), 'adversary': gen_policy()}
 
+    # def policy_mapping_fn(agent_id):
+    #     return agent_id
+
+    # config.update({
+    #     'multiagent': {
+    #         'policy_graphs': policy_graphs,
+    #         'policy_mapping_fn': tune.function(policy_mapping_fn)
+    #     }
+    # })
+    # # old -->
+
+    # <-- new
     # Setup PG with an ensemble of `num_policies` different policy graphs
-    policy_graphs = {'av': gen_policy(), 'adversary': gen_policy()}
+    policy_graphs = {'av': gen_policy()}
 
-    def policy_mapping_fn(agent_id):
-        return agent_id
+    def policy_mapping_fn(_):
+        return 'av'
 
     config.update({
         'multiagent': {
             'policy_graphs': policy_graphs,
-            'policy_mapping_fn': tune.function(policy_mapping_fn)
+            'policy_mapping_fn': tune.function(policy_mapping_fn),
+            'policies_to_train': ['av']
         }
     })
+    # new  -->
+
     return alg_run, env_name, config
 
 
