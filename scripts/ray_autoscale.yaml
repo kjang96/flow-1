@@ -1,7 +1,7 @@
 # cluster.yaml ========================================= 
 
 # An unique identifier for the head node and workers of this cluster.
-cluster_name: kathy_ma_tune_5 #<YOUR NAME>
+cluster_name: kathy_ma_tune_6 #<YOUR NAME>
 
 # The minimum number of workers nodes to launch in addition to the head
 # node. This number should be >= 0.
@@ -72,7 +72,7 @@ setup_commands:
     - pip install imutils
     # - cd flow && git fetch && git checkout ray_test && git pull origin ray_test
     - cd ray && git fetch && git checkout ray_master && git pull flow_upstream ray_master 
-    - cd flow && git remote add kathy https://github.com/kjang96/flow-1 && git pull kathy ma_roundabout && git checkout ma_roundabout
+    - cd flow && git remote add kathy https://github.com/kjang96/flow-1 && git fetch kathy && git checkout ma_roundabout
     - echo 'export PATH="/home/ubuntu/sumo/bin:$PATH"' >> ~/.bashrc
     - echo 'export SUMO_HOME="/home/ubuntu/sumo"' >> ~/.bashrc
     - echo 'export PYTHONPATH="/home/ubuntu/sumo/tools:$PYTHONPATH"' >> ~/.bashrc

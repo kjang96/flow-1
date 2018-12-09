@@ -33,9 +33,9 @@ from flow.utils.rllib import FlowParamsEncoder
 # Training settings
 HORIZON = 500
 SIM_STEP = 1
-ITR = 5
+ITR = 150
 N_ROLLOUTS = 40
-exp_tag = "kathy_ma_tune_5"  # experiment prefix
+exp_tag = "kathy_ma_tune_6"  # experiment prefix
 LOCAL = False
 
 # # # Local settings
