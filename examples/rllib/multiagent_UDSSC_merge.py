@@ -257,8 +257,6 @@ if __name__ == '__main__':
     def policy_mapping_fn(_):
         return 'av'
 
-    policy_ids = list(policy_graphs.keys())
-
     config.update({
         'multiagent': {
             'policy_graphs': policy_graphs,

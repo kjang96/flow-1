@@ -52,7 +52,7 @@ for i in range(NUM_RINGS):
 
 flow_params = dict(
     # name of the experiment
-    exp_tag='ma_ring_8',
+    exp_tag='ma_ring_9',
 
     # name of the flow environment the experiment is running on
     env_name='MultiWaveAttenuationPOEnv',
@@ -161,7 +161,8 @@ def setup_exps():
 
 if __name__ == '__main__':
     alg_run, env_name, config = setup_exps()
-    ray.init(num_cpus=N_CPUS + 1)
+    # ray.init(num_cpus=N_CPUS + 1)
+    ray.init("localhost:6379")
 
     run_experiments({
         flow_params['exp_tag']: {
