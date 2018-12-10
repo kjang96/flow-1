@@ -36,10 +36,10 @@ SIM_STEP = 1
 ITR = 150
 N_ROLLOUTS = 40
 CHECKPOINT_FREQ = 25
-exp_tag = "ma_12"  # experiment prefix
+exp_tag = "ma_13"  # experiment prefix
 
 
-# # # Local settings
+# # Local settings
 # N_CPUS = 1
 # RENDER = False
 # MODE = "local"
@@ -143,7 +143,7 @@ flow_params = dict(
             # "state_noise": 0.1,
             # what portion of the ramp the RL vehicle isn't controlled for 
             # "control_length": 0.1,
-            # 'adv_action_weight': 0.03,
+            'adv_action_weight': 0.03,
             'adv_state_weight': 0.03,
             # 'perturb_weight': 0.001,
             # range of inflow lengths for inflow_0, inclusive
