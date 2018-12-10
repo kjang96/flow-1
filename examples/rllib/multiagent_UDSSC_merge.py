@@ -35,23 +35,25 @@ HORIZON = 500
 SIM_STEP = 1
 ITR = 150
 N_ROLLOUTS = 40
+CHECKPOINT_FREQ = 25
 exp_tag = "ma_10"  # experiment prefix
 LOCAL = False
 
-# # # Local settings
-# N_CPUS = 1
-# RENDER = False
-# MODE = "local"
-# RESTART_INSTANCE = True
-# # SEEDS = [1]
-# LOCAL = True
 
-# Autoscaler settings
-N_CPUS = 10
+# # Local settings
+N_CPUS = 1
 RENDER = False
 MODE = "local"
 RESTART_INSTANCE = True
-LOCAL = False
+# SEEDS = [1]
+LOCAL = True
+
+# # Autoscaler settings
+# N_CPUS = 10
+# RENDER = False
+# MODE = "local"
+# RESTART_INSTANCE = True
+# LOCAL = False
 
 
 inflow = InFlows()
@@ -142,7 +144,8 @@ flow_params = dict(
             # "state_noise": 0.1,
             # what portion of the ramp the RL vehicle isn't controlled for 
             # "control_length": 0.1,
-            'perturb_weight': 0.03,
+            'adv_action_weight': 0.03,
+            'adv_state_weight': 0.03,
             # 'perturb_weight': 0.001,
             # range of inflow lengths for inflow_0, inclusive
             "range_inflow_0": [1, 4],
@@ -230,13 +233,17 @@ if __name__ == '__main__':
     test_env = create_env()
     obs_space = test_env.observation_space
     act_space = test_env.action_space
+    adv_action_space = test_env.adv_action_space
 
-    def gen_policy():
+    def gen_policy_agent():
         return (PPOPolicyGraph, obs_space, act_space, {})
+
+    def gen_policy_adversary():
+        return (PPOPolicyGraph, obs_space, adv_action_space, {})
 
     # <-- old
     # Setup PG with an ensemble of `num_policies` different policy graphs
-    policy_graphs = {'av': gen_policy(), 'adversary': gen_policy()}
+    policy_graphs = {'av': gen_policy_agent(), 'adversary': gen_policy_adversary()}
 
     def policy_mapping_fn(agent_id):
         return agent_id
@@ -256,7 +263,7 @@ if __name__ == '__main__':
         flow_params['exp_tag']: {
             'run': 'PPO',
             'env': env_name,
-            'checkpoint_freq': 25,
+            'checkpoint_freq': CHECKPOINT_FREQ,
             'stop': {
                 'training_iteration': ITR
             },

@@ -332,12 +332,12 @@ class MultiEnv(MultiAgentEnv, Env):
         if rl_actions is None:
             return
 
-        # clip according to the action space requirements
-        if isinstance(self.action_space, Box):
-            for key, action in rl_actions.items():
-                rl_actions[key] = np.clip(
-                    action,
-                    a_min=self.action_space.low,
-                    a_max=self.action_space.high)
+        # # clip according to the action space requirements
+        # if isinstance(self.action_space, Box):
+        #     for key, action in rl_actions.items():
+        #         rl_actions[key] = np.clip(
+        #             action,
+        #             a_min=self.adv_action_space.low,
+        #             a_max=self.adv_action_space.high)
 
         self._apply_rl_actions(rl_actions)

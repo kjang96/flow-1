@@ -121,7 +121,7 @@ class UDSSCMergeEnv(Env):
         # self.total_obs = self.n_obs_vehicles * 2 + 2 + \
         #                  int(self.roundabout_length // 5) * 2
                          
-        box = Box(low=0.,
+        box = Box(low=0,
                   high=1,
                   shape=(self.total_obs,),
                   dtype=np.float32)          
@@ -970,21 +970,20 @@ class MultiAgentUDSSCMergeEnv(MultiEnv, UDSSCMergeEnv):
         """See class definition."""
         av_action = rl_actions['av']
         adv_action = rl_actions['adversary']
-        perturb_weight = self.env_params.additional_params['perturb_weight']
-        # Apply noise
-        if "rl_action_noise" in self.env_params.additional_params:
-            rl_action_noise = self.env_params.additional_params["rl_action_noise"]
-            for i, rl_action in enumerate(av_action):
-                perturbation = np.random.normal(0, rl_action_noise) # 0.7 is arbitrary. but since accels are capped at +- 1 i don't want thi sto be too big
-                av_action[i] = rl_action + perturbation
 
-            # Reclip
-            if isinstance(self.action_space, Box):
-                av_action = np.clip(
-                    av_action,
-                    a_min=self.action_space.low,
-                    a_max=self.action_space.high)
-
+        adv_action_weight = 0
+        if 'adv_action_weight' in self.env_params.additional_params:
+            adv_action_weight = self.env_params.additional_params['adv_action_weight']
+        
+        rl_action_0 = av_action[0] + adv_action_weight * adv_action[0]
+        rl_action_1 = av_action[1] + adv_action_weight * adv_action[1]
+        
+        rl_action_0 = np.clip(rl_action_0, 
+                      self.env_params.additional_params["max_decel"],
+                      self.env_params.additional_params["max_accel"])
+        rl_action_1 = np.clip(rl_action_1,
+                      self.env_params.additional_params["max_decel"],
+                      self.env_params.additional_params["max_accel"])
         # Curation
         removal = [] 
         removal_2 = []
@@ -1003,14 +1002,12 @@ class MultiAgentUDSSCMergeEnv(MultiEnv, UDSSCMergeEnv):
         if self.rl_stack:
             rl_id = self.rl_stack[0]
             if self.in_control(rl_id):
-                rl_action = av_action[0] + perturb_weight * adv_action[0]
-                self.apply_acceleration([rl_id], [rl_action])
+                self.apply_acceleration([rl_id], [rl_action_0])
 
         if self.rl_stack_2:
             rl_id_2 = self.rl_stack_2[0]
             if self.in_control(rl_id_2):
-                rl_action = av_action[1] + perturb_weight * adv_action[1]
-                self.apply_acceleration([rl_id_2], [rl_action])
+                self.apply_acceleration([rl_id_2], [rl_action_1])
 
     def compute_reward(self, rl_actions, **kwargs):
         """The agent receives the class definition reward,
@@ -1033,26 +1030,40 @@ class MultiAgentUDSSCMergeEnvReset(MultiEnv, UDSSCMergeEnvReset):
     Multi-agent env for UDSSC with an adversarial agent perturbing
     the accelerations of the autonomous vehicle
     """
+    @property
+    def adv_action_space(self):
+        self.total_obs = 7 * 2 + \
+                         self.n_merging_in * 4 + \
+                         2 + \
+                         int(self.roundabout_length // 5) * 2 + \
+                         2
+                         
+        box = Box(low=-1.0,
+                  high=1.0,
+                  shape=(self.total_obs + 2,),
+                  dtype=np.float32)          
+        return box
+
     # <-- ORIGINAL. Commenting out temporarily
     def _apply_rl_actions(self, rl_actions):
         """See class definition."""
         av_action = rl_actions['av']
-        adv_action = rl_actions['adversary']
-        perturb_weight = self.env_params.additional_params['perturb_weight']
-        # Apply noise
-        if "rl_action_noise" in self.env_params.additional_params:
-            rl_action_noise = self.env_params.additional_params["rl_action_noise"]
-            for i, rl_action in enumerate(av_action):
-                perturbation = np.random.normal(0, rl_action_noise) # 0.7 is arbitrary. but since accels are capped at +- 1 i don't want thi sto be too big
-                av_action[i] = rl_action + perturbation
+        adv_action = rl_actions['adversary'][:2]
+        self.adv_actions = rl_actions['adversary']
 
-            # Reclip
-            if isinstance(self.action_space, Box):
-                av_action = np.clip(
-                    av_action,
-                    a_min=self.action_space.low,
-                    a_max=self.action_space.high)
-
+        adv_action_weight = 0
+        if 'adv_action_weight' in self.env_params.additional_params:
+            adv_action_weight = self.env_params.additional_params['adv_action_weight']
+        
+        rl_action_0 = av_action[0] + adv_action_weight * adv_action[0]
+        rl_action_1 = av_action[1] + adv_action_weight * adv_action[1]
+        
+        rl_action_0 = np.clip(rl_action_0, 
+                      -self.env_params.additional_params["max_decel"],
+                      self.env_params.additional_params["max_accel"])
+        rl_action_1 = np.clip(rl_action_1,
+                      -self.env_params.additional_params["max_decel"],
+                      self.env_params.additional_params["max_accel"])
         # Curation
         removal = [] 
         removal_2 = []
@@ -1071,14 +1082,13 @@ class MultiAgentUDSSCMergeEnvReset(MultiEnv, UDSSCMergeEnvReset):
         if self.rl_stack:
             rl_id = self.rl_stack[0]
             if self.in_control(rl_id):
-                rl_action = av_action[0] + perturb_weight * adv_action[0]
-                self.apply_acceleration([rl_id], [rl_action])
+                self.apply_acceleration([rl_id], [rl_action_0])
 
         if self.rl_stack_2:
             rl_id_2 = self.rl_stack_2[0]
             if self.in_control(rl_id_2):
-                rl_action = av_action[1] + perturb_weight * adv_action[1]
-                self.apply_acceleration([rl_id_2], [rl_action])
+                self.apply_acceleration([rl_id_2], [rl_action_1])
+
 
     def compute_reward(self, rl_actions, **kwargs):
         """The agent receives the class definition reward,
@@ -1092,6 +1102,22 @@ class MultiAgentUDSSCMergeEnvReset(MultiEnv, UDSSCMergeEnvReset):
         agent receive the same state
         """
         state = super().get_state(**kwargs)
+        
+        adv_state_weight = 0
+        if 'adv_state_weight' in self.env_params.additional_params:
+            adv_state_weight = self.env_params.additional_params['adv_state_weight']
+        try:
+            perturb = self.adv_actions[2:] * adv_state_weight
+        except:
+            perturb = 0
+
+        state += perturb
+
+        state = np.clip(
+                    state,
+                    a_min=self.observation_space.low,
+                    a_max=self.observation_space.high)
+
         return {'av': state, 'adversary': state}
 
     def reset(self):
