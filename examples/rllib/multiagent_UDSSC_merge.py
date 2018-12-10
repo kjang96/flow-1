@@ -35,7 +35,7 @@ HORIZON = 500
 SIM_STEP = 1
 ITR = 150
 N_ROLLOUTS = 40
-exp_tag = "kathy_ma_tune_7"  # experiment prefix
+exp_tag = "ma_10"  # experiment prefix
 LOCAL = False
 
 # # # Local settings
@@ -105,7 +105,7 @@ flow_params = dict(
     exp_tag=exp_tag,
 
     # name of the flow environment the experiment is running on
-    env_name='MultiAgentUDSSCMergeEnv',
+    env_name='MultiAgentUDSSCMergeEnvReset',
 
     # name of the scenario class the experiment is running on
     scenario='UDSSCMergingScenario',
@@ -142,8 +142,8 @@ flow_params = dict(
             # "state_noise": 0.1,
             # what portion of the ramp the RL vehicle isn't controlled for 
             # "control_length": 0.1,
-            # 'perturb_weight': 0.03,
-            'perturb_weight': 0.001,
+            'perturb_weight': 0.03,
+            # 'perturb_weight': 0.001,
             # range of inflow lengths for inflow_0, inclusive
             "range_inflow_0": [1, 4],
             # range of inflow lengths for inflow_1, inclusive
@@ -210,7 +210,7 @@ if __name__ == '__main__':
     config['observation_filter'] = 'NoFilter'
     # <-- Tune
     if not LOCAL:
-        config['lr'] = tune.grid_search([1e-2, 1e-3, 1e-4, 1e-5])
+        config['lr'] = 1e-4 #tune.grid_search([1e-2, 1e-3, 1e-4, 1e-5])
         config['num_sgd_iter'] = tune.grid_search([10, 30])
         config['clip_actions'] = False # check this out
     config['vf_loss_coeff'] = 1.0
@@ -256,7 +256,7 @@ if __name__ == '__main__':
         flow_params['exp_tag']: {
             'run': 'PPO',
             'env': env_name,
-            'checkpoint_freq': 1,
+            'checkpoint_freq': 25,
             'stop': {
                 'training_iteration': ITR
             },
