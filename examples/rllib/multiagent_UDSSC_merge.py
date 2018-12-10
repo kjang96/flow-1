@@ -36,24 +36,24 @@ SIM_STEP = 1
 ITR = 150
 N_ROLLOUTS = 40
 CHECKPOINT_FREQ = 25
-exp_tag = "ma_10"  # experiment prefix
+exp_tag = "ma_11"  # experiment prefix
 LOCAL = False
 
 
-# # Local settings
-N_CPUS = 1
-RENDER = False
-MODE = "local"
-RESTART_INSTANCE = True
-# SEEDS = [1]
-LOCAL = True
-
-# # Autoscaler settings
-# N_CPUS = 10
+# # # Local settings
+# N_CPUS = 1
 # RENDER = False
 # MODE = "local"
 # RESTART_INSTANCE = True
-# LOCAL = False
+# # SEEDS = [1]
+# LOCAL = True
+
+# Autoscaler settings
+N_CPUS = 10
+RENDER = False
+MODE = "local"
+RESTART_INSTANCE = True
+LOCAL = False
 
 
 inflow = InFlows()
@@ -145,7 +145,7 @@ flow_params = dict(
             # what portion of the ramp the RL vehicle isn't controlled for 
             # "control_length": 0.1,
             'adv_action_weight': 0.03,
-            'adv_state_weight': 0.03,
+            # 'adv_state_weight': 0.03,
             # 'perturb_weight': 0.001,
             # range of inflow lengths for inflow_0, inclusive
             "range_inflow_0": [1, 4],
