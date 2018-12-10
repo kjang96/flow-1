@@ -36,7 +36,7 @@ SIM_STEP = 1
 ITR = 150
 N_ROLLOUTS = 40
 CHECKPOINT_FREQ = 25
-exp_tag = "ma_13"  # experiment prefix
+exp_tag = "ma_14"  # experiment prefix
 
 
 # # Local settings
@@ -79,7 +79,8 @@ vehicles.add(veh_id="idm",
                  accel=1,
                  decel=1, 
                  tau=1.1,
-                 impatience=0.05
+                 impatience=0.05,
+                 max_speed=8,
              ),
          #  lane_change_mode=1621,
              lane_change_mode=0,
@@ -88,14 +89,14 @@ vehicles.add(veh_id="idm",
 # A single learning agent in the inner ring
 vehicles.add(veh_id="rl",
              acceleration_controller=(RLController, {}),
-         # acceleration_controller=(IDMController, {}),
              lane_change_controller=(SumoLaneChangeController, {}),
              routing_controller=(ContinuousRouter, {}),
              speed_mode="no_collide",
              num_vehicles=1,
              sumo_car_following_params=SumoCarFollowingParams(
                  tau=1.1,
-                 impatience=0.05
+                 impatience=0.05,
+                 max_speed=8,
              ),
          #  lane_change_mode="no_lat_collide",
              lane_change_mode="aggressive",
@@ -143,7 +144,7 @@ flow_params = dict(
             # "state_noise": 0.1,
             # what portion of the ramp the RL vehicle isn't controlled for 
             # "control_length": 0.1,
-            'adv_action_weight': 0.03,
+            # 'adv_action_weight': 0.03,
             'adv_state_weight': 0.03,
             # 'perturb_weight': 0.001,
             # range of inflow lengths for inflow_0, inclusive
@@ -170,9 +171,9 @@ flow_params = dict(
             # number of lanes in the outer loop
             "outer_lanes": 1,
             # max speed limit in the roundabout
-            "roundabout_speed_limit": 8,
+            "roundabout_speed_limit": 10,
             # max speed limit in the rest of the roundabout
-            "outside_speed_limit": 8,
+            "outside_speed_limit": 10,
             # resolution of the curved portions
             "resolution": 100,
             # num lanes
