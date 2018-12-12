@@ -1034,15 +1034,15 @@ class MultiAgentUDSSCMergeEnvReset(MultiEnv, UDSSCMergeEnvReset):
     """
     @property
     def adv_action_space(self):
-        self.total_obs = 7 * 2 + \
-                         self.n_merging_in * 4 + \
-                         2 + \
-                         int(self.roundabout_length // 5) * 2 + \
-                         2
+        # self.total_obs = 7 * 2 + \
+        #                  self.n_merging_in * 4 + \
+        #                  2 + \
+        #                  int(self.roundabout_length // 5) * 2 + \
+        #                  2
                          
         box = Box(low=-1.0,
                   high=1.0,
-                  shape=(self.total_obs + 2,),
+                  shape=(2,),
                   dtype=np.float32)          
         return box
 
@@ -1050,15 +1050,15 @@ class MultiAgentUDSSCMergeEnvReset(MultiEnv, UDSSCMergeEnvReset):
     def _apply_rl_actions(self, rl_actions):
         """See class definition."""
         av_action = rl_actions['av']
-        adv_action = rl_actions['adversary'][:2]
+        adv_action = rl_actions['adversary'][0]
         self.adv_actions = rl_actions['adversary']
 
         adv_action_weight = 0
         if 'adv_action_weight' in self.env_params.additional_params:
             adv_action_weight = self.env_params.additional_params['adv_action_weight']
         
-        rl_action_0 = av_action[0] + adv_action_weight * adv_action[0]
-        rl_action_1 = av_action[1] + adv_action_weight * adv_action[1]
+        rl_action_0 = av_action[0] + adv_action_weight * adv_action
+        rl_action_1 = av_action[1] + adv_action_weight * adv_action
         
         rl_action_0 = np.clip(rl_action_0, 
                       -self.env_params.additional_params["max_decel"],
@@ -1109,7 +1109,7 @@ class MultiAgentUDSSCMergeEnvReset(MultiEnv, UDSSCMergeEnvReset):
         if 'adv_state_weight' in self.env_params.additional_params:
             adv_state_weight = self.env_params.additional_params['adv_state_weight']
         try:
-            perturb = self.adv_actions[2:] * adv_state_weight
+            perturb = self.adv_actions[1] * adv_state_weight
         except:
             perturb = 0
 
