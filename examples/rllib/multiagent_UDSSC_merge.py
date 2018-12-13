@@ -33,10 +33,10 @@ from flow.utils.rllib import FlowParamsEncoder
 # Training settings
 HORIZON = 500
 SIM_STEP = 1
-ITR = 150
+ITR = 400
 N_ROLLOUTS = 40
 CHECKPOINT_FREQ = 25
-exp_tag = "ma_31"  # experiment prefix
+exp_tag = "ma_32"  # experiment prefix
 
 
 # # Local settings
@@ -144,7 +144,7 @@ flow_params = dict(
             # "state_noise": 0.1,
             # what portion of the ramp the RL vehicle isn't controlled for 
             # "control_length": 0.1,
-            'adv_action_weight': 0.1,
+            # 'adv_action_weight': 0.1,
             'adv_state_weight': 0.2,
             # range of inflow lengths for inflow_0, inclusive
             "range_inflow_0": [1, 4],
