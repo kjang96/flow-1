@@ -1039,10 +1039,12 @@ class MultiAgentUDSSCMergeEnvReset(MultiEnv, UDSSCMergeEnvReset):
         #                  2 + \
         #                  int(self.roundabout_length // 5) * 2 + \
         #                  2
+        actions = 2
+        selective_state = 20
                          
         box = Box(low=-1.0,
                   high=1.0,
-                  shape=(2,),
+                  shape=(selective_state + actions,),
                   dtype=np.float32)          
         return box
 
@@ -1050,15 +1052,15 @@ class MultiAgentUDSSCMergeEnvReset(MultiEnv, UDSSCMergeEnvReset):
     def _apply_rl_actions(self, rl_actions):
         """See class definition."""
         av_action = rl_actions['av']
-        adv_action = rl_actions['adversary'][0]
+        adv_action = rl_actions['adversary'][:2]
         self.adv_actions = rl_actions['adversary']
 
         adv_action_weight = 0
         if 'adv_action_weight' in self.env_params.additional_params:
             adv_action_weight = self.env_params.additional_params['adv_action_weight']
-        
-        rl_action_0 = av_action[0] + adv_action_weight * adv_action
-        rl_action_1 = av_action[1] + adv_action_weight * adv_action
+            
+        rl_action_0 = av_action[0] + adv_action_weight * adv_action[0]
+        rl_action_1 = av_action[1] + adv_action_weight * adv_action[1]
         
         rl_action_0 = np.clip(rl_action_0, 
                       -self.env_params.additional_params["max_decel"],
@@ -1109,11 +1111,15 @@ class MultiAgentUDSSCMergeEnvReset(MultiEnv, UDSSCMergeEnvReset):
         if 'adv_state_weight' in self.env_params.additional_params:
             adv_state_weight = self.env_params.additional_params['adv_state_weight']
         try:
-            perturb = self.adv_actions[1] * adv_state_weight
+            perturb = self.adv_actions[2:] * adv_state_weight
         except:
             perturb = 0
 
-        state += perturb
+        if perturb is not 0:
+            state[0:3] += perturb[:3]
+            state[7:10] += perturb[3:6]
+            state[14:20] += perturb[6:12]
+            state[26:32] += perturb[12:18]
 
         state = np.clip(
                     state,
