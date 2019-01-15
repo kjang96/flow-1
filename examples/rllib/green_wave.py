@@ -17,12 +17,44 @@ from flow.core.params import SumoParams, EnvParams, InitialConfig, NetParams, \
 from flow.core.params import VehicleParams
 from flow.controllers import SimCarFollowingController, GridRouter
 
-# time horizon of a single rollout
-HORIZON = 200
-# number of rollouts per training iteration
-N_ROLLOUTS = 20
-# number of parallel workers
-N_CPUS = 2
+# Training settings
+HORIZON = 500
+SIM_STEP = 1
+ITR = 400
+N_ROLLOUTS = 40
+CHECKPOINT_FREQ = 25
+EXP_TAG = "kathy_greenwave_0"  # experiment prefix
+
+# # Local settings
+# N_CPUS = 1
+# RENDER = False
+# MODE = "local"
+# RESTART_INSTANCE = True
+# # SEEDS = [1]
+# LOCAL = True
+
+# Autoscaler settings
+N_CPUS = 10
+RENDER = False
+MODE = "local"
+RESTART_INSTANCE = True
+LOCAL = False
+
+V_ENTER = 30
+TARGET_VELOCITY = 30
+SPEED_LIMIT=35
+INNER_LENGTH = 300
+LONG_LENGTH = 100
+SHORT_LENGTH = 300
+N_ROWS = 3
+N_COLUMNS = 3
+NUM_CARS_LEFT = 1
+NUM_CARS_RIGHT = 1
+NUM_CARS_TOP = 1
+NUM_CARS_BOT = 1
+tot_cars = (NUM_CARS_LEFT + NUM_CARS_RIGHT) * N_COLUMNS \
+           + (NUM_CARS_BOT + NUM_CARS_TOP) * N_ROWS
+
 
 
 def gen_edges(row_num, col_num):
@@ -70,20 +102,6 @@ def get_non_flow_params(enter_speed, additional_net_params):
 
     return initial_config, net_params
 
-
-V_ENTER = 30
-INNER_LENGTH = 300
-LONG_LENGTH = 100
-SHORT_LENGTH = 300
-N_ROWS = 3
-N_COLUMNS = 3
-NUM_CARS_LEFT = 1
-NUM_CARS_RIGHT = 1
-NUM_CARS_TOP = 1
-NUM_CARS_BOT = 1
-tot_cars = (NUM_CARS_LEFT + NUM_CARS_RIGHT) * N_COLUMNS \
-           + (NUM_CARS_BOT + NUM_CARS_TOP) * N_ROWS
-
 grid_array = {
     "short_length": SHORT_LENGTH,
     "inner_length": INNER_LENGTH,
@@ -97,7 +115,7 @@ grid_array = {
 }
 
 additional_env_params = {
-        'target_velocity': 50,
+        'target_velocity': TARGET_VELOCITY,
         'switch_time': 3.0,
         'num_observed': 2,
         'discrete': False,
@@ -105,7 +123,7 @@ additional_env_params = {
     }
 
 additional_net_params = {
-    'speed_limit': 35,
+    'speed_limit': SPEED_LIMIT,
     'grid_array': grid_array,
     'horizontal_lanes': 1,
     'vertical_lanes': 1
@@ -128,7 +146,7 @@ initial_config, net_params = \
 
 flow_params = dict(
     # name of the experiment
-    exp_tag='green_wave',
+    exp_tag=EXP_TAG,
 
     # name of the flow environment the experiment is running on
     env_name='PO_TrafficLightGridEnv',
@@ -204,10 +222,12 @@ if __name__ == '__main__':
             'config': {
                 **config
             },
-            'checkpoint_freq': 20,
+            'checkpoint_freq': 50,
             'max_failures': 999,
             'stop': {
-                'training_iteration': 200,
+                'training_iteration': 300,
             },
+            'upload_dir': 's3://kathy.experiments/rllib/experiments',
+            'num_samples': 3
         }
     })
