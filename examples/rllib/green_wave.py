@@ -225,7 +225,7 @@ if __name__ == '__main__':
             'checkpoint_freq': 50,
             'max_failures': 999,
             'stop': {
-                'training_iteration': 300,
+                'training_iteration': ITR,
             },
             'upload_dir': 's3://kathy.experiments/rllib/experiments',
             'num_samples': 3
