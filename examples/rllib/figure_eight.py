@@ -23,7 +23,7 @@ HORIZON = 1500
 # number of rollouts per training iteration
 N_ROLLOUTS = 20
 # number of parallel workers
-N_CPUS = 2
+N_CPUS = 8
 
 # We place one autonomous vehicle and 13 human-driven vehicles in the network
 vehicles = VehicleParams()
@@ -48,7 +48,7 @@ vehicles.add(
 
 flow_params = dict(
     # name of the experiment
-    exp_tag='figure_eight_intersection_control',
+    exp_tag='kathy_f8_2',
 
     # name of the flow environment the experiment is running on
     env_name='AccelEnv',
@@ -131,10 +131,11 @@ if __name__ == '__main__':
             'config': {
                 **config
             },
-            'checkpoint_freq': 20,
+            'checkpoint_freq': 1,
             'max_failures': 999,
             'stop': {
-                'training_iteration': 200,
+                'training_iteration': 1,
             },
+            'upload_dir': 's3://kathy.experiments/rllib/experiments',
         }
     })
