@@ -119,7 +119,7 @@ def visualizer_rllib(args):
 
     sim_params.restart_instance = False
     sim_params.emission_path = './test_time_rollout/'
-
+    sim_params.render = True
     # pick your rendering mode
     if args.render_mode == 'sumo_web3d':
         sim_params.num_clients = 2

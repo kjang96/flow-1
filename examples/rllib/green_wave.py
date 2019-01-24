@@ -20,21 +20,20 @@ from flow.controllers import SimCarFollowingController, GridRouter
 # Training settings
 HORIZON = 500
 SIM_STEP = 1
-ITR = 400
+ITR = 1
 N_ROLLOUTS = 40
-CHECKPOINT_FREQ = 25
-EXP_TAG = "kathy_greenwave_0"  # experiment prefix
+CHECKPOINT_FREQ = 1
+EXP_TAG = "kathy_greenwave_5"  # experiment prefix
 
 # # Local settings
-# N_CPUS = 1
+# N_CPUS = 2
 # RENDER = False
 # MODE = "local"
-# RESTART_INSTANCE = True
-# # SEEDS = [1]
+# RESTART_INSTANCE = False
 # LOCAL = True
 
 # Autoscaler settings
-N_CPUS = 10
+N_CPUS = 8
 RENDER = False
 MODE = "local"
 RESTART_INSTANCE = True
@@ -160,7 +159,7 @@ flow_params = dict(
     # sumo-related parameters (see flow.core.params.SumoParams)
     sim=SumoParams(
         sim_step=1,
-        render=False,
+        render=RENDER,
     ),
 
     # environment related parameters (see flow.core.params.EnvParams)
@@ -222,12 +221,12 @@ if __name__ == '__main__':
             'config': {
                 **config
             },
-            'checkpoint_freq': 50,
+            'checkpoint_freq': 1,
             'max_failures': 999,
             'stop': {
                 'training_iteration': ITR,
             },
             'upload_dir': 's3://kathy.experiments/rllib/experiments',
-            'num_samples': 3
+            # 'num_samples': 1
         }
     })
