@@ -23,21 +23,21 @@ SIM_STEP = 1
 ITR = 1
 N_ROLLOUTS = 40
 CHECKPOINT_FREQ = 1
-EXP_TAG = "kathy_greenwave_5"  # experiment prefix
+EXP_TAG = "kathy_greenwave_TEST_0"  # experiment prefix
 
-# # Local settings
-# N_CPUS = 2
-# RENDER = False
-# MODE = "local"
-# RESTART_INSTANCE = False
-# LOCAL = True
-
-# Autoscaler settings
-N_CPUS = 8
+# Local settings
+N_CPUS = 1
 RENDER = False
 MODE = "local"
-RESTART_INSTANCE = True
-LOCAL = False
+RESTART_INSTANCE = False
+LOCAL = True
+
+# # Autoscaler settings
+# N_CPUS = 8
+# RENDER = False
+# MODE = "local"
+# RESTART_INSTANCE = True
+# LOCAL = False
 
 V_ENTER = 30
 TARGET_VELOCITY = 30
