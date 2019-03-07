@@ -23,7 +23,7 @@ SIM_STEP = 1
 ITR = 1
 N_ROLLOUTS = 40
 CHECKPOINT_FREQ = 1
-EXP_TAG = "kathy_greenwave_TEST_2"  # experiment prefix
+EXP_TAG = "kathy_greenwave_TEST_4"  # experiment prefix
 
 # # Local settings
 # N_CPUS = 1
