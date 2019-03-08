@@ -20,10 +20,10 @@ from flow.controllers import SimCarFollowingController, GridRouter
 # Training settings
 HORIZON = 500
 SIM_STEP = 1
-ITR = 400
+ITR = 800
 N_ROLLOUTS = 40
 CHECKPOINT_FREQ = 1
-EXP_TAG = "kathy_greenwave_7"  # experiment prefix
+EXP_TAG = "kathy_greenwave_8"  # experiment prefix
 
 # # Local settings
 # N_CPUS = 1
@@ -212,7 +212,7 @@ def setup_exps():
     config['num_workers'] = N_CPUS
     config['train_batch_size'] = HORIZON * N_ROLLOUTS
     config['gamma'] = 0.999  # discount rate
-    config['model'].update({'fcnet_hiddens': [64, 64]})
+    config['model'].update({'fcnet_hiddens': [100, 50, 25]})
     config['use_gae'] = True
     config['lambda'] = 0.97
     config['kl_target'] = 0.02
@@ -249,6 +249,6 @@ if __name__ == '__main__':
                 'training_iteration': ITR,
             },
             'upload_dir': 's3://kathy.experiments/rllib/experiments',
-            # 'num_samples': 1
+            'num_samples': 3
         }
     })
