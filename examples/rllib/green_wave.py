@@ -20,10 +20,10 @@ from flow.controllers import SimCarFollowingController, GridRouter
 # Training settings
 HORIZON = 500
 SIM_STEP = 1
-ITR = 1
+ITR = 400
 N_ROLLOUTS = 40
 CHECKPOINT_FREQ = 1
-EXP_TAG = "kathy_greenwave_TEST_4"  # experiment prefix
+EXP_TAG = "kathy_greenwave_6"  # experiment prefix
 
 # # Local settings
 # N_CPUS = 1
@@ -212,7 +212,7 @@ def setup_exps():
     config['num_workers'] = N_CPUS
     config['train_batch_size'] = HORIZON * N_ROLLOUTS
     config['gamma'] = 0.999  # discount rate
-    config['model'].update({'fcnet_hiddens': [32, 32]})
+    config['model'].update({'fcnet_hiddens': [64, 64]})
     config['use_gae'] = True
     config['lambda'] = 0.97
     config['kl_target'] = 0.02
@@ -243,7 +243,7 @@ if __name__ == '__main__':
             'config': {
                 **config
             },
-            'checkpoint_freq': 1,
+            'checkpoint_freq': 50,
             'max_failures': 999,
             'stop': {
                 'training_iteration': ITR,

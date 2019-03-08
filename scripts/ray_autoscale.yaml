@@ -1,7 +1,7 @@
 # cluster.yaml ========================================= 
 
 # An unique identifier for the head node and workers of this cluster.
-cluster_name: kathy_greenwave_TEST_4 #<YOUR NAME>
+cluster_name: kathy_greenwave_6 #<YOUR NAME>
 
 # The minimum number of workers nodes to launch in addition to the head
 # node. This number should be >= 0.
@@ -57,7 +57,8 @@ head_node:
 # http://boto3.readthedocs.io/en/latest/reference/services/ec2.html#EC2.ServiceResource.create_instances
 worker_nodes:
     InstanceType: c4.4xlarge
-    ImageId: ami-0067051ba5c8f0b64 # Flow AMI (Ubuntu)
+    # ImageId: ami-0067051ba5c8f0b64 # Flow AMI (Ubuntu)
+    ImageId: ami-08ef982b6d33be416 # Flow AMI (Ubuntu)
 
     #Run workers on spot by default. Comment this out to use on-demand.
     InstanceMarketOptions:
