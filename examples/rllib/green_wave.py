@@ -23,11 +23,11 @@ SIM_STEP = 1
 ITR = 400
 N_ROLLOUTS = 40
 CHECKPOINT_FREQ = 1
-EXP_TAG = "kathy_greenwave_6"  # experiment prefix
+EXP_TAG = "kathy_greenwave_7"  # experiment prefix
 
 # # Local settings
 # N_CPUS = 1
-# RENDER = False
+# RENDER = True
 # MODE = "local"
 # RESTART_INSTANCE = False
 # LOCAL = True
@@ -45,12 +45,12 @@ SPEED_LIMIT=35
 INNER_LENGTH = 300
 LONG_LENGTH = 100
 SHORT_LENGTH = 300
-N_ROWS = 3
-N_COLUMNS = 3
-NUM_CARS_LEFT = 1
-NUM_CARS_RIGHT = 1
-NUM_CARS_TOP = 1
-NUM_CARS_BOT = 1
+N_ROWS = 1
+N_COLUMNS = 5
+NUM_CARS_LEFT = 5
+NUM_CARS_RIGHT = 5
+NUM_CARS_TOP = 5
+NUM_CARS_BOT = 5
 tot_cars = (NUM_CARS_LEFT + NUM_CARS_RIGHT) * N_COLUMNS \
            + (NUM_CARS_BOT + NUM_CARS_TOP) * N_ROWS
 
