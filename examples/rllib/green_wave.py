@@ -23,7 +23,7 @@ SIM_STEP = 1
 ITR = 800
 N_ROLLOUTS = 40
 CHECKPOINT_FREQ = 1
-EXP_TAG = "kathy_greenwave_8"  # experiment prefix
+EXP_TAG = "kathy_greenwave_9"  # experiment prefix
 
 # # Local settings
 # N_CPUS = 1
@@ -47,8 +47,8 @@ LONG_LENGTH = 100
 SHORT_LENGTH = 300
 N_ROWS = 1
 N_COLUMNS = 5
-NUM_CARS_LEFT = 5
-NUM_CARS_RIGHT = 5
+NUM_CARS_LEFT = 1
+NUM_CARS_RIGHT = 1
 NUM_CARS_TOP = 5
 NUM_CARS_BOT = 5
 tot_cars = (NUM_CARS_LEFT + NUM_CARS_RIGHT) * N_COLUMNS \
