@@ -41,7 +41,7 @@ auth:
 head_node:
     InstanceType: c4.4xlarge
     #ImageId: ami-060b3311dd2b675ee # Flow AMI (Ubuntu)
-    ImageId: ami-0cfaa621b632c4743 # kathy5 AMI (Ubuntu)
+    ImageId: ami-0e0ef19a7338487b9 # kathy6 AMI (Ubuntu)
     InstanceMarketOptions:
         MarketType: spot
          #Additional options can be found in the boto docs, e.g.
@@ -57,7 +57,7 @@ head_node:
 worker_nodes:
     InstanceType: c4.4xlarge
     #ImageId: ami-060b3311dd2b675ee # Flow AMI (Ubuntu)
-    ImageId: ami-0cfaa621b632c4743 # kathy5 AMI (Ubuntu)
+    ImageId: ami-0e0ef19a7338487b9 # kathy6 AMI (Ubuntu)
 
     #Run workers on spot by default. Comment this out to use on-demand.
     InstanceMarketOptions:
@@ -70,7 +70,9 @@ worker_nodes:
 
 setup_commands:
     # checkout your desired branch on all worker nodes
-    - cd flow && git pull && git checkout master
+    - cd flow && git remote add kathy https://github.com/kjang96/flow-1
+    - cd ~/flow && git fetch kathy && git checkout get_the_autoscaler_working && git pull
+    # - cd flow && git pull && git checkout master
     
     # set up ray by pip installing and copying over rllib and tune folder
     # - pip install --upgrade pyzmq notebook
@@ -87,7 +89,6 @@ setup_commands:
     - echo 'export SUMO_HOME="/home/ubuntu/sumo"' >> ~/.bashrc
     - echo 'export PYTHONPATH="/home/ubuntu/sumo/tools:$PYTHONPATH"' >> ~/.bashrc
     - echo 'export PATH="/home/ubuntu/anaconda3/bin:$PATH"' >> ~/.bashrc
-    - source activate flow
 # Custom commands that will be run on the head node after common setup.
 head_setup_commands:
     - cd
