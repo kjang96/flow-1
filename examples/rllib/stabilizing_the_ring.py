@@ -25,7 +25,7 @@ HORIZON = 3000
 # number of rollouts per training iteration
 N_ROLLOUTS = 20
 # number of parallel workers
-N_CPUS = 2
+N_CPUS = 8
 
 # We place one autonomous vehicle and 22 human-driven vehicles in the network
 vehicles = VehicleParams()
@@ -47,7 +47,7 @@ vehicles.add(
 
 flow_params = dict(
     # name of the experiment
-    exp_tag="stabilizing_the_ring",
+    exp_tag="kathy_sugiyama_0",
 
     # name of the flow environment the experiment is running on
     env_name="WaveAttenuationPOEnv",
@@ -146,11 +146,12 @@ if __name__ == "__main__":
             "config": {
                 **config
             },
-            "checkpoint_freq": 20,
+            "checkpoint_freq": 10,
             "checkpoint_at_end": True,
             "max_failures": 999,
             "stop": {
-                "training_iteration": 200,
+                "training_iteration": 50,
             },
+            "upload_dir": 's3://kathy.experiments/rllib/experiments',
         }
     })
