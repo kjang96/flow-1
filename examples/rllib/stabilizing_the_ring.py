@@ -47,7 +47,7 @@ vehicles.add(
 
 flow_params = dict(
     # name of the experiment
-    exp_tag="kathy_sugiyama_0",
+    exp_tag="kathy_sugiyama_1",
 
     # name of the flow environment the experiment is running on
     env_name="WaveAttenuationPOEnv",

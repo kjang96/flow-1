@@ -41,7 +41,7 @@ auth:
 head_node:
     InstanceType: c4.4xlarge
     #ImageId: ami-060b3311dd2b675ee # Flow AMI (Ubuntu)
-    ImageId: ami-0e0ef19a7338487b9 # kathy6 AMI (Ubuntu)
+    ImageId: ami-08077bcc4d9e66045 # kathy7 AMI (Ubuntu)
     InstanceMarketOptions:
         MarketType: spot
          #Additional options can be found in the boto docs, e.g.
@@ -57,7 +57,7 @@ head_node:
 worker_nodes:
     InstanceType: c4.4xlarge
     #ImageId: ami-060b3311dd2b675ee # Flow AMI (Ubuntu)
-    ImageId: ami-0e0ef19a7338487b9 # kathy6 AMI (Ubuntu)
+    ImageId: ami-08077bcc4d9e66045 # kathy7 AMI (Ubuntu)
 
     #Run workers on spot by default. Comment this out to use on-demand.
     InstanceMarketOptions:
