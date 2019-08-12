@@ -47,7 +47,7 @@ vehicles.add(
 
 flow_params = dict(
     # name of the experiment
-    exp_tag="kathy_sugiyama_3",
+    exp_tag="kathy_sugiyama_4",
 
     # name of the flow environment the experiment is running on
     env_name="WaveAttenuationPOEnv",
@@ -150,7 +150,7 @@ if __name__ == "__main__":
             "checkpoint_at_end": True,
             "max_failures": 999,
             "stop": {
-                "training_iteration": 50,
+                "training_iteration": 2,
             },
             "upload_dir": 's3://kathy.experiments/rllib/experiments',
         }
