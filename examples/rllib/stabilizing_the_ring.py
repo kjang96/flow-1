@@ -47,7 +47,7 @@ vehicles.add(
 
 flow_params = dict(
     # name of the experiment
-    exp_tag="kathy_sugiyama_1",
+    exp_tag="kathy_sugiyama_3",
 
     # name of the flow environment the experiment is running on
     env_name="WaveAttenuationPOEnv",
@@ -138,7 +138,7 @@ def setup_exps():
 
 if __name__ == "__main__":
     alg_run, gym_name, config = setup_exps()
-    ray.init(num_cpus=N_CPUS + 1, redis_address="localhost:6379")#, redirect_output=False)
+    ray.init(num_cpus=N_CPUS + 1)
     trials = run_experiments({
         flow_params["exp_tag"]: {
             "run": alg_run,
