@@ -1,7 +1,7 @@
 # cluster.yaml ========================================= 
 
 # An unique identifier for the head node and workers of this cluster.
-cluster_name: icra_25 #<YOUR NAME>
+cluster_name: icra_26 #<YOUR NAME>
 
 # The minimum number of workers nodes to launch in addition to the head
 # node. This number should be >= 0.
@@ -41,7 +41,7 @@ auth:
 head_node:
     InstanceType: c4.4xlarge
     #ImageId: ami-060b3311dd2b675ee # Flow AMI (Ubuntu)
-    ImageId: ami-0dfd7329b99c64987 # kathy10 AMI (Ubuntu)
+    ImageId: ami-09544298704576518 # kathy11 AMI (Ubuntu)
     InstanceMarketOptions:
         MarketType: spot
          #Additional options can be found in the boto docs, e.g.
@@ -57,7 +57,7 @@ head_node:
 worker_nodes:
     InstanceType: c4.4xlarge
     #ImageId: ami-060b3311dd2b675ee # Flow AMI (Ubuntu)
-    ImageId: ami-0dfd7329b99c64987 # kathy10 AMI (Ubuntu)
+    ImageId: ami-09544298704576518 # kathy11 AMI (Ubuntu)
 
     #Run workers on spot by default. Comment this out to use on-demand.
     InstanceMarketOptions:
