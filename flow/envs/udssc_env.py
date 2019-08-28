@@ -892,9 +892,17 @@ class UDSSCMergeEnvReset(UDSSCMergeEnv):
         state = np.concatenate([state, [len_inflow_0, len_inflow_1]])
 
         if "state_noise" in self.env_params.additional_params:
-            var = self.env_params.additional_params.get("state_noise")
+            std = self.env_params.additional_params.get("state_noise")
             for i, st in enumerate(state):
-                perturbation = np.random.normal(0, var) 
+                perturbation = np.random.normal(0, std) 
+                if "merge_norm_noise" in self.env_params.additional_params \
+                    and (14 <= i < 20) or (26 <= i < 32): # 14 and 20 are the indices of merge_dists_0
+                    merge_norm_noise = self.env_params.additional_params.get("merge_norm_noise")
+                    perturbation = np.random.normal(0, merge_norm_noise)
+                if "scenario_length_noise" in self.env_params.additional_params \
+                    and (i in [0, 4, 6, 7, 11, 13]): # indices of those affected by self.scenario_length
+                    scenario_length_noise = self.env_params.additional_params.get("scenario_length_noise")
+                    perturbation = np.random.normal(0, scenario_length_noise)
                 state[i] = st + perturbation
 
         # Reclip
