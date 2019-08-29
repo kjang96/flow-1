@@ -185,6 +185,9 @@ class UDSSCMergeEnv(Env):
         - average velocity
         - penalizing standstill
         """
+        # import ipdb; ipdb.set_trace()
+        if self.env_params.evaluate:
+            return rewards.min_delay(self)
         penalty = rewards.penalize_standstill(self, gain=1)
         penalty_2 = rewards.penalize_near_standstill(self, thresh=0.2, gain=1)
         penalty_jerk = rewards.penalize_jerkiness(self, gain=0.1)
@@ -196,8 +199,8 @@ class UDSSCMergeEnv(Env):
 
         # print('avg_vel: %.2f, min_delay: %.2f, penalty: %.2f, penalty_2: %.2f, penalty_jerk: %.2f, penalty_speed: %.2f' % \
         #       (avg_vel, min_delay, penalty, penalty_2, penalty_jerk, penalty_speeding))
-        # return 2 * min_delay + penalty + penalty_2 + penalty_jerk + penalty_speeding
-        return min_delay + penalty_jerk + penalty_speeding 
+        return 2 * min_delay + penalty + penalty_2 + penalty_jerk + penalty_speeding
+        # return min_delay + penalty_jerk + penalty_speeding 
 
     def get_state(self, **kwargs):
         """
@@ -891,22 +894,19 @@ class UDSSCMergeEnvReset(UDSSCMergeEnv):
         len_inflow_0 = self.len_inflow_0 / self.max_inflow
         len_inflow_1 = self.len_inflow_1 / self.max_inflow
         state = np.concatenate([state, [len_inflow_0, len_inflow_1]])
-        try:
-            if "state_noise" in self.env_params.additional_params:
-                std = self.env_params.additional_params.get("state_noise")
-                for i, st in enumerate(state):
-                    perturbation = np.random.normal(0, std) 
-                    if "merge_norm_noise" in self.env_params.additional_params \
-                        and ((14 <= i < 20) or (26 <= i < 32)): # 14 and 20 are the indices of merge_dists_0
-                        merge_norm_noise = self.env_params.additional_params.get("merge_norm_noise")
-                        perturbation = np.random.normal(0, merge_norm_noise)
-                    if "scenario_length_noise" in self.env_params.additional_params \
-                        and (i in [0, 4, 6, 7, 11, 13]): # indices of those affected by self.scenario_length
-                        scenario_length_noise = self.env_params.additional_params.get("scenario_length_noise")
-                        perturbation = np.random.normal(0, scenario_length_noise)
-                    state[i] = st + perturbation
-        except:
-            import ipdb; ipdb.set_trace()
+        if "state_noise" in self.env_params.additional_params:
+            std = self.env_params.additional_params.get("state_noise")
+            for i, st in enumerate(state):
+                perturbation = np.random.normal(0, std) 
+                if "merge_norm_noise" in self.env_params.additional_params \
+                    and ((14 <= i < 20) or (26 <= i < 32)): # 14 and 20 are the indices of merge_dists_0
+                    merge_norm_noise = self.env_params.additional_params.get("merge_norm_noise")
+                    perturbation = np.random.normal(0, merge_norm_noise)
+                if "scenario_length_noise" in self.env_params.additional_params \
+                    and (i in [0, 4, 6, 7, 11, 13]): # indices of those affected by self.scenario_length
+                    scenario_length_noise = self.env_params.additional_params.get("scenario_length_noise")
+                    perturbation = np.random.normal(0, scenario_length_noise)
+                state[i] = st + perturbation
 
         # Reclip
         if isinstance(self.observation_space, Box):
