@@ -24,7 +24,7 @@ HORIZON = 500
 SIM_STEP = 1
 ITR = 160
 N_ROLLOUTS = 40
-exp_tag = "icra_35"  # experiment prefix
+exp_tag = "icra_36"  # experiment prefix
 
 # # Local settings
 # N_CPUS = 1
@@ -55,7 +55,7 @@ vehicles.add(veh_id="idm",
                     decel=1, 
                     tau=1.1,
                     impatience=0.05,
-                    max_speed=8,
+                    max_speed=10,
                     speed_mode="all_checks",
                 ),
                 lane_change_params=SumoLaneChangeParams(
@@ -72,7 +72,7 @@ vehicles.add(veh_id="rl",
                 car_following_params=SumoCarFollowingParams(
                     tau=1.1,
                     impatience=0.05,
-                    max_speed=9,
+                    max_speed=10,
                     speed_mode="no_collide",
                 ),
                 lane_change_params=SumoLaneChangeParams(
@@ -121,7 +121,7 @@ flow_params = dict(
             # maximum deceleration for autonomous vehicles, in m/s^2
             "max_decel": 1,
             # desired velocity for all vehicles in the network, in m/s
-            "target_velocity": 8,
+            "target_velocity": 10,
             # number of observable vehicles preceding the rl vehicle
             "n_preceding": 1, # HAS TO BE 1
             # number of observable vehicles following the rl vehicle
