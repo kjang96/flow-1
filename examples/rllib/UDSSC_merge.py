@@ -22,9 +22,9 @@ from flow.scenarios.figure_eight import ADDITIONAL_NET_PARAMS
 # Training settings
 HORIZON = 500
 SIM_STEP = 1
-ITR = 160
+ITR = 300
 N_ROLLOUTS = 40
-exp_tag = "icra_36"  # experiment prefix
+exp_tag = "icra_37"  # experiment prefix
 
 # # Local settings
 # N_CPUS = 1
