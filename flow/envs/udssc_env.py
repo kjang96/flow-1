@@ -906,6 +906,9 @@ class UDSSCMergeEnvReset(UDSSCMergeEnv):
                     and (i in [0, 4, 6, 7, 11, 13]): # indices of those affected by self.scenario_length
                     scenario_length_noise = self.env_params.additional_params.get("scenario_length_noise")
                     perturbation = np.random.normal(0, scenario_length_noise)
+                if "no_inflow_noise" in self.env_params.additional_params \
+                    and (i in [92, 93]):
+                    perturbation = 0 
                 state[i] = st + perturbation
 
         # Reclip
