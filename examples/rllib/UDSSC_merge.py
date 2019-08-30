@@ -24,7 +24,7 @@ HORIZON = 500
 SIM_STEP = 1
 ITR = 160
 N_ROLLOUTS = 40
-exp_tag = "icra_47"  # experiment prefix
+exp_tag = "icra_48"  # experiment prefix
 
 # # Local settings
 # N_CPUS = 1
@@ -131,7 +131,7 @@ flow_params = dict(
             # batch size, for use in UDSSCMergeEnvReset
             "batch_size": HORIZON * N_ROLLOUTS,
             # # rl action noise
-            # "rl_action_noise": 0.2,
+            "rl_action_noise": 0.2,
             # # noise to add to the state space
             "state_noise": 0.1,
             # to be used with rl_action_noise; overrides that value 
