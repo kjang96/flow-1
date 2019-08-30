@@ -24,7 +24,7 @@ HORIZON = 500
 SIM_STEP = 1
 ITR = 300
 N_ROLLOUTS = 40
-exp_tag = "icra_39"  # experiment prefix
+exp_tag = "icra_40"  # experiment prefix
 
 # # Local settings
 # N_CPUS = 1
@@ -72,7 +72,7 @@ vehicles.add(veh_id="rl",
                 car_following_params=SumoCarFollowingParams(
                     tau=1.1,
                     impatience=0.05,
-                    max_speed=8,
+                    max_speed=8.5,
                     speed_mode="no_collide",
                 ),
                 lane_change_params=SumoLaneChangeParams(
