@@ -22,9 +22,9 @@ from flow.scenarios.figure_eight import ADDITIONAL_NET_PARAMS
 # Training settings
 HORIZON = 500
 SIM_STEP = 1
-ITR = 300
+ITR = 160
 N_ROLLOUTS = 40
-exp_tag = "icra_40"  # experiment prefix
+exp_tag = "icra_41"  # experiment prefix
 
 # # Local settings
 # N_CPUS = 1
@@ -52,7 +52,7 @@ vehicles.add(veh_id="idm",
                 num_vehicles=1,
                 car_following_params=SumoCarFollowingParams(
                     accel=1,
-                    decel=1, 
+                    decel=3, 
                     tau=1.1,
                     impatience=0.05,
                     max_speed=8,
@@ -72,7 +72,7 @@ vehicles.add(veh_id="rl",
                 car_following_params=SumoCarFollowingParams(
                     tau=1.1,
                     impatience=0.05,
-                    max_speed=8.5,
+                    # max_speed=8,
                     speed_mode="no_collide",
                 ),
                 lane_change_params=SumoLaneChangeParams(
@@ -119,7 +119,7 @@ flow_params = dict(
             # maximum acceleration for autonomous vehicles, in m/s^2
             "max_accel": 1,
             # maximum deceleration for autonomous vehicles, in m/s^2
-            "max_decel": 1,
+            "max_decel": 3,
             # desired velocity for all vehicles in the network, in m/s
             "target_velocity": 8,
             # number of observable vehicles preceding the rl vehicle
