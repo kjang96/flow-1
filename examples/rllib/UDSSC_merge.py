@@ -24,7 +24,7 @@ HORIZON = 500
 SIM_STEP = 1
 ITR = 160
 N_ROLLOUTS = 40
-exp_tag = "icra_48"  # experiment prefix
+exp_tag = "icra_49"  # experiment prefix
 
 # # Local settings
 # N_CPUS = 1
@@ -52,7 +52,7 @@ vehicles.add(veh_id="idm",
                 num_vehicles=1,
                 car_following_params=SumoCarFollowingParams(
                     accel=1,
-                    decel=3, 
+                    decel=1, 
                     tau=1.1,
                     impatience=0.05,
                     max_speed=8,
@@ -119,7 +119,7 @@ flow_params = dict(
             # maximum acceleration for autonomous vehicles, in m/s^2
             "max_accel": 1,
             # maximum deceleration for autonomous vehicles, in m/s^2
-            "max_decel": 3,
+            "max_decel": 1,
             # desired velocity for all vehicles in the network, in m/s
             "target_velocity": 8,
             # number of observable vehicles preceding the rl vehicle
@@ -131,9 +131,9 @@ flow_params = dict(
             # batch size, for use in UDSSCMergeEnvReset
             "batch_size": HORIZON * N_ROLLOUTS,
             # # rl action noise
-            "rl_action_noise": 0.2,
+            # "rl_action_noise": 0.2,
             # # noise to add to the state space
-            "state_noise": 0.1,
+            # "state_noise": 0.1,
             # to be used with rl_action_noise; overrides that value 
             # "merge_norm_noise": 0.05,
             # to be used with rl_action_noise; overrides that value 
