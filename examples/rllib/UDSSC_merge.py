@@ -22,9 +22,9 @@ from flow.scenarios.figure_eight import ADDITIONAL_NET_PARAMS
 # Training settings
 HORIZON = 500
 SIM_STEP = 1
-ITR = 160
+ITR = 300
 N_ROLLOUTS = 40
-exp_tag = "icra_38"  # experiment prefix
+exp_tag = "icra_39"  # experiment prefix
 
 # # Local settings
 # N_CPUS = 1
@@ -55,7 +55,7 @@ vehicles.add(veh_id="idm",
                     decel=1, 
                     tau=1.1,
                     impatience=0.05,
-                    # max_speed=10,
+                    max_speed=8,
                     speed_mode="all_checks",
                 ),
                 lane_change_params=SumoLaneChangeParams(
@@ -72,7 +72,7 @@ vehicles.add(veh_id="rl",
                 car_following_params=SumoCarFollowingParams(
                     tau=1.1,
                     impatience=0.05,
-                    # max_speed=10,
+                    max_speed=8,
                     speed_mode="no_collide",
                 ),
                 lane_change_params=SumoLaneChangeParams(
@@ -131,15 +131,15 @@ flow_params = dict(
             # batch size, for use in UDSSCMergeEnvReset
             "batch_size": HORIZON * N_ROLLOUTS,
             # # rl action noise
-            "rl_action_noise": 0.2,
+            # "rl_action_noise": 0.2,
             # # noise to add to the state space
-            "state_noise": 0.1,
+            # "state_noise": 0.1,
             # to be used with rl_action_noise; overrides that value 
-            "merge_norm_noise": 0.05,
+            # "merge_norm_noise": 0.05,
             # to be used with rl_action_noise; overrides that value 
-            "scenario_length_noise": 0.02,
+            # "scenario_length_noise": 0.02,
             # to be used with Reset env
-            "no_inflow_noise": True,
+            # "no_inflow_noise": True,
             # what portion of the ramp the RL vehicle isn't controlled for 
             "control_length": 0.1,
             # range of inflow lengths for inflow_0, inclusive
