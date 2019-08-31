@@ -185,13 +185,12 @@ class UDSSCMergeEnv(Env):
         - average velocity
         - penalizing standstill
         """
-        # import ipdb; ipdb.set_trace()
         if self.env_params.evaluate:
             return rewards.min_delay(self)
         penalty = rewards.penalize_standstill(self, gain=1)
         penalty_2 = rewards.penalize_near_standstill(self, thresh=0.2, gain=1)
         penalty_jerk = rewards.penalize_jerkiness(self, gain=0.1)
-        penalty_speeding = rewards.penalize_speeding(self, gain=2, fail=kwargs['fail'])
+        penalty_speeding = rewards.penalize_speeding(self, gain=3, fail=kwargs['fail'])
         min_delay = rewards.min_delay(self)
 
         # Use a similar weighting of of the headway reward as the velocity
