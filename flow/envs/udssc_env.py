@@ -1,4 +1,5 @@
 from flow.envs.base_env import Env
+from flow.multiagent_envs import MultiEnv
 from flow.core import rewards
 from flow.core.params import InitialConfig, NetParams, InFlows
 from flow.controllers import RLController, IDMController, ContinuousRouter
@@ -438,9 +439,6 @@ class UDSSCMergeEnv(Env):
         
         return rl_info
 
-
-
-
     def get_tailway(self, v1, v2):
         # Iterative approach
 
@@ -474,7 +472,6 @@ class UDSSCMergeEnv(Env):
                     queue.append((pr, tailway + self.k.scenario.edge_length(curr)))
 
         return None
-
 
     # env.vehicles.get_route(self.veh_id)
     def k_closest_to_merge(self, k):
@@ -604,7 +601,6 @@ class UDSSCMergeEnv(Env):
                 i += 1
         return state
 
-
     def roundabout_state(self): 
         """
         Need some way to pass a static state about this
@@ -634,7 +630,6 @@ class UDSSCMergeEnv(Env):
             states.append(num_veh)
         return states
 
-        
     def _edge_density(self, edge):
         num_veh = len(self.k.vehicle.get_ids_by_edge(edge))
         length = self.k.scenario.edge_length(edge)
@@ -769,7 +764,6 @@ class UDSSCMergeEnv(Env):
             self.rl_stack.remove(rl_id)
         for rl_id in removal_2:
             self.rl_stack_2.remove(rl_id)
-        
 
     def additional_command(self):
         if isinstance(self, UDSSCMergeEnvReset):
@@ -808,20 +802,6 @@ class UDSSCMergeEnvReset(UDSSCMergeEnv):
 
     @property
     def observation_space(self):
-        # state = np.array(np.concatenate([rl_info, rl_info_2,
-        #                                 merge_dists_0, merge_0_vel,
-        #                                 merge_dists_1, merge_1_vel,
-        #                                 queue_0, queue_1,
-        #                                 roundabout_full,
-        #                                 len_inflow_0, len_inflow_1]))
-
-        # rl_info = rl_pos, rl_pos_2, rl_vel, tailway_vel, tailway_dists, headway_vel, headway_dists = 7
-        # rl_info_2 = rl_pos, rl_pos_2, rl_vel, tailway_vel, tailway_dists, headway_vel, headway_dists = 7
-        # merge_info = self.n_merging_in * 4 # 4 variables
-        # queues = 2 # 2 queues
-        # Roundabout state = len(MERGE_EDGES) * 3
-        # roundabout_full = (ROUNDABOUT_LENGTH // 5) * 2 # 2 cols
-        # len_inflow_0 + len_inflow_1 = 2
         
         self.total_obs = 7 * 2 + \
                          self.n_merging_in * 4 + \
@@ -978,33 +958,78 @@ class UDSSCMergeEnvReset(UDSSCMergeEnv):
         observation = super().reset()
         return observation
 
-class MultiAgentUDSSCMergeEnv(UDSSCMergeEnv):
-    """Adversarial multi-agent env.
 
+class MultiAgentUDSSCMergeHumanAdversary(UDSSCMergeEnvReset, MultiEnv):
+    """Adversarial multi-agent env.
     Multi-agent env for UDSSC with an adversarial agent perturbing
-    the accelerations of the autonomous vehicle
+    the accelerations of the autonomous vehicle. There is also an adversary perturbing the accelerations
+    of each of the human drivers
     """
+
+    def __init__(self, env_params, sim_params, scenario, simulator='traci'):
+        super(MultiAgentUDSSCMergeHumanAdversary, self).__init__(env_params, sim_params, scenario, simulator='traci')
+
+    @property
+    def adv_action_space(self):
+        # self.total_obs = 7 * 2 + \
+        #                  self.n_merging_in * 4 + \
+        #                  2 + \
+        #                  int(self.roundabout_length // 5) * 2 + \
+        #                  2
+
+        box = Box(low=-1.0,
+                  high=1.0,
+                  shape=(2,),
+                  dtype=np.float32)
+        return box
+
+    @property
+    def human_adv_action_space(self):
+        # These are just accelerations that can be provided to every human vehicle
+
+        box = Box(low=-1.0,
+                  high=1.0,
+                  shape=(1,),
+                  dtype=np.float32)
+        return box
+
+    @property
+    def human_adv_obs_space(self):
+        # TODO(@evinitsky) what should they actually observe?
+        box = Box(low=-3.0,
+                  high=3.0,
+                  shape=(2,),
+                  dtype=np.float32)
+        return box
+
+    # <-- ORIGINAL. Commenting out temporarily
     def _apply_rl_actions(self, rl_actions):
         """See class definition."""
         av_action = rl_actions['av']
-        adv_action = rl_actions['adversary']
-        perturb_weight = self.env_params.additional_params['perturb_weight']
-        # Apply noise
-        if "rl_action_noise" in self.env_params.additional_params:
-            rl_action_noise = self.env_params.additional_params["rl_action_noise"]
-            for i, rl_action in enumerate(av_action):
-                perturbation = np.random.normal(0, rl_action_noise) # 0.7 is arbitrary. but since accels are capped at +- 1 i don't want thi sto be too big
-                av_action[i] = av_action + perturbation
+        if self.env_params.additional_params['action_adversary']:
+            self.adv_actions = rl_actions['action_adversary']
+            adv_action = rl_actions['action_adversary']
+            adv_action_weight = 0
+            if 'adv_action_weight' in self.env_params.additional_params:
+                adv_action_weight = self.env_params.additional_params['adv_action_weight']
 
-            # Reclip
-            if isinstance(self.action_space, Box):
-                av_action = np.clip(
-                    av_action,
-                    a_min=self.action_space.low,
-                    a_max=self.action_space.high)
+            rl_action_0 = av_action[0] + adv_action_weight * adv_action[0]
+            rl_action_1 = av_action[1] + adv_action_weight * adv_action[1]
+
+            rl_action_0 = np.clip(rl_action_0,
+                                  -self.env_params.additional_params["max_decel"],
+                                  self.env_params.additional_params["max_accel"])
+            rl_action_1 = np.clip(rl_action_1,
+                                  -self.env_params.additional_params["max_decel"],
+                                  self.env_params.additional_params["max_accel"])
+
+        else:
+            self.adv_actions = np.zeros(self.adv_action_space.shape[0])
+            rl_action_0 = av_action[0]
+            rl_action_1 = av_action[1]
 
         # Curation
-        removal = [] 
+        removal = []
         removal_2 = []
         for rl_id in self.rl_stack:
             if rl_id not in self.k.vehicle.get_rl_ids():
@@ -1017,46 +1042,93 @@ class MultiAgentUDSSCMergeEnv(UDSSCMergeEnv):
         for rl_id in removal_2:
             self.rl_stack_2.remove(rl_id)
 
+        accels = []
+        valid_ids = []
+
         # Apply RL Actions
         if self.rl_stack:
             rl_id = self.rl_stack[0]
             if self.in_control(rl_id):
-                rl_action = av_action[0] + perturb_weight * adv_action[0]
-                self.k.vehicle.apply_acceleration([rl_id], [rl_action])
+                accels.append(rl_action_0)
+                valid_ids.append(rl_id)
 
         if self.rl_stack_2:
             rl_id_2 = self.rl_stack_2[0]
             if self.in_control(rl_id_2):
-                rl_action = av_action[1] + perturb_weight * adv_action[1]
-                self.k.vehicle.apply_acceleration([rl_id_2], [rl_action])
+                accels.append(rl_action_1)
+                valid_ids.append(rl_id_2)
 
-    def compute_reward(self, state, rl_actions, **kwargs):
+        # Now go through the humans in the scene and perturb all of their actions
+        for veh_id, accel in rl_actions.items():
+            if veh_id != 'action_adversary' and veh_id != 'av':
+                base_accel = self.k.vehicle.get_acc_controller(veh_id).get_accel(self)
+                accels.append(base_accel + accel[0])
+                valid_ids.append(veh_id)
+
+        # TODO(@evinitsky) why is the human perturbation the wrong size????
+        self.k.vehicle.apply_acceleration(valid_ids, np.array(accels))
+
+
+    def compute_reward(self, rl_actions, **kwargs):
         """The agent receives the class definition reward,
         the adversary recieves the negative of the agent reward
         """
-        if self.env_params.evaluate:
-            reward = np.mean(self.k.vehicle.get_speed(self.k.vehicle.get_ids()))
-            return {'av': reward, 'adversary': -reward}
-        else:
-            reward = rewards.desired_velocity(self, fail=kwargs['fail'])
-            return {'av': reward, 'adversary': -reward}
-
-        # vel_reward = rewards.desired_velocity(self, fail=kwargs["fail"])
-        # avg_vel_reward = rewards.average_velocity(self, fail=kwargs["fail"])
-        penalty = rewards.penalize_standstill(self, gain=1.5)
-        penalty_2 = rewards.penalize_near_standstill(self, thresh=0.3, gain=1)
-        # num_arrived = self.k.vehicle.get_num_arrived()
-        # total_vel = rewards.total_velocity(self, fail=kwargs["fail"])
-        min_delay = rewards.min_delay(self)
-        # if np.isnan(vel_reward):
-        #     vel_reward = 0
-        reward = min_delay + penalty + penalty_2
-        return {'av': reward, 'adversary': -reward}
+        reward = super(MultiAgentUDSSCMergeHumanAdversary, self).compute_reward(rl_actions, **kwargs)
+        human_dict = {veh_id: -reward for veh_id in self.k.vehicle.get_human_ids()}
+        reward_dict = {'av': reward}
+        reward_dict.update(human_dict)
+        if self.env_params.additional_params['action_adversary']:
+            reward_dict['action_adversary'] = -reward
+        # Go through the human drivers and add zeros if the vehicles have left as a final observation
+        left_vehicles_dict = {veh_id: 0 for veh_id
+                              in self.k.vehicle.get_arrived_ids()}
+        reward_dict.update(left_vehicles_dict)
+        return reward_dict
 
     def get_state(self, **kwargs):
         """See class definition for the state. Both adversary and
         agent receive the same state
         """
-        
-        state = super().get_state(**kwargs)
-        return {'av': state, 'adversary': state}
+        state = super(MultiAgentUDSSCMergeHumanAdversary, self).get_state(**kwargs)
+        # quick defensive check
+        # assert super(MultiAgentUDSSCMergeHumanAdversary, self).get_state == UDSSCMergeEnvReset.get_state
+
+        adv_state_weight = 0
+        if 'adv_state_weight' in self.env_params.additional_params:
+            adv_state_weight = self.env_params.additional_params['adv_state_weight']
+        try:
+            perturb = self.adv_actions[1] * adv_state_weight
+        except:
+            perturb = 0
+
+        state += perturb
+
+        state = np.clip(
+            state,
+            a_min=self.observation_space.low,
+            a_max=self.observation_space.high)
+
+        state_dict = {}
+        state_dict['av'] = state
+        if self.env_params.additional_params['action_adversary']:
+            state_dict['action_adversary'] = state
+        # the adversary driving the human cars
+        human_ids = self.k.vehicle.get_human_ids()
+        human_state_dict = {human_id: np.array([np.clip(self.k.vehicle.get_headway(human_id) / 1000.0, 0, 1),
+                             np.clip(self.k.vehicle.get_speed(human_id) / 60.0, 0, 1)]) for human_id in human_ids}
+        state_dict.update(human_state_dict)
+
+        # Go through the human drivers and add zeros if the vehicles have left as a final observation
+        left_vehicles_dict = {veh_id: np.zeros(self.human_adv_obs_space.shape[0]) for veh_id
+                              in self.k.vehicle.get_arrived_ids()}
+        state_dict.update(left_vehicles_dict)
+        return state_dict
+
+    def reset(self, new_inflow_rate=None):
+        """See parent class.
+        The sumo instance is reset with a new ring length, and a number of
+        steps are performed with the rl vehicle acting as a human vehicle.
+        """
+        super(MultiAgentUDSSCMergeHumanAdversary, self).reset()
+        observation = self.get_state()
+        return observation
