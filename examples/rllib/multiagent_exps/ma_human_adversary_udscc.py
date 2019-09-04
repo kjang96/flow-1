@@ -34,7 +34,7 @@ ITR = 160
 N_ROLLOUTS = 40
 # N_ROLLOUTS = 1
 ACTION_ADVERSARY=True
-exp_tag = "icra_ma_74"  # experiment prefix
+exp_tag = "icra_ma_75"  # experiment prefix
 
 # # Local settings
 # N_CPUS = 1
@@ -158,6 +158,8 @@ flow_params = dict(
             "range_inflow_1": [1, 7],
             # whether to apply adversarial perturbations to the actions. If not, the actions just get noised.
             "action_adversary": ACTION_ADVERSARY,
+            # weight of adversarial perturbations
+            "adv_action_weight": 0.1,
         }
     ),
 
@@ -200,91 +202,6 @@ flow_params = dict(
     ),
 )
 
-# if __name__ == '__main__':
-#     if LOCAL:
-#         ray.init()
-#     else:
-#         ray.init("localhost:6379")
-
-#     config = ppo.DEFAULT_CONFIG.copy()
-#     config['num_workers'] = N_CPUS
-#     config['train_batch_size'] = HORIZON * N_ROLLOUTS
-#     config['gamma'] = 0.999  # discount rate
-#     config['model'].update({'fcnet_hiddens': [100, 50, 25]})
-#     config['use_gae'] = True
-#     config['lambda'] = 0.97
-#     config['sgd_minibatch_size'] = 128
-#     config['kl_target'] = 0.02
-#     config['horizon'] = HORIZON
-#     config['observation_filter'] = 'NoFilter'
-    # <-- Tune
-    # if not LOCAL:
-    #     config['lr'] = 1e-4 #tune.grid_search([1e-2, 1e-3, 1e-4, 1e-5])
-    #     config['num_sgd_iter'] = 10 #tune.grid_search([10, 30])
-    #     config['clip_actions'] = True # check this out
-    # config['vf_loss_coeff'] = 1.0
-    # config['vf_clip_param'] = 10.0
-    # # -->
-
-    # # save the flow params for replay
-    # flow_json = json.dumps(
-    #     flow_params, cls=FlowParamsEncoder, sort_keys=True, indent=4)
-    # config['env_config']['flow_params'] = flow_json
-
-    # create_env, env_name = make_create_env(params=flow_params, version=0)
-
-    # # Register as rllib env
-    # register_env(env_name, create_env)
-
-    # test_env = create_env()
-    # obs_space = test_env.observation_space
-    # act_space = test_env.action_space
-    # human_adv_action_space = test_env.human_adv_action_space
-    # human_adv_obs_space = test_env.human_adv_obs_space
-
-    # # Setup PG with an ensemble of `num_policies` different policy graphs
-    # policy_graphs = {'av': (None, obs_space, act_space, {}),
-    #                  'human_adversary': (None, human_adv_obs_space, human_adv_action_space, {})}
-    # policies_to_train = ['av', 'human_adversary']
-    # if ACTION_ADVERSARY:
-    #     action_adv_action_space = test_env.adv_action_space
-    #     policy_graphs['action_adversary'] = (None, obs_space, action_adv_action_space, {})
-    #     policies_to_train.append('action_adversary')
-
-    # # Everything besides 'av' and 'action_adversary' should get mapped to human adversary
-    # def policy_mapping_fn(agent_id):
-    #     if agent_id != 'av' and agent_id != 'action_adversary':
-    #         return 'human_adversary'
-    #     else:
-    #         return agent_id
-
-    # policy_ids = list(policy_graphs.keys())
-
-    # config.update({
-    #     'multiagent': {
-    #         'policy_graphs': policy_graphs,
-    #         'policy_mapping_fn': tune.function(policy_mapping_fn),
-    #         'policies_to_train': policies_to_train
-    #     }
-    # })
-    
-
-
-    # run_experiments({
-    #     flow_params['exp_tag']: {
-    #         'run': 'PPO',
-    #         'env': env_name,
-    #         'checkpoint_freq': 100,
-    #         'stop': {
-    #             'training_iteration': ITR
-    #         },
-    #         'config': config,
-    #         # 'upload_dir': 's3://kathy.experiments/rllib/experiments',
-    #         # 'num_samples': 3
-    #     },
-    # })
-####
-
 def setup_exps():
 
     alg_run = 'PPO'
@@ -305,13 +222,6 @@ def setup_exps():
 
     config['observation_filter'] = 'NoFilter'
 
-    ###
-    # if not LOCAL:
-    #     config['lr'] = 1e-4 #tune.grid_search([1e-2, 1e-3, 1e-4, 1e-5])
-    #     config['num_sgd_iter'] = 10 #tune.grid_search([10, 30])
-    #     config['clip_actions'] = True # check this out
-    # -->
-
     # save the flow params for replay
     flow_json = json.dumps(
         flow_params, cls=FlowParamsEncoder, sort_keys=True, indent=4)
@@ -326,8 +236,8 @@ def setup_exps():
     test_env = create_env()
     obs_space = test_env.observation_space
     act_space = test_env.action_space
-    human_adv_action_space = test_env.human_adv_action_space
-    human_adv_obs_space = test_env.human_adv_obs_space
+    # human_adv_action_space = test_env.human_adv_action_space
+    # human_adv_obs_space = test_env.human_adv_obs_space
 
     # Setup PG with an ensemble of `num_policies` different policy graphs
     # policy_graphs = {'av': (None, obs_space, act_space, {}),

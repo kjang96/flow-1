@@ -1076,15 +1076,16 @@ class MultiAgentUDSSCMergeHumanAdversary(UDSSCMergeEnvReset, MultiEnv):
         the adversary recieves the negative of the agent reward
         """
         reward = super(MultiAgentUDSSCMergeHumanAdversary, self).compute_reward(rl_actions, **kwargs)
-        human_dict = {veh_id: -reward for veh_id in self.k.vehicle.get_human_ids()}
+        # human_dict = {veh_id: -reward for veh_id in self.k.vehicle.get_human_ids()}
         reward_dict = {'av': reward}
-        reward_dict.update(human_dict)
+        # reward_dict.update(human_dict)
         if self.env_params.additional_params['action_adversary']:
             reward_dict['action_adversary'] = -reward
         # Go through the human drivers and add zeros if the vehicles have left as a final observation
-        left_vehicles_dict = {veh_id: 0 for veh_id
-                              in self.k.vehicle.get_arrived_ids()}
-        reward_dict.update(left_vehicles_dict)
+        # left_vehicles_dict = {veh_id: 0 for veh_id
+        #                       in self.k.vehicle.get_arrived_ids()}
+        # reward_dict.update(left_vehicles_dict)
+
         return reward_dict
 
     def get_state(self, **kwargs):
@@ -1113,22 +1114,21 @@ class MultiAgentUDSSCMergeHumanAdversary(UDSSCMergeEnvReset, MultiEnv):
             state,
             a_min=self.observation_space.low,
             a_max=self.observation_space.high)
-        # import ipdb; ipdb.set_trace()
 
         state_dict = {}
         state_dict['av'] = state
         if self.env_params.additional_params['action_adversary']:
             state_dict['action_adversary'] = state
         # the adversary driving the human cars
-        human_ids = self.k.vehicle.get_human_ids()
-        human_state_dict = {human_id: np.array([np.clip(self.k.vehicle.get_headway(human_id) / 1000.0, 0, 1),
-                             np.clip(self.k.vehicle.get_speed(human_id) / 60.0, 0, 1)]) for human_id in human_ids}
-        state_dict.update(human_state_dict)
+        # human_ids = self.k.vehicle.get_human_ids()
+        # human_state_dict = {human_id: np.array([np.clip(self.k.vehicle.get_headway(human_id) / 1000.0, 0, 1),
+        #                      np.clip(self.k.vehicle.get_speed(human_id) / 60.0, 0, 1)]) for human_id in human_ids}
+        # state_dict.update(human_state_dict)
 
-        # Go through the human drivers and add zeros if the vehicles have left as a final observation
-        left_vehicles_dict = {veh_id: np.zeros(self.human_adv_obs_space.shape[0]) for veh_id
-                              in self.k.vehicle.get_arrived_ids()}
-        state_dict.update(left_vehicles_dict)
+        # # Go through the human drivers and add zeros if the vehicles have left as a final observation
+        # left_vehicles_dict = {veh_id: np.zeros(self.human_adv_obs_space.shape[0]) for veh_id
+        #                       in self.k.vehicle.get_arrived_ids()}
+        # state_dict.update(left_vehicles_dict)
 
         return state_dict
 
