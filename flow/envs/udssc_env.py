@@ -976,10 +976,12 @@ class MultiAgentUDSSCMergeHumanAdversary(UDSSCMergeEnvReset, MultiEnv):
         #                  2 + \
         #                  int(self.roundabout_length // 5) * 2 + \
         #                  2
+        actions = 2
+        selective_state = 20
 
         box = Box(low=-1.0,
                   high=1.0,
-                  shape=(2,),
+                  shape=(selective_state + actions,),
                   dtype=np.float32)
         return box
 
@@ -1097,16 +1099,21 @@ class MultiAgentUDSSCMergeHumanAdversary(UDSSCMergeEnvReset, MultiEnv):
         if 'adv_state_weight' in self.env_params.additional_params:
             adv_state_weight = self.env_params.additional_params['adv_state_weight']
         try:
-            perturb = self.adv_actions[1] * adv_state_weight
+            perturb = self.adv_actions[2:] * adv_state_weight
         except:
             perturb = 0
 
-        state += perturb
+        if perturb is not 0:
+            state[0:3] += perturb[:3]
+            state[7:10] += perturb[3:6]
+            state[14:20] += perturb[6:12]
+            state[26:32] += perturb[12:18]
 
         state = np.clip(
             state,
             a_min=self.observation_space.low,
             a_max=self.observation_space.high)
+        # import ipdb; ipdb.set_trace()
 
         state_dict = {}
         state_dict['av'] = state
@@ -1122,6 +1129,7 @@ class MultiAgentUDSSCMergeHumanAdversary(UDSSCMergeEnvReset, MultiEnv):
         left_vehicles_dict = {veh_id: np.zeros(self.human_adv_obs_space.shape[0]) for veh_id
                               in self.k.vehicle.get_arrived_ids()}
         state_dict.update(left_vehicles_dict)
+
         return state_dict
 
     def reset(self, new_inflow_rate=None):
