@@ -34,7 +34,7 @@ ITR = 160
 N_ROLLOUTS = 40
 # N_ROLLOUTS = 1
 ACTION_ADVERSARY=True
-exp_tag = "icra_ma_77"  # experiment prefix
+exp_tag = "icra_ma_78"  # experiment prefix
 
 # # Local settings
 # N_CPUS = 1
@@ -161,7 +161,7 @@ flow_params = dict(
             # weight to apply to adversarial actions to the action space
             'adv_action_weight': 0.1,
             # weight to apply to adversarial actions to the state space
-            'adv_state_weight': 0,
+            'adv_state_weight': 0.1,
         }
     ),
 
