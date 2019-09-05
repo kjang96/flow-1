@@ -34,7 +34,7 @@ ITR = 160
 N_ROLLOUTS = 40
 # N_ROLLOUTS = 1
 ACTION_ADVERSARY=True
-exp_tag = "icra_ma_76"  # experiment prefix
+exp_tag = "icra_ma_77"  # experiment prefix
 
 # # Local settings
 # N_CPUS = 1
@@ -159,9 +159,9 @@ flow_params = dict(
             # whether to apply adversarial perturbations to the actions. If not, the actions just get noised.
             "action_adversary": ACTION_ADVERSARY,
             # weight to apply to adversarial actions to the action space
-            'adv_action_weight': 0,
+            'adv_action_weight': 0.1,
             # weight to apply to adversarial actions to the state space
-            'adv_state_weight': 0.1,
+            'adv_state_weight': 0,
         }
     ),
 
