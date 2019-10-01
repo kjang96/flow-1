@@ -1020,7 +1020,7 @@ class MultiAgentUDSSCMerge(UDSSCMergeEnvReset, MultiEnv):
                          
         box = Box(low=0.,
                   high=1,
-                  shape=(self.total_obs-7,), # -7 for the experiments that only have a single rl_info
+                  shape=(self.total_obs,), # -7 for the experiments that only have a single rl_info
                   dtype=np.float32)          
         return box
 
@@ -1031,8 +1031,11 @@ class MultiAgentUDSSCMerge(UDSSCMergeEnvReset, MultiEnv):
                         'merge_dists_1', 'merge_1_vel',
                         'queue_0', 'queue_1',
                         'roundabout_full', 'len_inflow_0', 'len_inflow_1']
-        state0 = np.concatenate([state_dict[key] for key in state_dict_keys if key != 'rl_info_2'])
-        state1 = np.concatenate([state_dict[key] for key in state_dict_keys if key != 'rl_info'])
+
+        state0 = np.concatenate([state_dict[key] for key in state_dict_keys])
+        state1 = np.concatenate([state_dict[key] for key in state_dict_keys])
+        # state0 = np.concatenate([state_dict[key] for key in state_dict_keys if key != 'rl_info_2'])
+        # state1 = np.concatenate([state_dict[key] for key in state_dict_keys if key != 'rl_info'])
 
         state0 = np.clip(
             state0,
