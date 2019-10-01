@@ -26,19 +26,19 @@ ITR = 160
 N_ROLLOUTS = 40
 exp_tag = "icra_73"  # experiment prefix
 
-# # Local settings
-# N_CPUS = 1
-# RENDER = False
-# MODE = "local"
-# RESTART_INSTANCE = True
-# LOCAL = True
-
-# Autoscaler settings
-N_CPUS = 10
+# Local settings
+N_CPUS = 1
 RENDER = False
 MODE = "local"
 RESTART_INSTANCE = True
-LOCAL = False
+LOCAL = True
+
+# # Autoscaler settings
+# N_CPUS = 10
+# RENDER = False
+# MODE = "local"
+# RESTART_INSTANCE = True
+# LOCAL = False
 
 # We place one autonomous vehicle and 13 human-driven vehicles in the network
 vehicles = VehicleParams()

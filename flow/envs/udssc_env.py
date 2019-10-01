@@ -817,7 +817,9 @@ class UDSSCMergeEnvReset(UDSSCMergeEnv):
                   dtype=np.float32)          
         return box
 
-    def get_state(self, **kwargs):
+    def get_state(self, internal=False, **kwargs):
+        state_dict = {}
+
         self.curate_rl_stack()
 
         rl_id = None
@@ -832,6 +834,8 @@ class UDSSCMergeEnvReset(UDSSCMergeEnv):
 
         rl_info = self.rl_info(self.rl_stack)
         rl_info_2 = self.rl_info(self.rl_stack_2)
+        state_dict['rl_info'] = rl_info
+        state_dict['rl_info_2'] = rl_info_2
 
         # DISTANCES
         # sorted by closest to farthest
@@ -843,6 +847,9 @@ class UDSSCMergeEnvReset(UDSSCMergeEnv):
                                     length=self.n_merging_in,
                                     normalizer=merge_1_norm)
 
+        state_dict['merge_dists_0'] = merge_dists_0
+        state_dict['merge_dists_1'] = merge_dists_1
+
 
         # VELOCITIES
         merge_0_vel = self.process(self.k.vehicle.get_speed(merge_id_0),
@@ -852,9 +859,15 @@ class UDSSCMergeEnvReset(UDSSCMergeEnv):
                                 length=self.n_merging_in,
                                 normalizer=max_speed)
 
+        state_dict['merge_0_vel'] = merge_0_vel
+        state_dict['merge_1_vel'] = merge_1_vel
+
         queue_0, queue_1 = self.queue_length()
         queue_0 = [queue_0 / queue_0_norm]
         queue_1 = [queue_1 / queue_1_norm]
+
+        state_dict['queue_0'] = queue_0
+        state_dict['queue_1'] = queue_1
         
         roundabout_full = self.roundabout_full()
         
@@ -864,6 +877,7 @@ class UDSSCMergeEnvReset(UDSSCMergeEnv):
         # Normalize the 1st column containing velocities
         roundabout_full[:,1] = roundabout_full[:,1]/max_speed
         roundabout_full = roundabout_full.flatten().tolist()
+        state_dict['roundabout_full'] = roundabout_full
         
         state = np.array(np.concatenate([rl_info, rl_info_2,
                                         merge_dists_0, merge_0_vel,
@@ -873,7 +887,20 @@ class UDSSCMergeEnvReset(UDSSCMergeEnv):
 
         len_inflow_0 = self.len_inflow_0 / self.max_inflow
         len_inflow_1 = self.len_inflow_1 / self.max_inflow
+        state_dict['len_inflow_0'] = [len_inflow_0]
+        state_dict['len_inflow_1'] = [len_inflow_1]
+
         state = np.concatenate([state, [len_inflow_0, len_inflow_1]])
+        
+        state_dict_keys = ['rl_info', 'rl_info_2',
+                           'merge_dists_0', 'merge_0_vel',
+                           'merge_dists_1', 'merge_1_vel',
+                           'queue_0', 'queue_1',
+                           'roundabout_full', 'len_inflow_0', 'len_inflow_1']
+        if internal:
+            return state_dict, state_dict_keys
+
+
         if "state_noise" in self.env_params.additional_params:
             std = self.env_params.additional_params.get("state_noise")
             for i, st in enumerate(state):
@@ -957,6 +984,71 @@ class UDSSCMergeEnvReset(UDSSCMergeEnv):
         # perform the generic reset function
         observation = super().reset()
         return observation
+
+class MultiAgentUDSSCMerge(UDSSCMergeEnvReset, MultiEnv):
+    """Non-adversarial multi-agent env.
+
+    One example of this is: both AVs in the platoon are running separate
+    policies. This can later extend to other vehicles in the system, should
+    we try a fully autonomous case.
+    """
+    def __init__(self, env_params, sim_params, scenario, simulator='traci'):
+        super(MultiAgentUDSSCMerge, self).__init__(env_params, sim_params, scenario, simulator='traci')
+
+    @property
+    def action_space(self):
+        """
+        Actions
+        Actions are a list of acceleration for the RL vehicle currently being
+        controlled, bounded by the maximum accelerations and decelerations
+        specified in EnvParams. 
+        """
+        return Box(low=-np.abs(self.env_params.additional_params["max_decel"]),
+                high=self.env_params.additional_params["max_accel"],
+                shape=(1,),
+                dtype=np.float32)
+
+    def get_state(self, **kwargs):
+        state_dict, state_dict_keys = super(MultiAgentUDSSCMerge, self).get_state(internal=True, **kwargs)
+        state_dict_keys = ['rl_info', 'rl_info_2',
+                        'merge_dists_0', 'merge_0_vel',
+                        'merge_dists_1', 'merge_1_vel',
+                        'queue_0', 'queue_1',
+                        'roundabout_full', 'len_inflow_0', 'len_inflow_1']
+        state = np.concatenate([state_dict[key] for key in state_dict_keys])
+        return {'av0': state, 'av1': state}
+
+    def _apply_rl_actions(self, rl_actions):
+        """See class definition."""
+        rl_action_0 = rl_actions['av0']
+        rl_action_1 = rl_actions['av1']
+
+        self.curate_rl_stack()
+
+        accels = []
+        valid_ids = []
+
+        # Apply RL Actions
+        if self.rl_stack:
+            rl_id = self.rl_stack[0]
+            if self.in_control(rl_id):
+                accels.append(rl_action_0)
+                valid_ids.append(rl_id)
+
+        if self.rl_stack_2:
+            rl_id_2 = self.rl_stack_2[0]
+            if self.in_control(rl_id_2):
+                accels.append(rl_action_1)
+                valid_ids.append(rl_id_2)
+
+        # TODO(@evinitsky) why is the human perturbation the wrong size????
+        self.k.vehicle.apply_acceleration(valid_ids, np.array(accels))
+
+    def compute_reward(self, rl_actions, **kwargs):
+        reward = super(MultiAgentUDSSCMerge, self).compute_reward(rl_actions, **kwargs)
+        return {'av0': reward, 'av1': reward}
+
+
 
 
 class MultiAgentUDSSCMergeHumanAdversary(UDSSCMergeEnvReset, MultiEnv):
