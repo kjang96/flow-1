@@ -1008,6 +1008,22 @@ class MultiAgentUDSSCMerge(UDSSCMergeEnvReset, MultiEnv):
                 shape=(1,),
                 dtype=np.float32)
 
+    @property
+    def observation_space(self):
+        self.total_obs = 7 * 2 + \
+                         self.n_merging_in * 4 + \
+                         2 + \
+                         int(self.roundabout_length // 5) * 2 + \
+                         2
+        # self.total_obs = self.n_obs_vehicles * 2 + 2 + \
+        #                  int(self.roundabout_length // 5) * 2
+                         
+        box = Box(low=0.,
+                  high=1,
+                  shape=(self.total_obs-7,), # -7 for the experiments that only have a single rl_info
+                  dtype=np.float32)          
+        return box
+
     def get_state(self, **kwargs):
         state_dict, state_dict_keys = super(MultiAgentUDSSCMerge, self).get_state(internal=True, **kwargs)
         state_dict_keys = ['rl_info', 'rl_info_2',
@@ -1017,6 +1033,17 @@ class MultiAgentUDSSCMerge(UDSSCMergeEnvReset, MultiEnv):
                         'roundabout_full', 'len_inflow_0', 'len_inflow_1']
         state0 = np.concatenate([state_dict[key] for key in state_dict_keys if key != 'rl_info_2'])
         state1 = np.concatenate([state_dict[key] for key in state_dict_keys if key != 'rl_info'])
+
+        state0 = np.clip(
+            state0,
+            a_min=self.observation_space.low,
+            a_max=self.observation_space.high)
+
+        state1 = np.clip(
+            state1,
+            a_min=self.observation_space.low,
+            a_max=self.observation_space.high)
+
         return {'av0': state0, 'av1': state1}
 
     def _apply_rl_actions(self, rl_actions):
