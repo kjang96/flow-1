@@ -30,11 +30,11 @@ from flow.utils.rllib import FlowParamsEncoder
 # Training settings
 HORIZON = 500
 SIM_STEP = 1
-ITR = 160
+ITR = 100
 N_ROLLOUTS = 40
 # N_ROLLOUTS = 1
 ACTION_ADVERSARY=True
-exp_tag = "tro-0"  # experiment prefix
+exp_tag = "tro-1"  # experiment prefix
 
 # # Local settings
 # N_CPUS = 1

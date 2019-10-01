@@ -1015,8 +1015,9 @@ class MultiAgentUDSSCMerge(UDSSCMergeEnvReset, MultiEnv):
                         'merge_dists_1', 'merge_1_vel',
                         'queue_0', 'queue_1',
                         'roundabout_full', 'len_inflow_0', 'len_inflow_1']
-        state = np.concatenate([state_dict[key] for key in state_dict_keys])
-        return {'av0': state, 'av1': state}
+        state0 = np.concatenate([state_dict[key] for key in state_dict_keys if key != 'rl_info_2'])
+        state1 = np.concatenate([state_dict[key] for key in state_dict_keys if key != 'rl_info'])
+        return {'av0': state0, 'av1': state1}
 
     def _apply_rl_actions(self, rl_actions):
         """See class definition."""
