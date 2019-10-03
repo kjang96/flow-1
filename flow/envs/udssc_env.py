@@ -6,8 +6,9 @@ from flow.controllers import RLController, IDMController, ContinuousRouter
 from flow.core.params import SumoParams, EnvParams, NetParams, InitialConfig, \
     SumoCarFollowingParams, SumoLaneChangeParams, VehicleParams  
 
-from gym.spaces.box import Box
-from gym.spaces.tuple_space import Tuple
+# from gym.spaces.box import Box
+# from gym.spaces.tuple_space import Tuple
+from gym.spaces import Box, Tuple, Dict
 
 from copy import deepcopy
 from math import ceil
@@ -797,8 +798,24 @@ class UDSSCMergeEnvReset(UDSSCMergeEnv):
         self.max_inflow = max(self.range_inflow_0 + self.range_inflow_1)
         self.batch_size = env_params.additional_params["batch_size"]
         self.counter = 0
+        self.max_actions = max(self.range_inflow_0, self.range_inflow_1)
 
         super().__init__(env_params, sim_params, scenario)
+
+
+    @property
+    def action_space(self):
+        """
+        Actions
+        Actions are a list of acceleration for the RL vehicle currently being
+        controlled, bounded by the maximum accelerations and decelerations
+        specified in EnvParams. 
+        """
+        return Box(low=-np.abs(self.env_params.additional_params["max_decel"]),
+                   high=self.env_params.additional_params["max_accel"],
+                   shape=(self.max_actions,),
+                   dtype=np.float32)
+        
 
     @property
     def observation_space(self):
@@ -808,9 +825,12 @@ class UDSSCMergeEnvReset(UDSSCMergeEnv):
                          2 + \
                          int(self.roundabout_length // 5) * 2 + \
                          2
-        # self.total_obs = self.n_obs_vehicles * 2 + 2 + \
-        #                  int(self.roundabout_length // 5) * 2
-                         
+    
+        ret = Dict({
+            "action_mask": Box(0, 1, shape=(self.max_actions, )),
+            "avail_actions": Box(-10, 10, shape=(self.max_actions, 2)),
+            "cart": self.wrapped.observation_space,
+        })
         box = Box(low=0.,
                   high=1,
                   shape=(self.total_obs,),
@@ -961,9 +981,9 @@ class UDSSCMergeEnvReset(UDSSCMergeEnv):
                 self.len_inflow_1 = 3
 
             for i in range(self.len_inflow_0):
-                inflow.add(veh_type="idm", edge="inflow_0", name="idm", vehs_per_hour=50)
+                inflow.add(veh_type="rl", edge="inflow_0", name="rl", vehs_per_hour=50)
             for i in range(self.len_inflow_1):
-                inflow.add(veh_type="idm", edge="inflow_1", name="idm", vehs_per_hour=50)
+                inflow.add(veh_type="rl", edge="inflow_1", name="rl", vehs_per_hour=50)
 
             # update the scenario\
             net_params = self.net_params
@@ -973,7 +993,7 @@ class UDSSCMergeEnvReset(UDSSCMergeEnv):
                 self.scenario.orig_name, self.scenario.vehicles, 
                 net_params, self.scenario.initial_config)
             #------------------------------------------------
-            # issue a random seed to induce randomness into the next rollout
+            # issue a random seed to induce randomness  into the next rollout
             # self.sim_params.seed = np.random.randint(0, 1e5)
 
             # self.k.vehicle = deepcopy(self.initial_vehicles)
@@ -1032,52 +1052,53 @@ class MultiAgentUDSSCMerge(UDSSCMergeEnvReset, MultiEnv):
                         'queue_0', 'queue_1',
                         'roundabout_full', 'len_inflow_0', 'len_inflow_1']
 
-        state0 = np.concatenate([state_dict[key] for key in state_dict_keys])
-        state1 = np.concatenate([state_dict[key] for key in state_dict_keys])
-        # state0 = np.concatenate([state_dict[key] for key in state_dict_keys if key != 'rl_info_2'])
-        # state1 = np.concatenate([state_dict[key] for key in state_dict_keys if key != 'rl_info'])
-
-        state0 = np.clip(
-            state0,
+        state = np.concatenate([state_dict[key] for key in state_dict_keys])
+        state = np.clip(
+            state,
             a_min=self.observation_space.low,
             a_max=self.observation_space.high)
 
-        state1 = np.clip(
-            state1,
-            a_min=self.observation_space.low,
-            a_max=self.observation_space.high)
+        rl_ids = self.k.vehicle.get_rl_ids()
+        ret = {}
+        for rl_id in rl_ids:
+            ret[rl_id] = state
 
-        return {'av0': state0, 'av1': state1}
+        
+
+        return ret
 
     def _apply_rl_actions(self, rl_actions):
         """See class definition."""
-        rl_action_0 = rl_actions['av0']
-        rl_action_1 = rl_actions['av1']
-
-        self.curate_rl_stack()
-
         accels = []
         valid_ids = []
 
-        # Apply RL Actions
-        if self.rl_stack:
-            rl_id = self.rl_stack[0]
+        for rl_id, a in rl_actions.items():
             if self.in_control(rl_id):
-                accels.append(rl_action_0)
+                accels.append(a)
                 valid_ids.append(rl_id)
 
-        if self.rl_stack_2:
-            rl_id_2 = self.rl_stack_2[0]
-            if self.in_control(rl_id_2):
-                accels.append(rl_action_1)
-                valid_ids.append(rl_id_2)
+        # # Apply RL Actions
+        # if self.rl_stack:
+        #     rl_id = self.rl_stack[0]
+        #     if self.in_control(rl_id):
+        #         accels.append(rl_action_0)
+        #         valid_ids.append(rl_id)
+
+        # if self.rl_stack_2:
+        #     rl_id_2 = self.rl_stack_2[0]
+        #     if self.in_control(rl_id_2):
+        #         accels.append(rl_action_1)
+        #         valid_ids.append(rl_id_2)
 
         # TODO(@evinitsky) why is the human perturbation the wrong size????
         self.k.vehicle.apply_acceleration(valid_ids, np.array(accels))
 
     def compute_reward(self, rl_actions, **kwargs):
         reward = super(MultiAgentUDSSCMerge, self).compute_reward(rl_actions, **kwargs)
-        return {'av0': reward, 'av1': reward}
+        ret = {}
+        for rl_id in self.k.vehicle.get_rl_ids():
+            ret[rl_id] = reward
+        return ret
 
 
 
@@ -1252,8 +1273,9 @@ class MultiAgentUDSSCMergeHumanAdversary(UDSSCMergeEnvReset, MultiEnv):
         # left_vehicles_dict = {veh_id: np.zeros(self.human_adv_obs_space.shape[0]) for veh_id
         #                       in self.k.vehicle.get_arrived_ids()}
         # state_dict.update(left_vehicles_dict)
-
-        return state_dict
+        
+        
+        return state_dict 
 
     def reset(self, new_inflow_rate=None):
         """See parent class.

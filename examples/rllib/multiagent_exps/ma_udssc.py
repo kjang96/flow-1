@@ -30,11 +30,11 @@ from flow.utils.rllib import FlowParamsEncoder
 # Training settings
 HORIZON = 500
 SIM_STEP = 1
-ITR = 100
+ITR = 160
 N_ROLLOUTS = 40
 # N_ROLLOUTS = 1
 ACTION_ADVERSARY=True
-exp_tag = "tro-3"  # experiment prefix
+exp_tag = "tro-4"  # experiment prefix
 
 # # Local settings
 # N_CPUS = 1
@@ -55,7 +55,7 @@ vehicles = VehicleParams()
 
 # Inner ring vehicles
 vehicles.add(veh_id="idm",
-                acceleration_controller=(IDMController, {"noise": 0.1}),
+                acceleration_controller=(IDMController, {"noise": 0}), #TODO
                 lane_change_controller=(SimLaneChangeController, {}),
                 routing_controller=(ContinuousRouter, {}),
                 num_vehicles=1,
@@ -94,13 +94,24 @@ vehicles.add(veh_id="rl",
 inflow = InFlows()
 
 inflow.add(veh_type="rl", edge="inflow_0", name="rl", vehs_per_hour=50)
-inflow.add(veh_type="idm", edge="inflow_0", name="idm", vehs_per_hour=50)
-inflow.add(veh_type="idm", edge="inflow_0", name="idm", vehs_per_hour=50)
+inflow.add(veh_type="rl", edge="inflow_0", name="rl", vehs_per_hour=50)
+inflow.add(veh_type="rl", edge="inflow_0", name="rl", vehs_per_hour=50)
 
 inflow.add(veh_type="rl", edge="inflow_1", name="rl", vehs_per_hour=50)
-inflow.add(veh_type="idm", edge="inflow_1", name="idm", vehs_per_hour=50)
-inflow.add(veh_type="idm", edge="inflow_1", name="idm", vehs_per_hour=50)
-inflow.add(veh_type="idm", edge="inflow_1", name="idm", vehs_per_hour=50)
+inflow.add(veh_type="rl", edge="inflow_1", name="rl", vehs_per_hour=50)
+inflow.add(veh_type="rl", edge="inflow_1", name="rl", vehs_per_hour=50)
+inflow.add(veh_type="rl", edge="inflow_1", name="rl", vehs_per_hour=50)
+
+# <!-- OLD SETUP
+# inflow.add(veh_type="rl", edge="inflow_0", name="rl", vehs_per_hour=50)
+# inflow.add(veh_type="idm", edge="inflow_0", name="idm", vehs_per_hour=50)
+# inflow.add(veh_type="idm", edge="inflow_0", name="idm", vehs_per_hour=50)
+
+# inflow.add(veh_type="rl", edge="inflow_1", name="rl", vehs_per_hour=50)
+# inflow.add(veh_type="idm", edge="inflow_1", name="idm", vehs_per_hour=50)
+# inflow.add(veh_type="idm", edge="inflow_1", name="idm", vehs_per_hour=50)
+# inflow.add(veh_type="idm", edge="inflow_1", name="idm", vehs_per_hour=50)
+# -->
 
 flow_params = dict(
     # name of the experiment
@@ -242,16 +253,19 @@ def setup_exps():
     # human_adv_obs_space = test_env.human_adv_obs_space
 
     # Setup PG with an ensemble of `num_policies` different policy graphs
-    # policy_graphs = {'av': (None, obs_space, act_space, {}),
-    #                  'human_adversary': (None, human_adv_obs_space, human_adv_action_space, {})}
-    policy_graphs = {'av0': (None, obs_space, act_space, {}),
-                     'av1': (None, obs_space, act_space, {}),}
+    policy_graphs = {'rl': (None, obs_space, act_space, {})}
+                    #  'human_adversary': (None, human_adv_obs_space, human_adv_action_space, {})}
+    # policy_graphs = {'av0': (None, obs_space, act_space, {}),
+    #                  'av1': (None, obs_space, act_space, {}),}
                      
-    policies_to_train = ['av0', 'av1']
+    # policies_to_train = ['av0', 'av1']
+    policies_to_train = ['rl']#, 'action_adversary']
 
     # Everything besides 'av' and 'action_adversary' should get mapped to human adversary
     def policy_mapping_fn(agent_id):
-        return agent_id
+        if agent_id.startswith('rl'):
+            return 'rl'
+        # # return agent_id
         # if agent_id != 'av':
         #     return 'action_adversary'
         # else:
