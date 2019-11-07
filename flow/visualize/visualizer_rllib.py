@@ -63,7 +63,7 @@ def visualizer_rllib(args):
 
     # check if we have a multiagent scenario but in a
     # backwards compatible way
-    if config.get('multiagent', {}).get('policy_graphs', {}):
+    if config.get('multiagent', {}).get('policies', {}):
         multiagent = True
         config['multiagent'] = pkl['multiagent']
     else:
@@ -179,7 +179,8 @@ def visualizer_rllib(args):
         rets = {}
         # map the agent id to its policy
         policy_map_fn = config['multiagent']['policy_mapping_fn'].func
-        for key in config['multiagent']['policy_graphs'].keys():
+        # for key in config['multiagent']['policy_graphs'].keys():
+        for key in config['multiagent']['policies'].keys():
             rets[key] = []
     else:
         rets = []
@@ -408,5 +409,5 @@ def create_parser():
 if __name__ == '__main__':
     parser = create_parser()
     args = parser.parse_args()
-    ray.init(num_cpus=1)
+    ray.init(num_cpus=1, object_store_memory=10000000)
     visualizer_rllib(args)
