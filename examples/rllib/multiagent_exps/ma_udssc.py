@@ -253,10 +253,8 @@ def setup_exps():
     # human_adv_obs_space = test_env.human_adv_obs_space
 
     # Setup PG with an ensemble of `num_policies` different policy graphs
-    policy_graphs = {'rl': (None, obs_space, act_space, {})}
+    policies = {'rl': (None, obs_space, act_space, {})}
                     #  'human_adversary': (None, human_adv_obs_space, human_adv_action_space, {})}
-    # policy_graphs = {'av0': (None, obs_space, act_space, {}),
-    #                  'av1': (None, obs_space, act_space, {}),}
                      
     # policies_to_train = ['av0', 'av1']
     policies_to_train = ['rl']#, 'action_adversary']
@@ -272,11 +270,12 @@ def setup_exps():
         #     return agent_id
         
 
-    policy_ids = list(policy_graphs.keys())
+    # policy_ids = list(policy_graphs.keys())
 
     config.update({
         'multiagent': {
-            'policy_graphs': policy_graphs,
+            # 'policy_graphs': policy_graphs,
+            'policies': policies,
             'policy_mapping_fn': tune.function(policy_mapping_fn),
             'policies_to_train': policies_to_train
         }
