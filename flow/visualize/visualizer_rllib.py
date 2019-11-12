@@ -11,6 +11,8 @@ EXAMPLE_USAGE : str
 parser : ArgumentParser
     Command-line argument parser
 """
+import faulthandler
+faulthandler.enable()
 
 import argparse
 from datetime import datetime
@@ -45,6 +47,8 @@ Here the arguments are:
 
 
 def visualizer_rllib(args):
+    print("TO KATHY: Don't forget you have this super jank implementation\
+        where you manually brought policy_map_fn here!!!!!")
     """Visualizer for RLlib experiments.
 
     This function takes args (see function create_parser below for
@@ -203,9 +207,17 @@ def visualizer_rllib(args):
             ]
     else:
         use_lstm = False
-
+    # import ipdb; ipdb.set_trace()
     env.restart_simulation(
         sim_params=sim_params, render=sim_params.render)
+
+    # <!-------
+    def policy_map_fn(agent_id):
+        # try:
+        if agent_id.startswith('rl'):
+            return 'rl'
+
+    # --------_>
 
     # Simulate and collect metrics
     final_outflows = []
