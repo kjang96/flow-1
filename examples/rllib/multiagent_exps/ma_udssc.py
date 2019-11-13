@@ -30,15 +30,15 @@ from flow.utils.rllib import FlowParamsEncoder
 # Training settings
 HORIZON = 500
 SIM_STEP = 1
-ITR = 400
+ITR = 800
 N_ROLLOUTS = 40
 # N_ROLLOUTS = 1
 ACTION_ADVERSARY=True
-exp_tag = "tro-5"  # experiment prefix
+exp_tag = "kj-tro-6"  # experiment prefix
 
 # # Local settings
 # N_CPUS = 1
-# RENDER = False
+# RENDER = True
 # MODE = "local"
 # RESTART_INSTANCE = True
 # LOCAL = True
@@ -164,9 +164,11 @@ flow_params = dict(
             # what portion of the ramp the RL vehicle isn't controlled for 
             "control_length": 0.1,
             # range of inflow lengths for inflow_0, inclusive
-            "range_inflow_0": [1, 4],
+            # "range_inflow_0": [1, 4],
+            "range_inflow_0": [4, 5], # Force it to be 4
             # range of inflow lengths for inflow_1, inclusive
-            "range_inflow_1": [1, 7],
+            # "range_inflow_1": [1, 7],
+            "range_inflow_1": [5, 6], # Force it to be 5
             # whether to apply adversarial perturbations to the actions. If not, the actions just get noised.
             "action_adversary": ACTION_ADVERSARY,
             # weight to apply to adversarial actions to the action space
