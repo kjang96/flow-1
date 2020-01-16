@@ -34,7 +34,7 @@ ITR = 800
 N_ROLLOUTS = 40
 # N_ROLLOUTS = 1
 ACTION_ADVERSARY=True
-exp_tag = "kjtro6"  # experiment prefix
+exp_tag = "kjtro7"  # experiment prefix
 
 # # Local settings
 # N_CPUS = 1
@@ -84,7 +84,8 @@ vehicles.add(veh_id="rl",
                     tau=1.1,
                     impatience=0.05,
                     # max_speed=8,
-                    speed_mode="no_collide",
+                    # speed_mode="no_collide",
+                    speed_mode=23,
                 ),
                 lane_change_params=SumoLaneChangeParams(
                     lane_change_mode="aggressive"
@@ -291,7 +292,7 @@ def setup_exps():
 if __name__ == '__main__':
     alg_run, gym_name, config = setup_exps()
     if LOCAL:
-        ray.init(num_cpus=N_CPUS+1, object_store_memory=10000000)
+        ray.init(num_cpus=N_CPUS+1, object_store_memory=78643200)
     else:
         ray.init(num_cpus=N_CPUS+1)
     trials = run_experiments({
