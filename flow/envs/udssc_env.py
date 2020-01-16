@@ -1030,13 +1030,15 @@ class MultiAgentUDSSCMerge(UDSSCMergeEnvReset, MultiEnv):
 
     @property
     def observation_space(self):
-        self.total_obs = 7 * 2 + \
-                         self.n_merging_in * 4 + \
-                         2 + \
-                         int(self.roundabout_length // 5) * 2 + \
-                         2
+        # self.total_obs = 7 * 2 + \
+        #                  self.n_merging_in * 4 + \
+        #                  2 + \
+        #                  int(self.roundabout_length // 5) * 2 + \
+        #                  2
         # self.total_obs = self.n_obs_vehicles * 2 + 2 + \
         #                  int(self.roundabout_length // 5) * 2
+
+        self.total_obs = 3
                          
         box = Box(low=0.,
                   high=1,
@@ -1045,26 +1047,46 @@ class MultiAgentUDSSCMerge(UDSSCMergeEnvReset, MultiEnv):
         return box
 
     def get_state(self, **kwargs):
-        state_dict, state_dict_keys = super(MultiAgentUDSSCMerge, self).get_state(internal=True, **kwargs)
-        state_dict_keys = ['rl_info', 'rl_info_2',
-                        'merge_dists_0', 'merge_0_vel',
-                        'merge_dists_1', 'merge_1_vel',
-                        'queue_0', 'queue_1',
-                        'roundabout_full', 'len_inflow_0', 'len_inflow_1']
+        """
+        The state space is not gucci. Need RL info for every individual RL vehicle
 
-        state = np.concatenate([state_dict[key] for key in state_dict_keys])
-        state = np.clip(
-            state,
-            a_min=self.observation_space.low,
-            a_max=self.observation_space.high)
+        I think I can actually rewrite the state. Whate we want: distance and vel of each vehicle? Idk if
+        absolute velocity will be great, but might as well do this anyway.
+        """
+        
+
+
+        # state_dict, state_dict_keys = super(MultiAgentUDSSCMerge, self).get_state(internal=True, **kwargs)
+        # state_dict_keys = ['rl_info', 'rl_info_2',
+        #                 'merge_dists_0', 'merge_0_vel',
+        #                 'merge_dists_1', 'merge_1_vel',
+        #                 'queue_0', 'queue_1',
+        #                 'roundabout_full', 'len_inflow_0', 'len_inflow_1']
+
+        # state = np.concatenate([state_dict[key] for key in state_dict_keys])
+        # state = np.clip(
+        #     state,
+        #     a_min=self.observation_space.low,
+        #     a_max=self.observation_space.high)
 
         rl_ids = self.k.vehicle.get_rl_ids()
         ret = {}
         for rl_id in rl_ids:
+
+
+            max_speed = self.k.scenario.max_speed() 
+            
+            # rl_pos, rl_vel
+            rl_pos = [self.k.vehicle.get_x_by_id(rl_id) / self.scenario_length]
+            rl_vel = [self.k.vehicle.get_speed(rl_id) / max_speed] if \
+                    self.k.vehicle.get_speed(rl_id)!= -1001 else [0]
+            if self.k.vehicle.get_edge(rl_id) in ROUNDABOUT_EDGES:
+                rl_pos_2 = [self.k.vehicle.get_x_by_id(rl_id) / self.roundabout_length]
+            else: 
+                rl_pos_2 = [0]
+            state = np.concatenate([rl_pos, rl_vel, rl_pos_2])
             ret[rl_id] = state
-
         
-
         return ret
 
     def _apply_rl_actions(self, rl_actions):

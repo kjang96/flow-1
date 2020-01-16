@@ -34,7 +34,7 @@ ITR = 400
 N_ROLLOUTS = 40
 # N_ROLLOUTS = 1
 ACTION_ADVERSARY=True
-exp_tag = "kjtro8"  # experiment prefix
+exp_tag = "kjtro9"  # experiment prefix
 
 # # Local settings
 # N_CPUS = 1
