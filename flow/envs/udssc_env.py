@@ -1038,7 +1038,7 @@ class MultiAgentUDSSCMerge(UDSSCMergeEnvReset, MultiEnv):
         # self.total_obs = self.n_obs_vehicles * 2 + 2 + \
         #                  int(self.roundabout_length // 5) * 2
 
-        self.total_obs = 3
+        self.total_obs = 2
                          
         box = Box(low=0.,
                   high=1,
@@ -1084,7 +1084,8 @@ class MultiAgentUDSSCMerge(UDSSCMergeEnvReset, MultiEnv):
                 rl_pos_2 = [self.k.vehicle.get_x_by_id(rl_id) / self.roundabout_length]
             else: 
                 rl_pos_2 = [0]
-            state = np.concatenate([rl_pos, rl_vel, rl_pos_2])
+            state = np.concatenate([rl_pos, rl_vel])
+            # state = np.concatenate([rl_pos, rl_vel, rl_pos_2])
             ret[rl_id] = state
         
         return ret
