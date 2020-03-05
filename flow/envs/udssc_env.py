@@ -977,7 +977,7 @@ class UDSSCMergeEnvReset(UDSSCMergeEnv):
             
             # Forcing the default
             if np.random.random() <= 1:
-                self.len_inflow_0 = 2
+                self.len_inflow_0 = 3
                 self.len_inflow_1 = 3
 
             for _ in range(self.len_inflow_0):
@@ -1085,6 +1085,10 @@ class MultiAgentUDSSCMerge(UDSSCMergeEnvReset, MultiEnv):
             else: 
                 rl_pos_2 = [0]
             state = np.concatenate([rl_pos, rl_vel])
+            state = np.clip(
+                state,
+                a_min=self.observation_space.low,
+                a_max=self.observation_space.high)
             # state = np.concatenate([rl_pos, rl_vel, rl_pos_2])
             ret[rl_id] = state
         

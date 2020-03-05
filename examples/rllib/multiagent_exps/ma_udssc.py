@@ -34,11 +34,11 @@ ITR = 400
 N_ROLLOUTS = 40
 # N_ROLLOUTS = 1
 ACTION_ADVERSARY=True
-exp_tag = "kjtro10"  # experiment prefix
+exp_tag = "kjtro11"  # experiment prefix
 
 # # Local settings
 # N_CPUS = 1
-# RENDER = False
+# RENDER = True
 # MODE = "local"
 # RESTART_INSTANCE = True
 # LOCAL = True
@@ -85,7 +85,7 @@ vehicles.add(veh_id="rl",
                     impatience=0.05,
                     # max_speed=8,
                     # speed_mode="no_collide",
-                    speed_mode=23,
+                    speed_mode=1,
                 ),
                 lane_change_params=SumoLaneChangeParams(
                     lane_change_mode="aggressive"
@@ -94,16 +94,16 @@ vehicles.add(veh_id="rl",
 
 inflow = InFlows()
 
-inflow.add(veh_type="rl", edge="inflow_0", name="rl", vehs_per_hour=50)
-inflow.add(veh_type="rl", edge="inflow_0", name="rl", vehs_per_hour=50)
-inflow.add(veh_type="rl", edge="inflow_0", name="rl", vehs_per_hour=50)
+# inflow.add(veh_type="rl", edge="inflow_0", name="rl", vehs_per_hour=50)
+# inflow.add(veh_type="rl", edge="inflow_0", name="rl", vehs_per_hour=50)
+# inflow.add(veh_type="rl", edge="inflow_0", name="rl", vehs_per_hour=50)
 
-inflow.add(veh_type="rl", edge="inflow_1", name="rl", vehs_per_hour=50)
-inflow.add(veh_type="rl", edge="inflow_1", name="rl", vehs_per_hour=50)
-inflow.add(veh_type="rl", edge="inflow_1", name="rl", vehs_per_hour=50)
-inflow.add(veh_type="rl", edge="inflow_1", name="rl", vehs_per_hour=50)
+# inflow.add(veh_type="rl", edge="inflow_1", name="rl", vehs_per_hour=50)
+# inflow.add(veh_type="rl", edge="inflow_1", name="rl", vehs_per_hour=50)
+# inflow.add(veh_type="rl", edge="inflow_1", name="rl", vehs_per_hour=50)
+# inflow.add(veh_type="rl", edge="inflow_1", name="rl", vehs_per_hour=50)
 
-# <!-- OLD SETUP
+# # <!-- OLD SETUP
 # inflow.add(veh_type="rl", edge="inflow_0", name="rl", vehs_per_hour=50)
 # inflow.add(veh_type="idm", edge="inflow_0", name="idm", vehs_per_hour=50)
 # inflow.add(veh_type="idm", edge="inflow_0", name="idm", vehs_per_hour=50)
@@ -112,7 +112,7 @@ inflow.add(veh_type="rl", edge="inflow_1", name="rl", vehs_per_hour=50)
 # inflow.add(veh_type="idm", edge="inflow_1", name="idm", vehs_per_hour=50)
 # inflow.add(veh_type="idm", edge="inflow_1", name="idm", vehs_per_hour=50)
 # inflow.add(veh_type="idm", edge="inflow_1", name="idm", vehs_per_hour=50)
-# -->
+# # -->
 
 flow_params = dict(
     # name of the experiment
@@ -166,7 +166,8 @@ flow_params = dict(
             "control_length": 0.1,
             # range of inflow lengths for inflow_0, inclusive
             # "range_inflow_0": [1, 4],
-            "range_inflow_0": [4, 5], # Force it to be 4
+            # "range_inflow_0": [4, 5], # Force it to be 4
+            "range_inflow_0": [5, 6], # Force it to be 4
             # range of inflow lengths for inflow_1, inclusive
             # "range_inflow_1": [1, 7],
             "range_inflow_1": [5, 6], # Force it to be 5
@@ -308,7 +309,7 @@ if __name__ == '__main__':
             'stop': {
                 'training_iteration': ITR,
             },
-            'upload_dir': 's3://kathy.experiments/rllib/experiments',
+            # 'upload_dir': 's3://kathy.experiments/rllib/experiments',
             'num_samples': 2,
         }
     })
