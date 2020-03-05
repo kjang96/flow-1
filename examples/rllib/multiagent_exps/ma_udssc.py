@@ -30,11 +30,11 @@ from flow.utils.rllib import FlowParamsEncoder
 # Training settings
 HORIZON = 500
 SIM_STEP = 1
-ITR = 400
+ITR = 100
 N_ROLLOUTS = 40
 # N_ROLLOUTS = 1
 ACTION_ADVERSARY=True
-exp_tag = "kjtro11"  # experiment prefix
+exp_tag = "kjtro12"  # experiment prefix
 
 # # Local settings
 # N_CPUS = 1
@@ -309,7 +309,7 @@ if __name__ == '__main__':
             'stop': {
                 'training_iteration': ITR,
             },
-            # 'upload_dir': 's3://kathy.experiments/rllib/experiments',
+            'upload_dir': 's3://kathy.experiments/rllib/experiments',
             'num_samples': 2,
         }
     })

@@ -963,7 +963,7 @@ class UDSSCMergeEnvReset(UDSSCMergeEnv):
         if self.counter % self.batch_size == 0: # Restarts after every iteration
             # Add variable number of inflows here.
             inflow = InFlows()
-            inflow.add(veh_type="rl", edge="inflow_0", name="rl", vehs_per_hour=50)
+            # inflow.add(veh_type="rl", edge="inflow_0", name="rl", vehs_per_hour=50)
             inflow.add(veh_type="rl", edge="inflow_1", name="rl", vehs_per_hour=50)
             self.len_inflow_0 = np.random.randint(self.range_inflow_0[0], self.range_inflow_0[1]+1)
             self.len_inflow_1 = np.random.randint(self.range_inflow_1[0], self.range_inflow_1[1]+1)
@@ -980,10 +980,10 @@ class UDSSCMergeEnvReset(UDSSCMergeEnv):
                 self.len_inflow_0 = 3
                 self.len_inflow_1 = 3
 
-            for _ in range(self.len_inflow_0):
-                inflow.add(veh_type="rl", edge="inflow_0", name="rl", vehs_per_hour=50)
-            for _ in range(self.len_inflow_1):
-                inflow.add(veh_type="rl", edge="inflow_1", name="rl", vehs_per_hour=50)
+            # for _ in range(self.len_inflow_0):
+            #     inflow.add(veh_type="rl", edge="inflow_0", name="rl", vehs_per_hour=50)
+            # for _ in range(self.len_inflow_1):
+            #     inflow.add(veh_type="rl", edge="inflow_1", name="rl", vehs_per_hour=50)
 
             # update the scenario\
             net_params = self.net_params
