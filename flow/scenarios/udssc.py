@@ -782,3 +782,20 @@ class UDSSCMergingScenario(Scenario):
         # return routes
 
         return rts
+
+
+    def specify_connections(self, net_params):
+        # """See parent class."""
+        connections = [
+            {"from": "merge_in_0",
+             "to": "left",
+             "fromLane": "0",
+             "toLane": "0",
+             "pass": "true"},
+            {"from": "merge_in_1",
+             "to": "right",
+             "fromLane": "0",
+             "toLane": "0",
+             "pass": "true"}
+        ]
+        return connections
