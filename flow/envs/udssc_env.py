@@ -980,10 +980,10 @@ class UDSSCMergeEnvReset(UDSSCMergeEnv):
                 self.len_inflow_0 = 3
                 self.len_inflow_1 = 3
 
-            # for _ in range(self.len_inflow_0):
-            #     inflow.add(veh_type="rl", edge="inflow_0", name="rl", vehs_per_hour=50)
-            # for _ in range(self.len_inflow_1):
-            #     inflow.add(veh_type="rl", edge="inflow_1", name="rl", vehs_per_hour=50)
+            for _ in range(self.len_inflow_0):
+                inflow.add(veh_type="rl", edge="inflow_0", name="rl", vehs_per_hour=50)
+            for _ in range(self.len_inflow_1):
+                inflow.add(veh_type="rl", edge="inflow_1", name="rl", vehs_per_hour=50)
 
             # update the scenario\
             net_params = self.net_params
@@ -1038,7 +1038,7 @@ class MultiAgentUDSSCMerge(UDSSCMergeEnvReset, MultiEnv):
         # self.total_obs = self.n_obs_vehicles * 2 + 2 + \
         #                  int(self.roundabout_length // 5) * 2
 
-        self.total_obs = 2
+        self.total_obs = 3
                          
         box = Box(low=0.,
                   high=1,
@@ -1080,11 +1080,14 @@ class MultiAgentUDSSCMerge(UDSSCMergeEnvReset, MultiEnv):
             rl_pos = [self.k.vehicle.get_x_by_id(rl_id) / self.scenario_length]
             rl_vel = [self.k.vehicle.get_speed(rl_id) / max_speed] if \
                     self.k.vehicle.get_speed(rl_id)!= -1001 else [0]
+            rl_headway = [self.k.vehicle.get_headway(rl_id) / self.scenario_length]
+
+
             if self.k.vehicle.get_edge(rl_id) in ROUNDABOUT_EDGES:
                 rl_pos_2 = [self.k.vehicle.get_x_by_id(rl_id) / self.roundabout_length]
             else: 
                 rl_pos_2 = [0]
-            state = np.concatenate([rl_pos, rl_vel])
+            state = np.concatenate([rl_pos, rl_vel, rl_headway])
             state = np.clip(
                 state,
                 a_min=self.observation_space.low,
