@@ -34,7 +34,7 @@ ITR = 100
 N_ROLLOUTS = 40
 # N_ROLLOUTS = 1
 ACTION_ADVERSARY=True
-exp_tag = "kjtro14"  # experiment prefix
+exp_tag = "kjtro15"  # experiment prefix
 
 # # Local settings
 # N_CPUS = 1
@@ -43,7 +43,7 @@ exp_tag = "kjtro14"  # experiment prefix
 # RESTART_INSTANCE = True
 # LOCAL = True
 
-# Autoscaler settings
+Autoscaler settings
 N_CPUS = 10
 RENDER = False
 MODE = "local"
