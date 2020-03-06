@@ -1126,8 +1126,13 @@ class MultiAgentUDSSCMerge(UDSSCMergeEnvReset, MultiEnv):
     def compute_reward(self, rl_actions, **kwargs):
         reward = super(MultiAgentUDSSCMerge, self).compute_reward(rl_actions, **kwargs)
         ret = {}
+        #####
         reward = rewards.min_delay(self)
+        #####
         for rl_id in self.k.vehicle.get_rl_ids():
+            ###
+            reward = self.k.vehicle.get_speed(rl_id)
+            ###
             ret[rl_id] = reward
         return ret
 

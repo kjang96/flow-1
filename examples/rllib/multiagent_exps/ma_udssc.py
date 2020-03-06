@@ -34,11 +34,11 @@ ITR = 100
 N_ROLLOUTS = 40
 # N_ROLLOUTS = 1
 ACTION_ADVERSARY=True
-exp_tag = "kjtro15"  # experiment prefix
+exp_tag = "kjtro16"  # experiment prefix
 
 # # Local settings
 # N_CPUS = 1
-# RENDER = True
+# RENDER = False
 # MODE = "local"
 # RESTART_INSTANCE = True
 # LOCAL = True
