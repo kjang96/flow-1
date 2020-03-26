@@ -946,64 +946,64 @@ class UDSSCMergeEnvReset(UDSSCMergeEnv):
                 a_max=self.observation_space.high)
         return state 
 
-    def reset(self):
-        """See parent class.
+    # def reset(self):
+    #     """See parent class.
 
-        The sumo instance is reset with a new ring length, and a number of
-        steps are performed with the rl vehicle acting as a human vehicle.
+    #     The sumo instance is reset with a new ring length, and a number of
+    #     steps are performed with the rl vehicle acting as a human vehicle.
 
-        Works agnostic of RESTART_INSTANCE value.
-        Designed to reset inflow lengths every iteration
-        Base_env's restart_simulation portion is commented out to avoid
-        resetting inflows every rollout, which is too much, and also to avoid
-        discrepancy between self.len_inflow_k vs. the reset value
-        That commented out portion is copied here to restart based on 
-        inflows agnostic of RESTART_INSTANCE value
-        """
-        if self.counter % self.batch_size == 0: # Restarts after every iteration
-            # Add variable number of inflows here.
-            inflow = InFlows()
-            # inflow.add(veh_type="rl", edge="inflow_0", name="rl", vehs_per_hour=50)
-            inflow.add(veh_type="rl", edge="inflow_1", name="rl", vehs_per_hour=50)
-            self.len_inflow_0 = np.random.randint(self.range_inflow_0[0], self.range_inflow_0[1]+1)
-            self.len_inflow_1 = np.random.randint(self.range_inflow_1[0], self.range_inflow_1[1]+1)
-            # print('############################')
-            # print('############################')
-            # print('len_inflow_0: %d' % self.len_inflow_0)
-            # print('len_inflow_1: %d' % self.len_inflow_1)
-            # print('############################')
-            # print('############################')
+    #     Works agnostic of RESTART_INSTANCE value.
+    #     Designed to reset inflow lengths every iteration
+    #     Base_env's restart_simulation portion is commented out to avoid
+    #     resetting inflows every rollout, which is too much, and also to avoid
+    #     discrepancy between self.len_inflow_k vs. the reset value
+    #     That commented out portion is copied here to restart based on 
+    #     inflows agnostic of RESTART_INSTANCE value
+    #     """
+    #     if self.counter % self.batch_size == 0: # Restarts after every iteration
+    #         # Add variable number of inflows here.
+    #         inflow = InFlows()
+    #         # inflow.add(veh_type="rl", edge="inflow_0", name="rl", vehs_per_hour=50)
+    #         inflow.add(veh_type="rl", edge="inflow_1", name="rl", vehs_per_hour=50)
+    #         self.len_inflow_0 = np.random.randint(self.range_inflow_0[0], self.range_inflow_0[1]+1)
+    #         self.len_inflow_1 = np.random.randint(self.range_inflow_1[0], self.range_inflow_1[1]+1)
+    #         # print('############################')
+    #         # print('############################')
+    #         # print('len_inflow_0: %d' % self.len_inflow_0)
+    #         # print('len_inflow_1: %d' % self.len_inflow_1)
+    #         # print('############################')
+    #         # print('############################')
 
             
-            # Forcing the default
-            if np.random.random() <= 1:
-                self.len_inflow_0 = 3
-                self.len_inflow_1 = 3
+    #         # Forcing the default
+    #         if np.random.random() <= 1:
+    #             self.len_inflow_0 = 3
+    #             self.len_inflow_1 = 3
 
-            # for _ in range(self.len_inflow_0):
-            #     inflow.add(veh_type="rl", edge="inflow_0", name="rl", vehs_per_hour=50)
-            # for _ in range(self.len_inflow_1):
-            #     inflow.add(veh_type="rl", edge="inflow_1", name="rl", vehs_per_hour=50)
+    #         # for _ in range(self.len_inflow_0):
+    #         #     inflow.add(veh_type="rl", edge="inflow_0", name="rl", vehs_per_hour=50)
+    #         # for _ in range(self.len_inflow_1):
+    #         #     inflow.add(veh_type="rl", edge="inflow_1", name="rl", vehs_per_hour=50)
 
-            # update the scenario\
-            net_params = self.net_params
-            net_params.inflows = inflow
+    #         # update the scenario\
+    #         net_params = self.net_params
+    #         net_params.inflows = inflow
 
-            self.scenario = self.scenario.__class__(
-                self.scenario.orig_name, self.scenario.vehicles, 
-                net_params, self.scenario.initial_config)
-            #------------------------------------------------
-            # issue a random seed to induce randomness  into the next rollout
-            # self.sim_params.seed = np.random.randint(0, 1e5)
+    #         self.scenario = self.scenario.__class__(
+    #             self.scenario.orig_name, self.scenario.vehicles, 
+    #             net_params, self.scenario.initial_config)
+    #         #------------------------------------------------
+    #         # issue a random seed to induce randomness  into the next rollout
+    #         # self.sim_params.seed = np.random.randint(0, 1e5)
 
-            # self.k.vehicle = deepcopy(self.initial_vehicles)
-            # self.k.vehicle.master_kernel = self.k
-            # # restart the sumo instance
-            # self.restart_simulation(self.sim_params)
+    #         # self.k.vehicle = deepcopy(self.initial_vehicles)
+    #         # self.k.vehicle.master_kernel = self.k
+    #         # # restart the sumo instance
+    #         # self.restart_simulation(self.sim_params)
 
-        # perform the generic reset function
-        observation = super().reset()
-        return observation
+    #     # perform the generic reset function
+    #     observation = super().reset()
+    #     return observation
 
 class MultiAgentUDSSCMerge(UDSSCMergeEnvReset, MultiEnv):
     """Non-adversarial multi-agent env.

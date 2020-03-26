@@ -27,6 +27,8 @@ from flow.controllers import RLController, IDMController, ContinuousRouter, \
 from flow.utils.registry import make_create_env
 from flow.utils.rllib import FlowParamsEncoder
 
+exp_tag = "kjtro17"  # experiment prefix
+
 # Training settings
 HORIZON = 500
 SIM_STEP = 1
@@ -34,7 +36,6 @@ ITR = 100
 N_ROLLOUTS = 40
 # N_ROLLOUTS = 1
 ACTION_ADVERSARY=True
-exp_tag = "kjtro16"  # experiment prefix
 
 # # Local settings
 # N_CPUS = 1
@@ -43,7 +44,7 @@ exp_tag = "kjtro16"  # experiment prefix
 # RESTART_INSTANCE = True
 # LOCAL = True
 
-Autoscaler settings
+# Autoscaler settings
 N_CPUS = 10
 RENDER = False
 MODE = "local"
@@ -98,7 +99,7 @@ inflow = InFlows()
 # inflow.add(veh_type="rl", edge="inflow_0", name="rl", vehs_per_hour=50)
 # inflow.add(veh_type="rl", edge="inflow_0", name="rl", vehs_per_hour=50)
 
-# inflow.add(veh_type="rl", edge="inflow_1", name="rl", vehs_per_hour=50)
+inflow.add(veh_type="rl", edge="inflow_1", name="rl", vehs_per_hour=50)
 # inflow.add(veh_type="rl", edge="inflow_1", name="rl", vehs_per_hour=50)
 # inflow.add(veh_type="rl", edge="inflow_1", name="rl", vehs_per_hour=50)
 # inflow.add(veh_type="rl", edge="inflow_1", name="rl", vehs_per_hour=50)
