@@ -27,7 +27,7 @@ from flow.controllers import RLController, IDMController, ContinuousRouter, \
 from flow.utils.registry import make_create_env
 from flow.utils.rllib import FlowParamsEncoder
 
-exp_tag = "kjtro17"  # experiment prefix
+exp_tag = "kjtro18"  # experiment prefix
 
 # Training settings
 HORIZON = 500
@@ -97,9 +97,9 @@ inflow = InFlows()
 
 # inflow.add(veh_type="rl", edge="inflow_0", name="rl", vehs_per_hour=50)
 # inflow.add(veh_type="rl", edge="inflow_0", name="rl", vehs_per_hour=50)
-# inflow.add(veh_type="rl", edge="inflow_0", name="rl", vehs_per_hour=50)
+inflow.add(veh_type="rl", edge="inflow_0", name="rl", vehs_per_hour=50)
 
-inflow.add(veh_type="rl", edge="inflow_1", name="rl", vehs_per_hour=50)
+# inflow.add(veh_type="rl", edge="inflow_1", name="rl", vehs_per_hour=50)
 # inflow.add(veh_type="rl", edge="inflow_1", name="rl", vehs_per_hour=50)
 # inflow.add(veh_type="rl", edge="inflow_1", name="rl", vehs_per_hour=50)
 # inflow.add(veh_type="rl", edge="inflow_1", name="rl", vehs_per_hour=50)
