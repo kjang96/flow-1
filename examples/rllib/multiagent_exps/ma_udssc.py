@@ -27,7 +27,7 @@ from flow.controllers import RLController, IDMController, ContinuousRouter, \
 from flow.utils.registry import make_create_env
 from flow.utils.rllib import FlowParamsEncoder
 
-exp_tag = "kjtro23"  # experiment prefix
+exp_tag = "kjtro24"  # experiment prefix
 
 # Training settings
 HORIZON = 500
@@ -164,7 +164,7 @@ flow_params = dict(
             # to be used with Reset env
             # "no_inflow_noise": True,
             # what portion of the ramp the RL vehicle isn't controlled for 
-            # "control_length": 0.1,
+            "control_length": 0.1,
             # range of inflow lengths for inflow_0, inclusive
             # "range_inflow_0": [1, 4],
             # "range_inflow_0": [4, 5], # Force it to be 4
