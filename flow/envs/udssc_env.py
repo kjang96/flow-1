@@ -50,6 +50,11 @@ ALL_EDGES = ROUNDABOUT_EDGES + \
 RAMP_0 = ["inflow_0", ":e_0", "merge_in_0", ":c_0"]
 RAMP_1 = ["inflow_1", ":g_2", "merge_in_1", ":a_0"]
 
+SHARED_ROUTE = ["left", ":d_0", "merge_out_1", ":g_0", "outflow_1"]
+ROUTE_0 = ["inflow_0", ":e_0", "merge_in_0", ":c_0"] + SHARED_ROUTE
+ROUTE_1 = ["inflow_1", ":g_2", "merge_in_1", ":a_0", "right", ":b_1", "top", ":c_1"] + SHARED_ROUTE
+ROUTE_2 = ["inflow_1", ":g_2", "merge_in_1", ":a_0", "right", ":b_0", "merge_out_0", ":e_1", "outflow_0"] 
+
 class UDSSCMergeEnv(Env):
     """
     Environment for training cooperative merging behavior in
@@ -657,6 +662,26 @@ class UDSSCMergeEnv(Env):
         distances = [reference - self.k.vehicle.get_x_by_id(v)
                      for v in veh_id]
         return distances
+    
+    def _dist_to_end(self, veh_id):
+        dist = 0
+        edge = self.k.vehicle.get_edge(veh_id)
+        if edge:
+            dist += self.scenario.edge_length(edge) - self.k.vehicle.get_position(veh_id)
+            for edge in self._get_edges_left(self.k.vehicle.get_edge(veh_id)):
+                dist += self.scenario.edge_length(edge)
+        return dist
+
+    def _get_edges_left(self, edge):
+        # edges = self.scenario.specify_absolute_order()
+        if edge in ROUTE_0:
+            edges = ROUTE_0
+        elif edge in ROUTE_1:
+            edges = ROUTE_1
+        elif edge in ROUTE_2:
+            edges = ROUTE_2
+        index_cur = edges.index(edge)
+        return edges[index_cur+1:]
 
     def queue_length(self):
         queue_0 = len(self.k.vehicle.get_ids_by_edge(["inflow_0", ":e_0", "merge_in_0", ":c_0"]))
@@ -742,6 +767,10 @@ class UDSSCMergeEnv(Env):
     def scenario_length(self):
         length = sum([self.k.scenario.edge_length(e) for e in ALL_EDGES])
         return length
+
+    @property
+    def max_route_length(self):
+        return sum([self.k.scenario.edge_length(edge) for edge in ROUTE_1])
 
     def curate_rl_stack(self):
 
@@ -1053,8 +1082,6 @@ class MultiAgentUDSSCMerge(UDSSCMergeEnvReset, MultiEnv):
         I think I can actually rewrite the state. Whate we want: distance and vel of each vehicle? Idk if
         absolute velocity will be great, but might as well do this anyway.
         """
-        
-
 
         # state_dict, state_dict_keys = super(MultiAgentUDSSCMerge, self).get_state(internal=True, **kwargs)
         # state_dict_keys = ['rl_info', 'rl_info_2',
@@ -1081,13 +1108,14 @@ class MultiAgentUDSSCMerge(UDSSCMergeEnvReset, MultiEnv):
             rl_vel = [self.k.vehicle.get_speed(rl_id) / max_speed] if \
                     self.k.vehicle.get_speed(rl_id)!= -1001 else [0]
             rl_headway = [self.k.vehicle.get_headway(rl_id) / self.scenario_length]
-
+            dist_to_end = [self._dist_to_end(rl_id) / self.max_route_length]
 
             if self.k.vehicle.get_edge(rl_id) in ROUNDABOUT_EDGES:
                 rl_pos_2 = [self.k.vehicle.get_x_by_id(rl_id) / self.roundabout_length]
             else: 
                 rl_pos_2 = [0]
-            state = np.concatenate([rl_pos, rl_vel, rl_headway])
+            # state = np.concatenate([rl_pos, rl_vel, rl_headway])
+            state = np.concatenate([dist_to_end, rl_vel, rl_headway])
             state = np.clip(
                 state,
                 a_min=self.observation_space.low,
