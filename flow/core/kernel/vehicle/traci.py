@@ -70,6 +70,9 @@ class TraCIVehicle(KernelVehicle):
         self._arrived_ids = []
         self._arrived_rl_ids = []
 
+        # experimental shit by me 
+        self._time_in_system = {}
+
         # whether or not to automatically color vehicles
         try:
             self._color_vehicles = sim_params.color_vehicles
@@ -125,6 +128,9 @@ class TraCIVehicle(KernelVehicle):
         for veh_id in self.__ids:
             vehicle_obs[veh_id] = \
                 self.kernel_api.vehicle.getSubscriptionResults(veh_id)
+            if veh_id not in self._time_in_system:
+                self._time_in_system[veh_id] = 0
+            self._time_in_system[veh_id] +=1
         sim_obs = self.kernel_api.simulation.getSubscriptionResults()
 
         arrived_rl_ids = []
@@ -660,6 +666,10 @@ class TraCIVehicle(KernelVehicle):
         if isinstance(veh_id, (list, np.ndarray)):
             return [self.get_lane_followers(vehID, error) for vehID in veh_id]
         return self.__vehicles.get(veh_id, {}).get("lane_followers", error)
+
+    def get_time(self, veh_id, error=None):
+        """Experimental by Kathy."""
+        return self._time_in_system.get(veh_id, error)
 
     def _multi_lane_headways(self):
         """Compute multi-lane data for all vehicles.
