@@ -27,7 +27,7 @@ from flow.controllers import RLController, IDMController, ContinuousRouter, \
 from flow.utils.registry import make_create_env
 from flow.utils.rllib import FlowParamsEncoder
 
-exp_tag = "kjtro25"  # experiment prefix
+exp_tag = "kjtro26"  # experiment prefix
 
 # Training settings
 HORIZON = 500
@@ -227,7 +227,8 @@ def setup_exps():
     config = agent_cls._default_config.copy()
     config['num_workers'] = N_CPUS
     config['train_batch_size'] = HORIZON * N_ROLLOUTS
-    config['gamma'] = 0.999  # discount rate
+    # config['gamma'] = 0.999  # discount rate
+    config['gamma'] = 0.95
     config['model'].update({'fcnet_hiddens': [100, 50, 25]})
     config['sgd_minibatch_size'] = 128
     config['use_gae'] = True
