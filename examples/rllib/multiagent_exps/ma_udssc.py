@@ -27,7 +27,7 @@ from flow.controllers import RLController, IDMController, ContinuousRouter, \
 from flow.utils.registry import make_create_env
 from flow.utils.rllib import FlowParamsEncoder
 
-exp_tag = "kjtro30"  # experiment prefix
+exp_tag = "kjtro31"  # experiment prefix
 
 # Training settings
 HORIZON = 500
@@ -39,7 +39,7 @@ ACTION_ADVERSARY=True
 
 # # Local settings
 # N_CPUS = 1
-# RENDER = True
+# RENDER = False
 # MODE = "local"
 # RESTART_INSTANCE = True
 # LOCAL = True
