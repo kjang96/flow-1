@@ -124,7 +124,7 @@ class MultiEnv(MultiAgentEnv, Env):
         for rl_id in self.k.vehicle.get_arrived_rl_ids():
             done[rl_id] = True
             if self.k.vehicle.get_time(rl_id) < 40:
-                reward[rl_id] = 100
+                reward[rl_id] = 100 
             else:
                 reward[rl_id] = 0
             states[rl_id] = np.zeros(self.observation_space.shape[0])
