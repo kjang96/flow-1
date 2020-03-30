@@ -27,7 +27,7 @@ from flow.controllers import RLController, IDMController, ContinuousRouter, \
 from flow.utils.registry import make_create_env
 from flow.utils.rllib import FlowParamsEncoder
 
-exp_tag = "kjtro32"  # experiment prefix
+exp_tag = "kjtro33"  # experiment prefix
 
 # Training settings
 HORIZON = 500
@@ -96,12 +96,12 @@ vehicles.add(veh_id="rl",
 inflow = InFlows()
 
 # inflow.add(veh_type="rl", edge="inflow_0", name="rl", vehs_per_hour=50)
-# inflow.add(veh_type="rl", edge="inflow_0", name="rl", vehs_per_hour=50)
+inflow.add(veh_type="rl", edge="inflow_0", name="rl", vehs_per_hour=50)
 inflow.add(veh_type="rl", edge="inflow_0", name="rl", vehs_per_hour=50)
 
 # inflow.add(veh_type="rl", edge="inflow_1", name="rl", vehs_per_hour=50)
 # inflow.add(veh_type="rl", edge="inflow_1", name="rl", vehs_per_hour=50)
-# inflow.add(veh_type="rl", edge="inflow_1", name="rl", vehs_per_hour=50)
+inflow.add(veh_type="rl", edge="inflow_1", name="rl", vehs_per_hour=50)
 inflow.add(veh_type="rl", edge="inflow_1", name="rl", vehs_per_hour=50)
 
 # # <!-- OLD SETUP
@@ -228,7 +228,7 @@ def setup_exps():
     config['num_workers'] = N_CPUS
     config['train_batch_size'] = HORIZON * N_ROLLOUTS
     # config['gamma'] = 0.999  # discount rate
-    config['gamma'] = 0.95
+    config['gamma'] = tune.grid_search([0.95, 0.99])
     config['model'].update({'fcnet_hiddens': [100, 50, 25]})
     config['sgd_minibatch_size'] = 128
     config['use_gae'] = True
