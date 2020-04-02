@@ -1107,7 +1107,9 @@ class MultiAgentUDSSCMerge(UDSSCMergeEnvReset, MultiEnv):
             rl_pos = [self.k.vehicle.get_x_by_id(rl_id) / self.scenario_length]
             rl_vel = [self.k.vehicle.get_speed(rl_id) / max_speed] if \
                     self.k.vehicle.get_speed(rl_id)!= -1001 else [0]
-            rl_headway = [self.k.vehicle.get_headway(rl_id) / self.scenario_length]
+            rl_headway = [self.k.vehicle.get_headway(rl_id) / self.max_route_length \
+                          if self.k.vehicle.get_headway(rl_id) != 1000 else 0]
+
             dist_to_end = [self._dist_to_end(rl_id) / self.max_route_length]
 
             if self.k.vehicle.get_edge(rl_id) in ROUNDABOUT_EDGES:
