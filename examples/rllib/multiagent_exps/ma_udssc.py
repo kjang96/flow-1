@@ -27,7 +27,7 @@ from flow.controllers import RLController, IDMController, ContinuousRouter, \
 from flow.utils.registry import make_create_env
 from flow.utils.rllib import FlowParamsEncoder
 
-exp_tag = "kjtro38"  # experiment prefix
+exp_tag = "kjtro39"  # experiment prefix
 
 # Training settings
 HORIZON = 500
@@ -151,7 +151,7 @@ flow_params = dict(
             # number of observable vehicles following the rl vehicle
             "n_following": 1, # HAS TO BE 1
             # number of observable merging-in vehicle from the larger loop
-            "n_merging_in": 6,
+            "n_merging_in": 4,
             # batch size, for use in UDSSCMergeEnvReset
             "batch_size": HORIZON * N_ROLLOUTS,
             # # rl action noise

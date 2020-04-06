@@ -1067,7 +1067,7 @@ class MultiAgentUDSSCMerge(UDSSCMergeEnvReset, MultiEnv):
         # self.total_obs = self.n_obs_vehicles * 2 + 2 + \
         #                  int(self.roundabout_length // 5) * 2
 
-        self.total_obs = 2
+        self.total_obs = 2 + (2* self.n_merging_in)
                          
         box = Box(low=0.,
                   high=1,
@@ -1096,6 +1096,9 @@ class MultiAgentUDSSCMerge(UDSSCMergeEnvReset, MultiEnv):
         #     a_min=self.observation_space.low,
         #     a_max=self.observation_space.high)
 
+        merge_0_norm = sum([self.k.scenario.edge_length(e) for e in RAMP_0])
+        merge_1_norm = sum([self.k.scenario.edge_length(e) for e in RAMP_1])
+
         rl_ids = self.k.vehicle.get_rl_ids()
         ret = {}
         for rl_id in rl_ids:
@@ -1103,14 +1106,27 @@ class MultiAgentUDSSCMerge(UDSSCMergeEnvReset, MultiEnv):
 
             max_speed = self.k.scenario.max_speed() 
             
-            # rl_pos, rl_vel
             rl_pos = [self.k.vehicle.get_x_by_id(rl_id) / self.scenario_length]
             rl_vel = [self.k.vehicle.get_speed(rl_id) / max_speed] if \
                     self.k.vehicle.get_speed(rl_id)!= -1001 else [0]
             rl_headway = [self.k.vehicle.get_headway(rl_id) / self.max_route_length \
                           if self.k.vehicle.get_headway(rl_id) != 1000 else 0]
-
             dist_to_end = [self._dist_to_end(rl_id) / self.max_route_length]
+
+            # <!---- NEW CODE
+            # DISTANCES
+            # sorted by closest to farthest
+            merge_id_0, merge_id_1 = self.k_closest_to_merge(self.n_merging_in)
+            merge_dists_0 = self.process(self._dist_to_merge_0(merge_id_0),
+                                        length=self.n_merging_in,
+                                        normalizer=merge_0_norm)
+            merge_dists_1 = self.process(self._dist_to_merge_1(merge_id_1),
+                                        length=self.n_merging_in,
+                                        normalizer=merge_1_norm)
+
+            # ----->
+
+
 
             if self.k.vehicle.get_edge(rl_id) in ROUNDABOUT_EDGES:
                 rl_pos_2 = [self.k.vehicle.get_x_by_id(rl_id) / self.roundabout_length]
@@ -1118,12 +1134,12 @@ class MultiAgentUDSSCMerge(UDSSCMergeEnvReset, MultiEnv):
                 rl_pos_2 = [0]
             # state = np.concatenate([rl_pos, rl_vel, rl_headway])
             # state = np.concatenate([dist_to_end, rl_vel, rl_headway])
-            state = np.concatenate([dist_to_end, rl_vel])
+            # state = np.concatenate([dist_to_end, rl_vel])
+            state = np.concatenate([dist_to_end, rl_vel, merge_dists_0, merge_dists_1])
             state = np.clip(
                 state,
                 a_min=self.observation_space.low,
                 a_max=self.observation_space.high)
-            # state = np.concatenate([rl_pos, rl_vel, rl_pos_2])
             ret[rl_id] = state
         
         return ret
@@ -1165,6 +1181,7 @@ class MultiAgentUDSSCMerge(UDSSCMergeEnvReset, MultiEnv):
             reward = self.k.vehicle.get_speed(rl_id)
             ###
             ret[rl_id] = reward
+    
         return ret
 
 
