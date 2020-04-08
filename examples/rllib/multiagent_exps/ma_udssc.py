@@ -27,7 +27,7 @@ from flow.controllers import RLController, IDMController, ContinuousRouter, \
 from flow.utils.registry import make_create_env
 from flow.utils.rllib import FlowParamsEncoder
 
-exp_tag = "kjtro40"  # experiment prefix
+exp_tag = "kjtro41"  # experiment prefix
 
 # Training settings
 HORIZON = 500
