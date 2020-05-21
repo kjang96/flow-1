@@ -60,6 +60,7 @@ def visualizer_rllib(args):
 
     config = get_rllib_config(result_dir)
     # TODO(ev) backwards compatibility hack
+    pkl = get_rllib_pkl(result_dir)
     try:
         pkl = get_rllib_pkl(result_dir)
     except Exception:

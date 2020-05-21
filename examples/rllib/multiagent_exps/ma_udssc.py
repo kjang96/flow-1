@@ -37,19 +37,19 @@ N_ROLLOUTS = 40
 # N_ROLLOUTS = 1
 ACTION_ADVERSARY=True
 
-# # Local settings
-# N_CPUS = 1
-# RENDER = False
-# MODE = "local"
-# RESTART_INSTANCE = True
-# LOCAL = True
-
-# Autoscaler settings
-N_CPUS = 10
+# Local settings
+N_CPUS = 1
 RENDER = False
 MODE = "local"
 RESTART_INSTANCE = True
-LOCAL = False
+LOCAL = True
+
+# # Autoscaler settings
+# N_CPUS = 10
+# RENDER = False
+# MODE = "local"
+# RESTART_INSTANCE = True
+# LOCAL = False
 
 # We place one autonomous vehicle and 13 human-driven vehicles in the network
 vehicles = VehicleParams()
@@ -223,22 +223,22 @@ flow_params = dict(
 
 def setup_exps():
 
-    alg_run = 'PPO'
+    alg_run = 'contrib/MADDPG'
     agent_cls = get_agent_class(alg_run)
     config = agent_cls._default_config.copy()
     config['num_workers'] = N_CPUS
-    config['train_batch_size'] = HORIZON * N_ROLLOUTS
-    # config['gamma'] = 0.999  # discount rate
-    config['gamma'] = tune.grid_search([0.95, 0.99])
-    config['model'].update({'fcnet_hiddens': [100, 50, 25]})
-    config['sgd_minibatch_size'] = 128
-    config['use_gae'] = True
-    config['lambda'] = 0.97
-    config['kl_target'] = 0.02
-    config['num_sgd_iter'] = 10
-    config['horizon'] = HORIZON
-    config['vf_loss_coeff'] = 1.0
-    config['vf_clip_param'] = 10.0
+    # config['train_batch_size'] = HORIZON * N_ROLLOUTS
+    # # config['gamma'] = 0.999  # discount rate
+    # config['gamma'] = tune.grid_search([0.95, 0.99])
+    # config['model'].update({'fcnet_hiddens': [100, 50, 25]})
+    # config['sgd_minibatch_size'] = 128
+    # config['use_gae'] = True
+    # config['lambda'] = 0.97
+    # config['kl_target'] = 0.02
+    # config['num_sgd_iter'] = 10
+    # config['horizon'] = HORIZON
+    # config['vf_loss_coeff'] = 1.0
+    # config['vf_clip_param'] = 10.0
 
     config['observation_filter'] = 'NoFilter'
 
@@ -260,7 +260,7 @@ def setup_exps():
     # human_adv_obs_space = test_env.human_adv_obs_space
 
     # Setup PG with an ensemble of `num_policies` different policy graphs
-    policies = {'rl': (None, obs_space, act_space, {})}
+    policies = {'rl': (None, obs_space, act_space, {"agent_id": 0})}
                     #  'human_adversary': (None, human_adv_obs_space, human_adv_action_space, {})}
                      
     # policies_to_train = ['av0', 'av1']
